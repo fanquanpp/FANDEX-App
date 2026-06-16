@@ -3,226 +3,481 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FANDEX - 下载</title>
+    <title>FANDEX App - 下载</title>
     <style>
-        /* 基础重置与全局样式 */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ========== 全局重置 ========== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+        /* ========== CSS 变量（与 FANDEX 主站一致） ========== */
         :root {
-            --bg-primary: #0d1117;
-            --bg-secondary: #161b22;
-            --bg-card: #1c2128;
-            --border-color: #30363d;
-            --text-primary: #e6edf3;
-            --text-secondary: #8b949e;
-            --accent-blue: #58a6ff;
-            --accent-green: #3fb950;
-            --accent-purple: #bc8cff;
+            --color-primary: #3366cc;
+            --color-primary-hover: #264da8;
+            --color-secondary: #00b894;
+            --color-tertiary: #e05a2b;
+            --color-bg: #fafafa;
+            --color-bg-card: #eeeeee;
+            --color-bg-hover: #dcdcdc;
+            --color-bg-sidebar: #f3f3f3;
+            --color-text: #0d0d0d;
+            --color-text-secondary: #4d4d4d;
+            --color-text-tertiary: #808080;
+            --color-text-inverse: #ffffff;
+            --color-border: #2e2e2e;
+            --color-border-light: #c4c4c4;
+            --color-nav-bg: rgba(250, 250, 250, 0.95);
+            --nav-height: 48px;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --font-display: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+            --transition-fast: 0.12s ease;
+            --transition-base: 0.22s ease;
         }
+
+        [data-theme='dark'] {
+            --color-primary: #6ea8fe;
+            --color-primary-hover: #93c0ff;
+            --color-secondary: #55efc4;
+            --color-tertiary: #f09070;
+            --color-bg: #0d0d0d;
+            --color-bg-card: #181818;
+            --color-bg-hover: #282828;
+            --color-bg-sidebar: #121212;
+            --color-text: #ebebeb;
+            --color-text-secondary: #b3b3b3;
+            --color-text-tertiary: #8a8a8a;
+            --color-text-inverse: #0d0d0d;
+            --color-border: #525252;
+            --color-border-light: #383838;
+            --color-nav-bg: rgba(13, 13, 13, 0.95);
+        }
+
+        /* ========== 页面主体 ========== */
+        html { font-size: 16px; overscroll-behavior: none; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
             min-height: 100vh;
+            min-height: 100dvh;
+            font-family: var(--font-body);
+            font-size: 1.0625rem;
+            line-height: 1.85;
+            color: var(--color-text);
+            background: var(--color-bg);
+            transition: background var(--transition-base), color var(--transition-base);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-wrap: break-word;
+        }
+
+        a { color: var(--color-primary); text-decoration: none; }
+        a:hover { color: var(--color-primary-hover); }
+
+        ::selection { background: var(--color-primary); color: var(--color-text-inverse); }
+
+        /* ========== 顶部导航栏 ========== */
+        .app-nav {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            padding: 24px 16px;
+            justify-content: space-between;
+            padding: 0 var(--spacing-md);
+            background: var(--color-nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: var(--nav-height);
         }
 
-        /* 头部区域 */
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            max-width: 480px;
+        .nav-left { display: flex; align-items: center; gap: var(--spacing-sm); }
+
+        /* Logo：左侧竖色条 + 文字 */
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        .nav-logo:hover { opacity: 0.85; }
+
+        .logo-mark {
+            display: inline-block;
+            width: 8px;
+            height: 28px;
+            background: var(--color-primary);
         }
 
-        .header h1 {
-            font-size: 2rem;
+        .logo-text {
+            display: flex;
+            align-items: center;
+            height: 28px;
+            padding: 0 8px;
+            background: var(--color-text);
+            color: var(--color-bg);
             font-weight: 700;
-            letter-spacing: 0.08em;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 0.8em;
+            font-family: var(--font-display);
+            letter-spacing: 0.1em;
         }
 
-        .header p {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
+        .nav-right { display: flex; align-items: center; gap: var(--spacing-sm); }
+
+        /* 导航链接按钮 */
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border: 1px solid var(--color-border);
+            background: var(--color-bg-card);
+            color: var(--color-text-secondary);
+            font-family: var(--font-display);
+            font-size: 0.78em;
+            font-weight: 500;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            transition: all var(--transition-fast);
+        }
+        .nav-link:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        /* 主题切换按钮 */
+        .theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--color-border);
+            background: var(--color-bg-card);
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 1em;
+        }
+        .theme-toggle:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        /* ========== 主内容区 ========== */
+        .main-content {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-md);
+        }
+
+        /* ========== 页面标题区 ========== */
+        .page-header {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .page-title {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--color-text);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .page-desc {
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
             line-height: 1.6;
         }
 
-        /* 下载卡片容器 */
-        .download-list {
-            width: 100%;
-            max-width: 480px;
+        /* ========== 版本卡片网格 ========== */
+        .version-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1px;
+            background: var(--color-border-light);
+            border: 1px solid var(--color-border-light);
+        }
+
+        @media (min-width: 640px) {
+            .version-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* ========== 版本卡片 ========== */
+        .version-card {
+            background: var(--color-bg);
+            padding: var(--spacing-lg);
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: var(--spacing-sm);
+            transition: background var(--transition-fast), transform var(--transition-fast);
+            text-decoration: none;
+            color: inherit;
         }
 
-        /* 单个下载卡片 */
-        .download-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            transition: border-color 0.2s ease;
-        }
-
-        .download-card:hover {
-            border-color: var(--accent-blue);
+        .version-card:hover {
+            background: var(--color-bg-hover);
+            transform: translateY(-2px);
         }
 
         .card-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
         }
 
-        .version-tag {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
+        .card-version {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--color-text);
         }
 
-        .status-badge {
-            font-size: 0.75rem;
-            padding: 2px 8px;
-            border-radius: 10px;
+        .card-badge {
+            font-family: var(--font-display);
+            font-size: 0.7rem;
             font-weight: 500;
+            padding: 2px 8px;
+            border: 1px solid var(--color-tertiary);
+            color: var(--color-tertiary);
+            letter-spacing: 0.05em;
         }
 
-        .status-beta {
-            background: rgba(188, 140, 255, 0.15);
-            color: var(--accent-purple);
-            border: 1px solid rgba(188, 140, 255, 0.3);
-        }
-
-        .card-meta {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
+        .card-desc {
+            font-size: 0.82rem;
+            color: var(--color-text-secondary);
             line-height: 1.5;
         }
 
-        /* 下载按钮 */
-        .download-btn {
-            display: block;
-            width: 100%;
-            padding: 12px 0;
-            background: linear-gradient(135deg, #238636, #2ea043);
-            color: #ffffff;
-            text-align: center;
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            transition: opacity 0.2s ease, transform 0.1s ease;
-        }
-
-        .download-btn:hover {
-            opacity: 0.9;
-        }
-
-        .download-btn:active {
-            transform: scale(0.98);
-        }
-
-        .download-btn .btn-sub {
-            display: block;
+        .card-meta {
             font-size: 0.75rem;
-            font-weight: 400;
-            opacity: 0.8;
-            margin-top: 2px;
+            color: var(--color-text-tertiary);
+            font-family: var(--font-display);
         }
 
-        /* 页脚提示 */
-        .footer-note {
-            margin-top: 32px;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.75rem;
+            background: var(--color-primary);
+        }
+
+        /* ========== 推荐区域 ========== */
+        .recommend-section {
+            margin-top: var(--spacing-2xl, 48px);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--color-border-light);
+        }
+
+        .recommend-title {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--color-text);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .recommend-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1px;
+            background: var(--color-border-light);
+            border: 1px solid var(--color-border-light);
+        }
+
+        @media (min-width: 640px) {
+            .recommend-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .recommend-card {
+            background: var(--color-bg);
+            padding: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            text-decoration: none;
+            color: inherit;
+            transition: background var(--transition-fast), transform var(--transition-fast);
+        }
+
+        .recommend-card:hover {
+            background: var(--color-bg-hover);
+            transform: translateY(-2px);
+        }
+
+        .recommend-card .card-platform {
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--color-primary);
+            letter-spacing: 0.05em;
+        }
+
+        .recommend-card .card-name {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--color-text);
+        }
+
+        .recommend-card .card-desc {
+            font-size: 0.82rem;
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ========== 页脚 ========== */
+        .page-footer {
+            margin-top: var(--spacing-2xl, 48px);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--color-border-light);
+            font-size: 0.78rem;
+            color: var(--color-text-tertiary);
             text-align: center;
-            max-width: 400px;
             line-height: 1.6;
         }
 
-        .footer-note a {
-            color: var(--accent-blue);
-            text-decoration: none;
+        .page-footer a {
+            color: var(--color-text-tertiary);
+            border-bottom: 1px solid var(--color-border-light);
+            transition: color var(--transition-fast);
         }
 
-        .footer-note a:hover {
-            text-decoration: underline;
+        .page-footer a:hover {
+            color: var(--color-primary);
+        }
+
+        /* ========== 触控设备移除悬停效果 ========== */
+        @media (hover: none) and (pointer: coarse) {
+            .version-card:hover,
+            .recommend-card:hover {
+                background: inherit;
+                transform: none;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>FANDEX</h1>
-        <p>离线技术知识阅读工具 -- 下载 APK 安装包至 Android 设备</p>
-    </div>
-
-    <div class="download-list">
-
-        <!-- v1.3.1-beta -->
-        <div class="download-card">
-            <div class="card-header">
-                <span class="version-tag">v1.3.1-beta</span>
-                <span class="status-badge status-beta">BETA</span>
-            </div>
-            <div class="card-meta">
-                顶部栏整合 / 侧边栏分级 / 表格修复 / 全屏阅读
-            </div>
-            <a class="download-btn" href="./FANDEX-v1.3.1-beta.apk" download="FANDEX-v1.3.1-beta.apk">
-                下载 APK
-                <span class="btn-sub">Android 8.0+</span>
+    <!-- 顶部导航栏 -->
+    <nav class="app-nav">
+        <div class="nav-left">
+            <a href="https://fanquanpp.github.io/FANDEX/" class="nav-logo">
+                <span class="logo-mark"></span>
+                <span class="logo-text">FANDEX</span>
             </a>
         </div>
+        <div class="nav-right">
+            <a href="https://fanquanpp.github.io/FANDEX/" class="nav-link">FANDEX</a>
+            <a href="https://github.com/fanquanpp/FANDEX-App" class="nav-link">GitHub</a>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">&#9790;</button>
+        </div>
+    </nav>
 
-        <!-- v1.3.0-beta -->
-        <div class="download-card">
-            <div class="card-header">
-                <span class="version-tag">v1.3.0-beta</span>
-                <span class="status-badge status-beta">BETA</span>
-            </div>
-            <div class="card-meta">
-                原生 Compose 渲染 / DataStore 持久化 / 侧边栏导航 / 三语界面 / 深浅双模式
-            </div>
-            <a class="download-btn" href="./FANDEX-v1.3.0-beta.apk" download="FANDEX-v1.3.0-beta.apk">
-                下载 APK
-                <span class="btn-sub">Android 8.0+ | 约 7.8 MB</span>
-            </a>
+    <!-- 主内容区 -->
+    <main class="main-content">
+
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <h1 class="page-title">App 下载</h1>
+            <p class="page-desc">Android 离线查阅工具，无需网络，支持中英日三语界面与深浅色双模式</p>
         </div>
 
-        <!-- v1.2.0-beta -->
-        <div class="download-card">
-            <div class="card-header">
-                <span class="version-tag">v1.2.0-beta</span>
-                <span class="status-badge status-beta">BETA</span>
-            </div>
-            <div class="card-meta">
-                三语界面 / 文档编号 / 分类分界线 / 翻页与返回顶部
-            </div>
-            <a class="download-btn" href="./FANDEX-v1.2.0-beta.apk" download="FANDEX-v1.2.0-beta.apk">
-                下载 APK
-                <span class="btn-sub">Android 8.0+ | 约 7.6 MB</span>
+        <!-- 版本下载卡片 -->
+        <div class="version-grid">
+
+            <!-- v1.3.1-beta -->
+            <a class="version-card" href="./FANDEX-v1.3.1-beta.apk" download="FANDEX-v1.3.1-beta.apk">
+                <span class="card-icon">A</span>
+                <div class="card-header">
+                    <span class="card-version">v1.3.1-beta</span>
+                    <span class="card-badge">BETA</span>
+                </div>
+                <p class="card-desc">顶部栏整合 / 侧边栏分级 / 表格修复 / 全屏阅读</p>
+                <span class="card-meta">Android 8.0+</span>
             </a>
+
+            <!-- v1.3.0-beta -->
+            <a class="version-card" href="./FANDEX-v1.3.0-beta.apk" download="FANDEX-v1.3.0-beta.apk">
+                <span class="card-icon" style="background:var(--color-secondary)">A</span>
+                <div class="card-header">
+                    <span class="card-version">v1.3.0-beta</span>
+                    <span class="card-badge">BETA</span>
+                </div>
+                <p class="card-desc">原生 Compose 渲染 / DataStore 持久化 / 侧边栏导航 / 三语界面</p>
+                <span class="card-meta">Android 8.0+</span>
+            </a>
+
         </div>
 
-    </div>
+        <!-- 互相推荐区域 -->
+        <div class="recommend-section">
+            <h2 class="recommend-title">更多平台</h2>
+            <div class="recommend-grid">
 
-    <div class="footer-note">
-        安装前请允许"安装未知来源应用"权限。<br>
-        源码与更新日志：<a href="https://github.com/fanquanpp/FANDEX-App">GitHub 仓库</a>
-    </div>
+                <a href="https://fanquanpp.github.io/FANDEX/" class="recommend-card">
+                    <span class="card-platform">WEB</span>
+                    <span class="card-name">FANDEX</span>
+                    <p class="card-desc">基于 GitHub Pages 的云端在线查阅平台，双端适配，自动构建部署</p>
+                </a>
+
+                <a href="https://github.com/fanquanpp/FANDEX-App" class="recommend-card">
+                    <span class="card-platform">ANDROID</span>
+                    <span class="card-name">FANDEX-App</span>
+                    <p class="card-desc">完全离线查阅应用，无网络依赖，原生渲染，三语界面</p>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="page-footer">
+            安装前请在系统设置中允许"安装未知来源应用"权限<br>
+            <a href="https://github.com/fanquanpp/FANDEX-App">GitHub 仓库</a>
+        </footer>
+
+    </main>
+
+    <script>
+        /**
+         * 主题切换逻辑
+         * 读取 localStorage 中存储的主题偏好，默认跟随系统
+         */
+        (function() {
+            var stored = localStorage.getItem('fandex-theme');
+            if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+
+        function toggleTheme() {
+            var current = document.documentElement.getAttribute('data-theme');
+            var next = current === 'dark' ? '' : 'dark';
+            if (next) {
+                document.documentElement.setAttribute('data-theme', next);
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+            localStorage.setItem('fandex-theme', next || 'light');
+            /* 更新按钮图标 */
+            document.querySelector('.theme-toggle').innerHTML = next === 'dark' ? '&#9788;' : '&#9790;';
+        }
+
+        /* 初始化按钮图标 */
+        (function() {
+            var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            document.querySelector('.theme-toggle').innerHTML = isDark ? '&#9788;' : '&#9790;';
+        })();
+    </script>
 
 </body>
 </html>
