@@ -1,19 +1,23 @@
 # FANDEX-App
 
-FANDEX 知识体系的 Android 客户端 -- 离线优先的技术知识阅读与间隔重复复习工具。
+FANDEX 知识体系的 Android 客户端 -- 完全离线的技术知识阅读工具。
 
 ## 特性
 
-- **离线阅读** -- 内置 49 个模块、1933 篇 Markdown 文档，无需网络即可浏览全部内容
-- **分类体系** -- 覆盖 AI、前端、后端、数据库、计算机科学、数学、云与基础设施、工具链 8 大技术领域
-- **间隔复习** -- 基于 SM-2 间隔重复算法的知识巩固模式，6 级自评反馈
-- **搜索筛选** -- 首页支持关键词搜索和分类筛选，快速定位目标内容
-- **Markdown 渲染** -- 文档以 HTML 形式呈现，支持代码块、引用、表格、列表等元素
-- **Material Design 3** -- 遵循 MD3 设计规范，支持亮色/暗色主题与动态取色
+- **离线阅读** -- 内置 49 个模块、1933 篇文档，无需网络即可浏览全部内容
+- **分类体系** -- 覆盖人工智能、前端、后端、数据库、计算机科学、数学、云与基础设施、工具链 8 大技术领域
+- **原生渲染** -- 基于 commonmark-java 的原生 Compose Markdown 渲染器，无 WebView 依赖
+- **代码高亮** -- 支持 16 种编程语言的轻量级语法高亮，代码块一键复制
+- **深浅双模式** -- 默认深色主题，支持亮色/深色切换，DataStore 持久化保存
+- **三语界面** -- 中文/英文/日语界面切换，文档内容保持中文
+- **侧边栏导航** -- 抽屉式侧边栏，分类与模块快速跳转
+- **字体缩放** -- 阅读页支持 0.8x - 1.4x 字体大小调节
+- **翻页浏览** -- 文档内上一篇/下一篇快速切换，页码显示
+- **返回顶部** -- 悬浮按钮一键回到文档顶部
 
 ## 下载
 
-前往 [Releases](https://github.com/fanquanpp/FANDEX-App/releases/latest) 下载最新版本。
+前往 [Releases](https://github.com/fanquanpp/FANDEX-App/releases) 下载最新版本。
 
 > 下载 `.zip` 文件后，将后缀名改为 `.apk` 即可安装。
 
@@ -21,18 +25,17 @@ FANDEX 知识体系的 Android 客户端 -- 离线优先的技术知识阅读与
 
 ```
 UI 层        Jetpack Compose + Material 3
-Service 层   内容加载 / 复习调度 / SM-2 算法
-Data 层      Room 本地数据库 + JSON 内容索引
+Service 层   内容加载 / 导航调度
+Data 层      DataStore 偏好存储 + JSON 内容索引
 ```
 
 ### 页面结构
 
 | 页面 | 路由 | 职责 |
 |------|------|------|
-| HomeScreen | /home | 分类浏览、模块检索、搜索筛选 |
-| ModuleScreen | /module/{id} | 模块文档列表 |
-| ArticleScreen | /article/{module}/{slug}/{title} | WebView 文档阅读 |
-| ReviewScreen | /review | 间隔重复复习与自评 |
+| HomeScreen | /home | 分类浏览、模块卡片 |
+| ModuleScreen | /module/{id} | 模块文档列表（带编号） |
+| ArticleScreen | /article/{module}/{slug}/{title} | 原生 Markdown 文档阅读 |
 
 ### 内容分类
 
@@ -54,10 +57,9 @@ Data 层      Room 本地数据库 + JSON 内容索引
 | 语言 | Kotlin 2.0.21 |
 | UI 框架 | Jetpack Compose + Material 3 |
 | 导航 | Navigation Compose 2.8.5 |
-| 文档渲染 | WebView (JavaScript 禁用) + MarkdownRenderer |
-| 本地存储 | Room 2.6.1 (KSP) |
+| 文档渲染 | commonmark-java + 原生 Compose 组件 |
+| 偏好存储 | DataStore Preferences |
 | JSON 解析 | Gson 2.11.0 |
-| 复习算法 | SM-2 间隔重复 |
 | 最低 SDK | 26 (Android 8.0) |
 | 目标 SDK | 35 (Android 15) |
 
