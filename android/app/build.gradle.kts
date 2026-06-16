@@ -16,10 +16,20 @@ android {
         versionName = "1.0.0-beta1"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("../fandex-release.jks")
+            storePassword = "fandex2026"
+            keyAlias = "fandex"
+            keyPassword = "fandex2026"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
