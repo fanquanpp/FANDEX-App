@@ -234,39 +234,6 @@
             overflow: hidden;
         }
 
-        .card-icon-inner {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            position: relative;
-        }
-
-        /* 新图标预览：深色底 + 蓝色竖条 + 白色文字区 */
-        .icon-new {
-            background: #0d0d0d;
-        }
-
-        .icon-new .icon-bar {
-            width: 4px;
-            height: 100%;
-            background: #3366cc;
-        }
-
-        .icon-new .icon-text {
-            flex: 1;
-            height: 100%;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-display);
-            font-weight: 700;
-            font-size: 7px;
-            color: #0d0d0d;
-            letter-spacing: 0.5px;
-        }
-
         /* 经典图标预览：蓝色底 + 白色 F */
         .icon-classic {
             background: #4F5BD5;
@@ -535,14 +502,14 @@
 
                 <!-- v1.4.0-beta -->
                 <a class="version-card" onclick="showDetail('1.4.0')">
-                    <span class="card-icon"><span class="card-icon-inner icon-new"><span class="icon-bar"></span><span class="icon-text">F</span></span></span>
+                    <span class="card-icon"><span class="icon-classic">F</span></span>
                     <h3 class="card-title">v1.4.0-beta</h3>
                     <p class="card-desc">双图标切换 / 启动页 / 图标持久化</p>
                 </a>
 
                 <!-- v1.3.1-beta -->
                 <a class="version-card" onclick="showDetail('1.3.1')">
-                    <span class="card-icon"><span class="card-icon-inner icon-new"><span class="icon-bar"></span><span class="icon-text">F</span></span></span>
+                    <span class="card-icon"><span class="icon-classic">F</span></span>
                     <h3 class="card-title">v1.3.1-beta</h3>
                     <p class="card-desc">顶部栏整合 / 侧边栏分级 / 表格修复 / 全屏阅读</p>
                 </a>
@@ -762,23 +729,22 @@
 
         /**
          * 主题切换逻辑
+         * 使用显式 'light'/'dark' 值，避免 removeAttribute 导致的状态不一致
          */
         (function() {
             var stored = localStorage.getItem('fandex-theme');
             if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
             }
         })();
 
         function toggleTheme() {
             var current = document.documentElement.getAttribute('data-theme');
-            var next = current === 'dark' ? '' : 'dark';
-            if (next) {
-                document.documentElement.setAttribute('data-theme', next);
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-            }
-            localStorage.setItem('fandex-theme', next || 'light');
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('fandex-theme', next);
             document.querySelector('.theme-toggle').innerHTML = next === 'dark' ? '&#9788;' : '&#9790;';
         }
 
