@@ -13,6 +13,20 @@ dist/
 .astro/
 .cache/
 generated/
-.kotlin/
+
+# Android build outputs
+android/app/build/
+android/build/
+android/.kotlin/
+
+# Signing keys
+*.jks
+*.keystore
+
+# Temporary files
+build-log*.txt
 sdk-tmp/
+scripts/
+
+# Code Wiki (generated)
 Code-Wiki.md
