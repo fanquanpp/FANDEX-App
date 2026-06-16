@@ -28,23 +28,27 @@ import com.fandex.app.data.Strings
  * 首页界面组件
  *
  * 功能：按分类展示模块列表，支持分类筛选
- * 输入：语言设置、模块导航回调
+ * 输入：语言设置、当前选中分类、分类变更回调、模块导航回调
  * 输出：可滚动的分类-模块列表
  * 流程：加载索引 -> 渲染分类筛选 -> 渲染增强模块卡片
  *
  * 设计变更（v1.3.1）：
  * - 移除内部 TopAppBar，由 HomeActivity 统一管理
  * - 移除 onOpenDrawer 回调，侧边栏由 HomeActivity 管理
+ *
+ * 设计变更（v1.4.1）：
+ * - selectedCategory 状态提升至 FANDEXApp，避免导航返回时筛选状态丢失
  */
 @Composable
 fun HomeScreen(
     language: Strings.Language = Strings.Language.ZH,
+    selectedCategory: String? = null,
+    onCategoryChange: (String?) -> Unit = {},
     onNavigateToModule: (String) -> Unit
 ) {
     val context = LocalContext.current
     val strings = Strings.get(language)
     var index by remember { mutableStateOf<ContentIndex?>(null) }
-    var selectedCategory by remember { mutableStateOf<String?>(null) }
 
     /* 首次渲染时加载索引数据 */
     LaunchedEffect(Unit) {
@@ -109,7 +113,7 @@ fun HomeScreen(
                 item {
                     FilterChip(
                         selected = selectedCategory == null,
-                        onClick = { selectedCategory = null },
+                        onClick = { onCategoryChange(null) },
                         label = { Text(strings.all) }
                     )
                 }
@@ -121,7 +125,7 @@ fun HomeScreen(
                     FilterChip(
                         selected = selectedCategory == category.id,
                         onClick = {
-                            selectedCategory = if (selectedCategory == category.id) null else category.id
+                            onCategoryChange(if (selectedCategory == category.id) null else category.id)
                         },
                         label = { Text(category.label) },
                         colors = FilterChipDefaults.filterChipColors(

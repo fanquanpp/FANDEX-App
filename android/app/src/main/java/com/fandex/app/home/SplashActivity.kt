@@ -33,10 +33,10 @@ import kotlinx.coroutines.delay
  *
  * 功能：应用冷启动入口，展示品牌信息后跳转至 HomeActivity
  * 输入：无
- * 输出：启动页界面（品牌 Logo、标语、版本号），3 秒后自动跳转
+ * 输出：启动页界面（品牌 Logo、欢迎语、标语），1.8 秒后自动跳转
  * 流程：
  *   1. 从 DataStore 读取 is_splash_enabled 设置（默认 true）
- *   2. 若启动页开启：显示启动页 3 秒后跳转 HomeActivity
+ *   2. 若启动页开启：显示启动页 1.8 秒后跳转 HomeActivity
  *   3. 若启动页关闭：直接跳转 HomeActivity
  *   4. 跳转后 finish() 当前 Activity，防止返回
  */
@@ -52,13 +52,13 @@ class SplashActivity : ComponentActivity() {
                 .collectAsState(initial = true)
 
             /* 启动页展示时长（毫秒） */
-            val splashDurationMs = 3000L
+            val splashDurationMs = 1800L
 
             /* 监听设置值变化，决定是否展示启动页 */
             LaunchedEffect(isSplashEnabled) {
                 try {
                     if (isSplashEnabled) {
-                        /* 启动页开启：等待 3 秒后跳转 */
+                        /* 启动页开启：等待 1.8 秒后跳转 */
                         delay(splashDurationMs)
                     }
                     /* 跳转到 HomeActivity */
@@ -89,7 +89,7 @@ class SplashActivity : ComponentActivity() {
  *
  * 功能：渲染启动页的品牌展示界面
  * 输入：无
- * 输出：深色背景 + Logo + 标语 + 性质说明 + 作者 + 版本号
+ * 输出：深色背景 + Logo + 欢迎语 + 标语
  * 流程：垂直居中排列各元素
  */
 @androidx.compose.runtime.Composable
@@ -138,38 +138,21 @@ private fun SplashScreenContent() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            /* 欢迎语 */
+            Text(
+                text = "欢迎回来",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = textColor.copy(alpha = 0.85f)
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             /* 标语 */
             Text(
                 text = "离线技术知识查阅工具",
                 fontSize = 14.sp,
                 color = secondaryTextColor
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            /* 性质说明 */
-            Text(
-                text = "无需网络 / 原生渲染 / 三语界面",
-                fontSize = 12.sp,
-                color = secondaryTextColor.copy(alpha = 0.5f)
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            /* 作者 */
-            Text(
-                text = "fanquanpp",
-                fontSize = 12.sp,
-                color = secondaryTextColor.copy(alpha = 0.4f)
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            /* 版本号 */
-            Text(
-                text = "v1.4.0-beta",
-                fontSize = 11.sp,
-                color = secondaryTextColor.copy(alpha = 0.3f)
             )
         }
     }
