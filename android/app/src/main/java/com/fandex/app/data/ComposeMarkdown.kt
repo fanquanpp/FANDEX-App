@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -1101,7 +1102,7 @@ private fun IntRange.overlaps(other: IntRange): Boolean {
  */
 private data class TokenSpan(
     val range: IntRange,
-    val color: androidx.compose.ui.graphics.Color
+    val color: Color
 )
 
 /**
@@ -1114,7 +1115,7 @@ private data class TokenSpan(
  */
 private data class HeadingConfig(
     val fontSize: TextUnit,
-    val borderColor: androidx.compose.ui.graphics.Color,
+    val borderColor: Color,
     val borderWidth: Dp
 )
 
@@ -1126,30 +1127,30 @@ private data class HeadingConfig(
  * 输出：完整的颜色配置对象
  */
 private data class MarkdownColorScheme(
-    val onBackground: androidx.compose.ui.graphics.Color,
-    val primary: androidx.compose.ui.graphics.Color,
-    val onSurfaceVariant: androidx.compose.ui.graphics.Color,
-    val outlineVariant: androidx.compose.ui.graphics.Color,
-    val surface: androidx.compose.ui.graphics.Color,
-    val surfaceVariant: androidx.compose.ui.graphics.Color,
-    val headingBorder1: androidx.compose.ui.graphics.Color,
-    val headingBorder2: androidx.compose.ui.graphics.Color,
-    val headingBorder3: androidx.compose.ui.graphics.Color,
-    val headingBorder4: androidx.compose.ui.graphics.Color,
-    val headingBorder5: androidx.compose.ui.graphics.Color,
-    val headingBorder6: androidx.compose.ui.graphics.Color,
-    val blockquoteBorder: androidx.compose.ui.graphics.Color,
-    val blockquoteBg: androidx.compose.ui.graphics.Color,
-    val codeBg: androidx.compose.ui.graphics.Color,
-    val codeBorder: androidx.compose.ui.graphics.Color,
-    val codeHeaderBg: androidx.compose.ui.graphics.Color,
-    val inlineCodeBg: androidx.compose.ui.graphics.Color,
-    val tableHeaderBg: androidx.compose.ui.graphics.Color,
-    val tableHeaderFg: androidx.compose.ui.graphics.Color,
-    val hlKeyword: androidx.compose.ui.graphics.Color,
-    val hlString: androidx.compose.ui.graphics.Color,
-    val hlComment: androidx.compose.ui.graphics.Color,
-    val hlNumber: androidx.compose.ui.graphics.Color
+    val onBackground: Color,
+    val primary: Color,
+    val onSurfaceVariant: Color,
+    val outlineVariant: Color,
+    val surface: Color,
+    val surfaceVariant: Color,
+    val headingBorder1: Color,
+    val headingBorder2: Color,
+    val headingBorder3: Color,
+    val headingBorder4: Color,
+    val headingBorder5: Color,
+    val headingBorder6: Color,
+    val blockquoteBorder: Color,
+    val blockquoteBg: Color,
+    val codeBg: Color,
+    val codeBorder: Color,
+    val codeHeaderBg: Color,
+    val inlineCodeBg: Color,
+    val tableHeaderBg: Color,
+    val tableHeaderFg: Color,
+    val hlKeyword: Color,
+    val hlString: Color,
+    val hlComment: Color,
+    val hlNumber: Color
 ) {
     companion object {
         /**
@@ -1164,58 +1165,58 @@ private data class MarkdownColorScheme(
 
         /** 浅色模式颜色方案 */
         private val lightScheme = MarkdownColorScheme(
-            onBackground = androidx.compose.ui.graphics.Color(0xFF0D0D0D),
-            primary = androidx.compose.ui.graphics.Color(0xFF3366CC),
-            onSurfaceVariant = androidx.compose.ui.graphics.Color(0xFF808080),
-            outlineVariant = androidx.compose.ui.graphics.Color(0xFFC4C4C4),
-            surface = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
-            surfaceVariant = androidx.compose.ui.graphics.Color(0xFFF0F0F0),
-            headingBorder1 = androidx.compose.ui.graphics.Color(0xFF3366CC),
-            headingBorder2 = androidx.compose.ui.graphics.Color(0xFF00B894),
-            headingBorder3 = androidx.compose.ui.graphics.Color(0xFFE05A2B),
-            headingBorder4 = androidx.compose.ui.graphics.Color(0xFFC4C4C4),
-            headingBorder5 = androidx.compose.ui.graphics.Color(0xFF808080),
-            headingBorder6 = androidx.compose.ui.graphics.Color(0xFF808080),
-            blockquoteBorder = androidx.compose.ui.graphics.Color(0xFF3366CC),
-            blockquoteBg = androidx.compose.ui.graphics.Color(0xFFF5F5F5),
-            codeBg = androidx.compose.ui.graphics.Color(0xFFF5F5F5),
-            codeBorder = androidx.compose.ui.graphics.Color(0xFFE0E0E0),
-            codeHeaderBg = androidx.compose.ui.graphics.Color(0xFFE8E8E8),
-            inlineCodeBg = androidx.compose.ui.graphics.Color(0xFFF0F0F0),
-            tableHeaderBg = androidx.compose.ui.graphics.Color(0xFF3366CC),
-            tableHeaderFg = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
-            hlKeyword = androidx.compose.ui.graphics.Color(0xFFA626A4),
-            hlString = androidx.compose.ui.graphics.Color(0xFF50A14F),
-            hlComment = androidx.compose.ui.graphics.Color(0xFFA0A1A7),
-            hlNumber = androidx.compose.ui.graphics.Color(0xFF986801)
+            onBackground = Color(0xFF0D0D0D),
+            primary = Color(0xFF3366CC),
+            onSurfaceVariant = Color(0xFF808080),
+            outlineVariant = Color(0xFFC4C4C4),
+            surface = Color(0xFFFFFFFF),
+            surfaceVariant = Color(0xFFF0F0F0),
+            headingBorder1 = Color(0xFF3366CC),
+            headingBorder2 = Color(0xFF00B894),
+            headingBorder3 = Color(0xFFE05A2B),
+            headingBorder4 = Color(0xFFC4C4C4),
+            headingBorder5 = Color(0xFF808080),
+            headingBorder6 = Color(0xFF808080),
+            blockquoteBorder = Color(0xFF3366CC),
+            blockquoteBg = Color(0xFFF5F5F5),
+            codeBg = Color(0xFFF5F5F5),
+            codeBorder = Color(0xFFE0E0E0),
+            codeHeaderBg = Color(0xFFE8E8E8),
+            inlineCodeBg = Color(0xFFF0F0F0),
+            tableHeaderBg = Color(0xFF3366CC),
+            tableHeaderFg = Color(0xFFFFFFFF),
+            hlKeyword = Color(0xFFA626A4),
+            hlString = Color(0xFF50A14F),
+            hlComment = Color(0xFFA0A1A7),
+            hlNumber = Color(0xFF986801)
         )
 
         /** 暗色模式颜色方案 */
         private val darkScheme = MarkdownColorScheme(
-            onBackground = androidx.compose.ui.graphics.Color(0xFFEBEBEB),
-            primary = androidx.compose.ui.graphics.Color(0xFF6EA8FE),
-            onSurfaceVariant = androidx.compose.ui.graphics.Color(0xFF8A8A8A),
-            outlineVariant = androidx.compose.ui.graphics.Color(0xFF383838),
-            surface = androidx.compose.ui.graphics.Color(0xFF181818),
-            surfaceVariant = androidx.compose.ui.graphics.Color(0xFF202020),
-            headingBorder1 = androidx.compose.ui.graphics.Color(0xFF6EA8FE),
-            headingBorder2 = androidx.compose.ui.graphics.Color(0xFF55EFC4),
-            headingBorder3 = androidx.compose.ui.graphics.Color(0xFFF09070),
-            headingBorder4 = androidx.compose.ui.graphics.Color(0xFF525252),
-            headingBorder5 = androidx.compose.ui.graphics.Color(0xFF8A8A8A),
-            headingBorder6 = androidx.compose.ui.graphics.Color(0xFF8A8A8A),
-            blockquoteBorder = androidx.compose.ui.graphics.Color(0xFF6EA8FE),
-            blockquoteBg = androidx.compose.ui.graphics.Color(0xFF181818),
-            codeBg = androidx.compose.ui.graphics.Color(0xFF1A1A1A),
-            codeBorder = androidx.compose.ui.graphics.Color(0xFF333333),
-            codeHeaderBg = androidx.compose.ui.graphics.Color(0xFF252525),
-            inlineCodeBg = androidx.compose.ui.graphics.Color(0xFF2A2A2A),
-            tableHeaderBg = androidx.compose.ui.graphics.Color(0xFF3366CC),
-            tableHeaderFg = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
-            hlKeyword = androidx.compose.ui.graphics.Color(0xFFC678DD),
-            hlString = androidx.compose.ui.graphics.Color(0xFF98C379),
-            hlComment = androidx.compose.ui.graphics.Color(0xFF8A8A8A),
-            hlNumber = androidx.compose.ui.graphics.Color(0xFFD19A66)
+            onBackground = Color(0xFFEBEBEB),
+            primary = Color(0xFF6EA8FE),
+            onSurfaceVariant = Color(0xFF8A8A8A),
+            outlineVariant = Color(0xFF383838),
+            surface = Color(0xFF181818),
+            surfaceVariant = Color(0xFF202020),
+            headingBorder1 = Color(0xFF6EA8FE),
+            headingBorder2 = Color(0xFF55EFC4),
+            headingBorder3 = Color(0xFFF09070),
+            headingBorder4 = Color(0xFF525252),
+            headingBorder5 = Color(0xFF8A8A8A),
+            headingBorder6 = Color(0xFF8A8A8A),
+            blockquoteBorder = Color(0xFF6EA8FE),
+            blockquoteBg = Color(0xFF181818),
+            codeBg = Color(0xFF1A1A1A),
+            codeBorder = Color(0xFF333333),
+            codeHeaderBg = Color(0xFF252525),
+            inlineCodeBg = Color(0xFF2A2A2A),
+            tableHeaderBg = Color(0xFF3366CC),
+            tableHeaderFg = Color(0xFFFFFFFF),
+            hlKeyword = Color(0xFFC678DD),
+            hlString = Color(0xFF98C379),
+            hlComment = Color(0xFF8A8A8A),
+            hlNumber = Color(0xFFD19A66)
         )
     }
 }

@@ -2,7 +2,6 @@ package com.fandex.app.data
 
 import android.content.Context
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import java.io.InputStreamReader
 
 /**
@@ -15,8 +14,10 @@ import java.io.InputStreamReader
  */
 object ContentLoader {
 
+    /** 索引文件路径 */
     private const val INDEX_PATH = "dist-mobile/index.json"
-    private const val QUIZZES_PATH = "dist-mobile/quizzes.json"
+
+    /** JSON 解析器（线程安全，全局复用） */
     private val gson = Gson()
 
     /**
@@ -57,27 +58,6 @@ object ContentLoader {
             content
         } catch (e: Exception) {
             null
-        }
-    }
-
-    /**
-     * 加载 Quiz 数据
-     *
-     * 输入：Context
-     * 输出：QuizItem 列表，加载失败返回空列表
-     * 流程：打开 quizzes.json -> Gson 反序列化 -> 返回列表
-     */
-    fun loadQuizzes(context: Context): List<QuizItem> {
-        return try {
-            val inputStream = context.assets.open(QUIZZES_PATH)
-            val reader = InputStreamReader(inputStream, "UTF-8")
-            val type = object : TypeToken<List<QuizItem>>() {}.type
-            val quizzes: List<QuizItem> = gson.fromJson(reader, type)
-            reader.close()
-            inputStream.close()
-            quizzes
-        } catch (e: Exception) {
-            emptyList()
         }
     }
 }
