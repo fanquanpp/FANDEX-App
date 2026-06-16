@@ -7,19 +7,15 @@ package com.fandex.app.data
  * 输入：Language 枚举（ZH/EN/JA）
  * 输出：所有 UI 文本的三语版本
  *
- * 使用方式：Strings.get(Language.ZH).home
  * 默认语言：ZH（中文）
+ * 文档内容语言：仅中文
  */
 object Strings {
 
-    /**
-     * 支持的语言枚举
-     */
+    /** 支持的语言枚举 */
     enum class Language { ZH, EN, JA }
 
-    /**
-     * 语言字符串集合
-     */
+    /** 语言字符串集合 */
     data class LangStrings(
         val appName: String,
         val homeSubtitle: String,
@@ -37,15 +33,17 @@ object Strings {
         val previousDoc: String,
         val nextDoc: String,
         val backToTop: String,
-        val noContent: String
+        val noContent: String,
+        val fontSizeIncrease: String,
+        val fontSizeDecrease: String,
+        val menu: String,
+        val documents: String,
+        val category: String,
+        val description: String,
+        val pageOf: String
     )
 
-    /**
-     * 获取指定语言的字符串集合
-     *
-     * 输入：Language 枚举值
-     * 输出：对应的 LangStrings 实例
-     */
+    /** 获取指定语言的字符串集合 */
     fun get(lang: Language): LangStrings = when (lang) {
         Language.ZH -> LangStrings(
             appName = "FANDEX",
@@ -64,7 +62,14 @@ object Strings {
             previousDoc = "\u4E0A\u4E00\u7BC7",
             nextDoc = "\u4E0B\u4E00\u7BC7",
             backToTop = "\u56DE\u5230\u9876\u90E8",
-            noContent = "\u6682\u65E0\u5185\u5BB9"
+            noContent = "\u6682\u65E0\u5185\u5BB9",
+            fontSizeIncrease = "\u5B57\u4F53\u589E\u5927",
+            fontSizeDecrease = "\u5B57\u4F53\u7F29\u5C0F",
+            menu = "\u83DC\u5355",
+            documents = "\u6587\u6863",
+            category = "\u5206\u7C7B",
+            description = "\u7B80\u4ECB",
+            pageOf = "/"
         )
         Language.EN -> LangStrings(
             appName = "FANDEX",
@@ -80,10 +85,17 @@ object Strings {
             darkMode = "Dark Mode",
             back = "Back",
             language = "Language",
-            previousDoc = "Previous",
+            previousDoc = "Prev",
             nextDoc = "Next",
             backToTop = "Top",
-            noContent = "No content available"
+            noContent = "No content",
+            fontSizeIncrease = "A+",
+            fontSizeDecrease = "A-",
+            menu = "Menu",
+            documents = "Documents",
+            category = "Category",
+            description = "Desc",
+            pageOf = "/"
         )
         Language.JA -> LangStrings(
             appName = "FANDEX",
@@ -102,7 +114,14 @@ object Strings {
             previousDoc = "\u524D\u3078",
             nextDoc = "\u6B21\u3078",
             backToTop = "\u30C8\u30C3\u30D7\u3078",
-            noContent = "\u30B3\u30F3\u30C6\u30F3\u30C4\u304C\u3042\u308A\u307E\u305B\u3093"
+            noContent = "\u30B3\u30F3\u30C6\u30F3\u30C4\u306A\u3057",
+            fontSizeIncrease = "\u62E1\u5927",
+            fontSizeDecrease = "\u7E2E\u5C0F",
+            menu = "\u30E1\u30CB\u30E5\u30FC",
+            documents = "\u30C9\u30AD\u30E5\u30E1\u30F3\u30C8",
+            category = "\u30AB\u30C6\u30B4\u30EA",
+            description = "\u8AAC\u660E",
+            pageOf = "/"
         )
     }
 }

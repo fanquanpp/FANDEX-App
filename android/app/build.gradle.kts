@@ -13,8 +13,8 @@ android {
         applicationId = "com.fandex.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.2.0-beta"
+        versionCode = 7
+        versionName = "1.3.0-beta"
     }
 
     signingConfigs {
@@ -71,6 +71,9 @@ dependencies {
     implementation("org.commonmark:commonmark:0.22.0")
     implementation("org.commonmark:commonmark-ext-gfm-tables:0.22.0")
     implementation("org.commonmark:commonmark-ext-gfm-strikethrough:0.22.0")
+
+    // DataStore (preferences persistence)
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     // JSON parsing
     implementation("com.google.code.gson:gson:2.11.0")

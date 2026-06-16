@@ -8,6 +8,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,16 +29,17 @@ import com.fandex.app.data.Strings
 /**
  * 首页界面组件
  *
- * 功能：按分类展示模块列表，支持分类筛选
- * 输入：模块分类数据（从 assets 加载）、语言设置
+ * 功能：按分类展示模块列表，支持分类筛选，紧凑顶部栏含菜单按钮
+ * 输入：语言设置、模块导航回调、侧边栏打开回调
  * 输出：可滚动的分类-模块列表
- * 流程：加载索引 -> 渲染分类筛选 -> 渲染模块卡片
+ * 流程：加载索引 -> 渲染紧凑顶部栏 -> 渲染分类筛选 -> 渲染增强模块卡片
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     language: Strings.Language = Strings.Language.ZH,
-    onNavigateToModule: (String) -> Unit
+    onNavigateToModule: (String) -> Unit,
+    onOpenDrawer: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val strings = Strings.get(language)
@@ -88,33 +91,48 @@ fun HomeScreen(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 80.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            /* 标题区域 */
-            item {
-                Text(
-                    text = "FANDEX",
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "${contentIndex.documents.size} ${strings.docs} / ${contentIndex.modules.size} ${strings.modules}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+    /* 构建分类 ID 到 Category 对象的映射，供模块卡片查找分类名 */
+    val categoryMap = remember(contentIndex) {
+        contentIndex.categories.associateBy { it.id }
+    }
 
+    Scaffold(
+        topBar = {
+            /* 紧凑顶部栏：菜单按钮 + FANDEX 标题 */
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "FANDEX",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onOpenDrawer) {
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = strings.menu
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
+            )
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 80.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
             /* 分类筛选条 */
             item {
                 LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     item {
                         FilterChip(
@@ -141,7 +159,7 @@ fun HomeScreen(
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             /* 模块卡片列表 - 按分类分组 */
@@ -153,6 +171,7 @@ fun HomeScreen(
                 CategoryModuleSection(
                     category = category,
                     modules = categoryModules,
+                    categoryMap = categoryMap,
                     strings = strings,
                     onModuleClick = onNavigateToModule
                 )
@@ -165,13 +184,14 @@ fun HomeScreen(
  * 分类模块区块
  *
  * 功能：展示某分类下的所有模块卡片，模块间以分类色短分界线分隔
- * 输入：Category 和该分类下的模块列表
- * 输出：分类标题 + 模块卡片列表
+ * 输入：Category、该分类下的模块列表、分类映射表、语言字符串
+ * 输出：分类标题 + 增强模块卡片列表
  */
 @Composable
 fun CategoryModuleSection(
     category: Category,
     modules: List<Module>,
+    categoryMap: Map<String, Category>,
     strings: Strings.LangStrings,
     onModuleClick: (String) -> Unit
 ) {
@@ -184,22 +204,22 @@ fun CategoryModuleSection(
         /* 分类标题 */
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 8.dp, top = 12.dp)
+            modifier = Modifier.padding(bottom = 6.dp, top = 8.dp)
         ) {
             Box(
                 modifier = Modifier
                     .width(4.dp)
-                    .height(20.dp)
+                    .height(18.dp)
                     .clip(RoundedCornerShape(2.dp))
                     .background(cardColor)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = category.label,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = "${modules.size} ${strings.modules}",
                 style = MaterialTheme.typography.labelSmall,
@@ -212,6 +232,7 @@ fun CategoryModuleSection(
             ModuleCard(
                 module = module,
                 accentColor = cardColor,
+                categoryLabel = category.label,
                 strings = strings,
                 onClick = { onModuleClick(module.id) }
             )
@@ -219,7 +240,7 @@ fun CategoryModuleSection(
             if (index < modules.size - 1) {
                 Box(
                     modifier = Modifier
-                        .padding(start = 24.dp, top = 4.dp, bottom = 4.dp)
+                        .padding(start = 24.dp, top = 2.dp, bottom = 2.dp)
                         .width(32.dp)
                         .height(2.dp)
                         .clip(RoundedCornerShape(1.dp))
@@ -231,24 +252,36 @@ fun CategoryModuleSection(
 }
 
 /**
- * 模块卡片
+ * 模块卡片（增强版）
  *
- * 功能：展示单个模块信息，点击进入模块详情
- * 输入：Module 对象、强调色、语言字符串
- * 输出：可点击的模块卡片
+ * 功能：展示单个模块的详细信息，包含标题、文档数、分类名、简介首行
+ * 输入：Module 对象、强调色、分类标签、语言字符串
+ * 输出：可点击的增强模块卡片
  */
 @Composable
 fun ModuleCard(
     module: Module,
     accentColor: Color,
+    categoryLabel: String,
     strings: Strings.LangStrings,
     onClick: () -> Unit
 ) {
+    /**
+     * 提取简介首行
+     *
+     * 输入：module.description（可能含多行文本）
+     * 输出：第一行非空文本，截断至 60 字符
+     */
+    val descriptionFirstLine = remember(module.description) {
+        val firstLine = module.description.lines().firstOrNull { it.isNotBlank() } ?: ""
+        if (firstLine.length > 60) firstLine.take(57) + "..." else firstLine
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
@@ -257,7 +290,7 @@ fun ModuleCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             /* 模块颜色圆点 */
@@ -267,8 +300,9 @@ fun ModuleCard(
                     .clip(CircleShape)
                     .background(accentColor)
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
+                /* 标题行 */
                 Text(
                     text = module.title,
                     style = MaterialTheme.typography.bodyLarge,
@@ -276,11 +310,34 @@ fun ModuleCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Text(
-                    text = "${module.documents.size} ${strings.docs}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                /* 文档数 + 分类名 */
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 2.dp)
+                ) {
+                    Text(
+                        text = "${module.documents.size} ${strings.docs}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = categoryLabel,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = accentColor.copy(alpha = 0.7f)
+                    )
+                }
+                /* 简介首行 */
+                if (descriptionFirstLine.isNotBlank()) {
+                    Text(
+                        text = descriptionFirstLine,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
             }
         }
     }
