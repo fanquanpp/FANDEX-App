@@ -8,9 +8,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavType
@@ -28,7 +33,7 @@ import java.net.URLDecoder
 /**
  * 首页 Activity
  *
- * 功能：应用主入口，管理 Navigation Compose 路由和底部导航
+ * 功能：应用主入口，管理 Navigation Compose 路由、底部导航和白昼/黑夜模式切换
  * 输入：无
  * 输出：完整的导航框架，包含首页、模块、文章、复习四个路由
  * 流程：onCreate -> 设置 Compose 内容 -> 初始化导航控制器 -> 渲染底部导航和路由
@@ -38,8 +43,13 @@ class HomeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            FANDEXTheme {
-                FANDEXApp()
+            /* isDarkMode 状态持久化，切换主题时保持用户选择 */
+            var isDarkMode by rememberSaveable { mutableStateOf(false) }
+            FANDEXTheme(darkTheme = isDarkMode) {
+                FANDEXApp(
+                    isDarkMode = isDarkMode,
+                    onToggleTheme = { isDarkMode = !isDarkMode }
+                )
             }
         }
     }
@@ -61,13 +71,16 @@ data class BottomNavItem(
 /**
  * FANDEX 应用主框架
  *
- * 功能：管理底部导航和 NavHost 路由
- * 输入：无
+ * 功能：管理底部导航、NavHost 路由和白昼/黑夜模式切换
+ * 输入：isDarkMode 当前主题状态、onToggleTheme 主题切换回调
  * 输出：底部导航栏 + 页面路由容器
  * 流程：初始化 NavController -> 定义底部导航项 -> 渲染 Scaffold + NavHost
  */
 @Composable
-fun FANDEXApp() {
+fun FANDEXApp(
+    isDarkMode: Boolean = false,
+    onToggleTheme: () -> Unit = {}
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -102,6 +115,22 @@ fun FANDEXApp() {
                             }
                         )
                     }
+                    /* 白昼/黑夜模式切换按钮 */
+                    NavigationBarItem(
+                        icon = {
+                            Icon(
+                                imageVector = if (isDarkMode) {
+                                    Icons.Default.LightMode
+                                } else {
+                                    Icons.Default.DarkMode
+                                },
+                                contentDescription = if (isDarkMode) "Light Mode" else "Dark Mode"
+                            )
+                        },
+                        label = { Text(if (isDarkMode) "Light" else "Dark") },
+                        selected = false,
+                        onClick = onToggleTheme
+                    )
                 }
             }
         }
@@ -138,7 +167,7 @@ fun FANDEXApp() {
                 )
             }
 
-            /* 文章阅读路由 - 使用 URL 编码传递 title */
+            /* 文章阅读路由 - 使用 URL 编码传递 title，传递 isDarkMode 支持主题切换 */
             composable(
                 route = Screen.Article.route,
                 arguments = listOf(
@@ -155,6 +184,7 @@ fun FANDEXApp() {
                     moduleId = moduleId,
                     slug = slug,
                     title = title,
+                    isDarkMode = isDarkMode,
                     onNavigateBack = { navController.popBackStack() }
                 )
             }

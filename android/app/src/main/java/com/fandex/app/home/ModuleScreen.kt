@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -26,10 +26,10 @@ import com.fandex.app.data.Document
 /**
  * 模块详情页面
  *
- * 功能：展示指定模块下的所有文档列表
+ * 功能：展示指定模块下的所有文档列表（含编号）
  * 输入：模块 ID、导航回调
- * 输出：文档卡片列表
- * 流程：加载索引 -> 查找模块 -> 渲染文档列表
+ * 输出：带编号的文档卡片列表
+ * 流程：加载索引 -> 查找模块 -> 渲染带编号的文档列表
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -142,10 +142,11 @@ fun ModuleScreen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            /* 文档列表 */
-            items(documents) { document ->
+            /* 文档列表（带编号） */
+            itemsIndexed(documents) { index, document ->
                 DocumentListItem(
                     document = document,
+                    index = index + 1,
                     accentColor = accentColor,
                     onClick = {
                         onNavigateToArticle(document.module, document.slug, document.title)
@@ -157,15 +158,16 @@ fun ModuleScreen(
 }
 
 /**
- * 文档列表项
+ * 文档列表项（带编号）
  *
- * 功能：展示单个文档条目，点击跳转阅读
- * 输入：Document 对象和强调色
- * 输出：可点击的文档列表项
+ * 功能：展示带编号的单个文档条目，点击跳转阅读
+ * 输入：Document 对象、编号、强调色
+ * 输出：可点击的带编号文档列表项
  */
 @Composable
 fun DocumentListItem(
     document: Document,
+    index: Int,
     accentColor: Color,
     onClick: () -> Unit
 ) {
@@ -176,13 +178,22 @@ fun DocumentListItem(
             .padding(horizontal = 4.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        /* 编号圆圈 */
         Box(
             modifier = Modifier
-                .size(6.dp)
+                .size(24.dp)
                 .clip(CircleShape)
-                .background(accentColor)
-        )
-        Spacer(modifier = Modifier.width(12.dp))
+                .background(accentColor.copy(alpha = 0.15f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "$index",
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = accentColor
+            )
+        }
+        Spacer(modifier = Modifier.width(10.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = document.title,

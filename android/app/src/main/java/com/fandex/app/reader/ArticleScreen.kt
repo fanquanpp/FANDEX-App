@@ -19,8 +19,8 @@ import com.fandex.app.data.MarkdownRenderer
  * 文章阅读页面
  *
  * 功能：使用 WebView 渲染 Markdown 转 HTML 的文档内容
- * 输入：模块 ID、文档 slug、文档标题
- * 输出：WebView 展示渲染后的文档
+ * 输入：模块 ID、文档 slug、文档标题、是否暗色模式
+ * 输出：WebView 展示渲染后的文档（支持语法高亮、代码复制、主题切换）
  * 流程：接收参数 -> AndroidView factory 中加载 Markdown -> 转换为 HTML -> WebView 渲染
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,9 +29,17 @@ fun ArticleScreen(
     moduleId: String,
     slug: String,
     title: String,
+    isDarkMode: Boolean = false,
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
+    /* 保存 WebView 引用，用于主题切换时调用 JS */
+    var webView by remember { mutableStateOf<WebView?>(null) }
+
+    /* 当 isDarkMode 变化时，通过 JS 切换 WebView 主题（无需重新加载） */
+    LaunchedEffect(isDarkMode) {
+        webView?.evaluateJavascript("toggleTheme($isDarkMode)", null)
+    }
 
     Scaffold(
         topBar = {
@@ -58,15 +66,18 @@ fun ArticleScreen(
         AndroidView(
             factory = { ctx ->
                 WebView(ctx).apply {
-                    settings.javaScriptEnabled = false
+                    /* 启用 JavaScript：语法高亮、复制按钮、主题切换均依赖 JS */
+                    settings.javaScriptEnabled = true
                     settings.domStorageEnabled = true
                     webViewClient = WebViewClient()
 
                     /* 在 factory 中一次性加载文档内容 */
                     val markdown = ContentLoader.loadDocumentMarkdown(context, moduleId, slug)
                     val content = markdown ?: "No content available"
-                    val html = MarkdownRenderer.render(title, content)
+                    val html = MarkdownRenderer.render(title, content, isDarkMode)
                     loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
+
+                    webView = this
                 }
             },
             modifier = Modifier

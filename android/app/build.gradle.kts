@@ -13,8 +13,8 @@ android {
         applicationId = "com.fandex.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.0.0"
+        versionCode = 4
+        versionName = "1.1.0"
     }
 
     signingConfigs {
@@ -66,6 +66,11 @@ dependencies {
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+
+    // Markdown parsing
+    implementation("org.commonmark:commonmark:0.22.0")
+    implementation("org.commonmark:commonmark-ext-gfm-tables:0.22.0")
+    implementation("org.commonmark:commonmark-ext-gfm-strikethrough:0.22.0")
 
     // JSON parsing
     implementation("com.google.code.gson:gson:2.11.0")
