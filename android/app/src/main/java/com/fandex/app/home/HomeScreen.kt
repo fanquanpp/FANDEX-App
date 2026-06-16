@@ -8,9 +8,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.*
 import com.fandex.app.data.Category
 import com.fandex.app.data.ContentIndex
 import com.fandex.app.data.ContentLoader
@@ -29,17 +27,19 @@ import com.fandex.app.data.Strings
 /**
  * 首页界面组件
  *
- * 功能：按分类展示模块列表，支持分类筛选，紧凑顶部栏含菜单按钮
- * 输入：语言设置、模块导航回调、侧边栏打开回调
+ * 功能：按分类展示模块列表，支持分类筛选
+ * 输入：语言设置、模块导航回调
  * 输出：可滚动的分类-模块列表
- * 流程：加载索引 -> 渲染紧凑顶部栏 -> 渲染分类筛选 -> 渲染增强模块卡片
+ * 流程：加载索引 -> 渲染分类筛选 -> 渲染增强模块卡片
+ *
+ * 设计变更（v1.3.1）：
+ * - 移除内部 TopAppBar，由 HomeActivity 统一管理
+ * - 移除 onOpenDrawer 回调，侧边栏由 HomeActivity 管理
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     language: Strings.Language = Strings.Language.ZH,
-    onNavigateToModule: (String) -> Unit,
-    onOpenDrawer: () -> Unit = {}
+    onNavigateToModule: (String) -> Unit
 ) {
     val context = LocalContext.current
     val strings = Strings.get(language)
@@ -96,86 +96,57 @@ fun HomeScreen(
         contentIndex.categories.associateBy { it.id }
     }
 
-    Scaffold(
-        topBar = {
-            /* 紧凑顶部栏：菜单按钮 + FANDEX 标题 */
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "FANDEX",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        /* 分类筛选条 */
+        item {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                item {
+                    FilterChip(
+                        selected = selectedCategory == null,
+                        onClick = { selectedCategory = null },
+                        label = { Text(strings.all) }
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onOpenDrawer) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = strings.menu
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        }
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 80.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            /* 分类筛选条 */
-            item {
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    item {
-                        FilterChip(
-                            selected = selectedCategory == null,
-                            onClick = { selectedCategory = null },
-                            label = { Text(strings.all) }
-                        )
-                    }
-                    items(contentIndex.categories) { category ->
-                        val catColor = remember(category.color) {
-                            try { Color(android.graphics.Color.parseColor(category.color)) }
-                            catch (_: Exception) { Color(0xFF4F5BD5) }
-                        }
-                        FilterChip(
-                            selected = selectedCategory == category.id,
-                            onClick = {
-                                selectedCategory = if (selectedCategory == category.id) null else category.id
-                            },
-                            label = { Text(category.label) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = catColor.copy(alpha = 0.15f),
-                                selectedLabelColor = catColor
-                            )
-                        )
-                    }
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                items(contentIndex.categories) { category ->
+                    val catColor = remember(category.color) {
+                        try { Color(android.graphics.Color.parseColor(category.color)) }
+                        catch (_: Exception) { Color(0xFF4F5BD5) }
+                    }
+                    FilterChip(
+                        selected = selectedCategory == category.id,
+                        onClick = {
+                            selectedCategory = if (selectedCategory == category.id) null else category.id
+                        },
+                        label = { Text(category.label) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = catColor.copy(alpha = 0.15f),
+                            selectedLabelColor = catColor
+                        )
+                    )
+                }
             }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
-            /* 模块卡片列表 - 按分类分组 */
-            val groupedModules = filteredModules.groupBy { it.category }
-            val orderedCategories = contentIndex.categories.filter { groupedModules.containsKey(it.id) }
+        /* 模块卡片列表 - 按分类分组 */
+        val groupedModules = filteredModules.groupBy { it.category }
+        val orderedCategories = contentIndex.categories.filter { groupedModules.containsKey(it.id) }
 
-            items(orderedCategories) { category ->
-                val categoryModules = groupedModules[category.id] ?: emptyList()
-                CategoryModuleSection(
-                    category = category,
-                    modules = categoryModules,
-                    categoryMap = categoryMap,
-                    strings = strings,
-                    onModuleClick = onNavigateToModule
-                )
-            }
+        items(orderedCategories) { category ->
+            val categoryModules = groupedModules[category.id] ?: emptyList()
+            CategoryModuleSection(
+                category = category,
+                modules = categoryModules,
+                categoryMap = categoryMap,
+                strings = strings,
+                onModuleClick = onNavigateToModule
+            )
         }
     }
 }

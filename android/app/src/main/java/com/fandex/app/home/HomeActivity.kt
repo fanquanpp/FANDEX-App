@@ -21,12 +21,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Menu
@@ -34,16 +38,17 @@ import androidx.compose.material.icons.filled.TextDecrease
 import androidx.compose.material.icons.filled.TextIncrease
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
@@ -72,9 +77,10 @@ import androidx.navigation.navArgument
 import com.fandex.app.data.ContentIndex
 import com.fandex.app.data.ContentLoader
 import com.fandex.app.data.DataStoreManager
+import com.fandex.app.data.Document
+import com.fandex.app.data.MarkdownContent
 import com.fandex.app.data.Strings
 import com.fandex.app.navigation.Screen
-import com.fandex.app.reader.ArticleScreen
 import com.fandex.app.ui.theme.FANDEXTheme
 import java.net.URLDecoder
 import kotlinx.coroutines.launch
@@ -82,7 +88,7 @@ import kotlinx.coroutines.launch
 /**
  * 首页 Activity
  *
- * 功能：应用主入口，管理 Navigation Compose 路由、侧边栏、底部导航、主题/语言/字体设置持久化
+ * 功能：应用主入口，管理 Navigation Compose 路由、侧边栏、主题/语言/字体设置持久化
  * 输入：无
  * 输出：完整的导航框架，包含首页、模块、文章三个路由及侧边栏导航
  * 流程：onCreate -> 设置 Compose 内容 -> 从 DataStore 读取偏好 -> 渲染侧边栏和路由
@@ -161,10 +167,15 @@ class HomeActivity : ComponentActivity() {
 /**
  * FANDEX 应用主框架
  *
- * 功能：管理侧边栏、底部导航、NavHost 路由、主题/语言/字体设置
+ * 功能：管理侧边栏、顶部导航栏、NavHost 路由、主题/语言/字体设置
  * 输入：isDarkMode、onToggleTheme、language、onToggleLanguage、fontSizeScale、onFontSizeChange
- * 输出：侧边栏 + 底部导航栏 + 页面路由容器
- * 流程：初始化导航控制器 -> 判断当前路由 -> 渲染侧边栏/底部栏/顶部栏 -> 路由分发
+ * 输出：侧边栏 + 统一顶部导航栏 + 页面路由容器
+ * 流程：初始化导航控制器 -> 判断当前路由 -> 渲染侧边栏/顶部栏 -> 路由分发
+ *
+ * 设计变更（v1.3.1）：
+ * - 移除底部导航栏，所有功能按钮整合到顶部导航栏
+ * - 侧边栏根据当前路由显示不同内容
+ * - 文章阅读页全屏显示，仅保留紧凑顶部栏和底部翻页栏
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -186,11 +197,10 @@ fun FANDEXApp(
     /* 侧边栏状态 */
     val drawerState = rememberDrawerState(DrawerValue.Closed)
 
-    /* 判断是否在文章阅读页 */
+    /* 判断当前路由类型 */
     val isArticleRoute = currentRoute != null && currentRoute.startsWith("article/")
-
-    /* 文章阅读页隐藏底部导航 */
-    val showBottomBar = !isArticleRoute
+    val isModuleRoute = currentRoute != null && currentRoute.startsWith("module/")
+    val isHomeRoute = currentRoute == Screen.Home.route
 
     /* 加载内容索引用于侧边栏 */
     var contentIndex by remember { mutableStateOf<ContentIndex?>(null) }
@@ -198,99 +208,221 @@ fun FANDEXApp(
         contentIndex = ContentLoader.loadIndex(context)
     }
 
+    /* 文章页获取当前模块 ID，用于侧边栏文档列表 */
+    val currentModuleId = if (isArticleRoute) {
+        navBackStackEntry?.arguments?.getString("moduleId") ?: ""
+    } else if (isModuleRoute) {
+        navBackStackEntry?.arguments?.getString("moduleId") ?: ""
+    } else ""
+
+    /* 打开侧边栏的统一方法 */
+    val openDrawer: () -> Unit = {
+        scope.launch {
+            try { drawerState.open() } catch (_: Exception) { /* 静默处理 */ }
+        }
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
                 drawerShape = RoundedCornerShape(topEnd = 0.dp, bottomEnd = 0.dp),
-                modifier = Modifier.width(260.dp)
+                modifier = Modifier.width(280.dp)
             ) {
-                SidebarContent(
-                    contentIndex = contentIndex,
-                    strings = strings,
-                    onModuleClick = { moduleId ->
-                        /* 点击模块跳转，关闭侧边栏 */
-                        scope.launch {
-                            try {
-                                drawerState.close()
-                            } catch (_: Exception) { /* 关闭失败静默处理 */ }
+                /* 根据当前路由显示不同侧边栏内容 */
+                when {
+                    isArticleRoute -> SidebarArticleContent(
+                        contentIndex = contentIndex,
+                        currentModuleId = currentModuleId,
+                        strings = strings,
+                        onDocumentClick = { mod, slug, title ->
+                            scope.launch {
+                                try { drawerState.close() } catch (_: Exception) { /* 静默处理 */ }
+                            }
+                            navController.navigate(Screen.Article.createRoute(mod, slug, title)) {
+                                popUpTo(Screen.Article.route) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        },
+                        onNavigateHome = {
+                            scope.launch {
+                                try { drawerState.close() } catch (_: Exception) { /* 静默处理 */ }
+                            }
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Home.route) { inclusive = true }
+                                launchSingleTop = true
+                            }
                         }
-                        navController.navigate(Screen.Module.createRoute(moduleId)) {
-                            popUpTo(Screen.Home.route) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
+                    )
+                    isModuleRoute -> SidebarModuleContent(
+                        contentIndex = contentIndex,
+                        currentModuleId = currentModuleId,
+                        strings = strings,
+                        onDocumentClick = { mod, slug, title ->
+                            scope.launch {
+                                try { drawerState.close() } catch (_: Exception) { /* 静默处理 */ }
+                            }
+                            navController.navigate(Screen.Article.createRoute(mod, slug, title))
+                        },
+                        onNavigateHome = {
+                            scope.launch {
+                                try { drawerState.close() } catch (_: Exception) { /* 静默处理 */ }
+                            }
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Home.route) { inclusive = true }
+                                launchSingleTop = true
+                            }
                         }
-                    }
-                )
+                    )
+                    else -> SidebarHomeContent(
+                        contentIndex = contentIndex,
+                        strings = strings,
+                        isDarkMode = isDarkMode,
+                        onModuleClick = { moduleId ->
+                            scope.launch {
+                                try { drawerState.close() } catch (_: Exception) { /* 静默处理 */ }
+                            }
+                            navController.navigate(Screen.Module.createRoute(moduleId)) {
+                                popUpTo(Screen.Home.route) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
+                }
             }
         }
     ) {
         Scaffold(
-            bottomBar = {
-                if (showBottomBar) {
-                    /* 紧凑底部导航栏：3个小图标按钮，无文字标签 */
-                    NavigationBar(
-                        modifier = Modifier.height(48.dp)
-                    ) {
-                        /* 首页按钮 */
-                        NavigationBarItem(
-                            icon = {
+            topBar = {
+                /* 统一顶部导航栏，根据路由显示不同按钮 */
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = when {
+                                isArticleRoute -> {
+                                    val encodedTitle = navBackStackEntry?.arguments?.getString("title") ?: ""
+                                    try { URLDecoder.decode(encodedTitle, "UTF-8") } catch (_: Exception) { encodedTitle }
+                                }
+                                isModuleRoute -> currentModuleId
+                                else -> "FANDEX"
+                            },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = if (isHomeRoute) MaterialTheme.typography.titleLarge else MaterialTheme.typography.titleMedium,
+                            fontWeight = if (isHomeRoute) FontWeight.Bold else FontWeight.SemiBold,
+                            color = if (isHomeRoute) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                        )
+                    },
+                    navigationIcon = {
+                        if (isArticleRoute) {
+                            /* 文章页：返回按钮 */
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = strings.back,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        } else if (isModuleRoute) {
+                            /* 模块页：返回按钮 */
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = strings.back,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        } else {
+                            /* 首页：菜单按钮 */
+                            IconButton(onClick = openDrawer) {
+                                Icon(
+                                    Icons.Default.Menu,
+                                    contentDescription = strings.menu,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+                    },
+                    actions = {
+                        if (isArticleRoute) {
+                            /* 文章页：字体缩放 + 菜单 */
+                            IconButton(
+                                onClick = {
+                                    val newScale = (fontSizeScale - 0.1f).coerceIn(0.8f, 1.4f)
+                                    onFontSizeChange(newScale)
+                                },
+                                enabled = fontSizeScale > 0.8f
+                            ) {
+                                Icon(
+                                    Icons.Default.TextDecrease,
+                                    contentDescription = strings.fontSizeDecrease,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                            IconButton(
+                                onClick = {
+                                    val newScale = (fontSizeScale + 0.1f).coerceIn(0.8f, 1.4f)
+                                    onFontSizeChange(newScale)
+                                },
+                                enabled = fontSizeScale < 1.4f
+                            ) {
+                                Icon(
+                                    Icons.Default.TextIncrease,
+                                    contentDescription = strings.fontSizeIncrease,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                            IconButton(onClick = openDrawer) {
+                                Icon(
+                                    Icons.Default.Menu,
+                                    contentDescription = strings.menu,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        } else if (isModuleRoute) {
+                            /* 模块页：菜单 */
+                            IconButton(onClick = openDrawer) {
+                                Icon(
+                                    Icons.Default.Menu,
+                                    contentDescription = strings.menu,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        } else {
+                            /* 首页：主页 + 语言 + 主题 */
+                            IconButton(onClick = {
+                                navController.navigate(Screen.Home.route) {
+                                    popUpTo(Screen.Home.route) { inclusive = true }
+                                    launchSingleTop = true
+                                }
+                            }) {
                                 Icon(
                                     Icons.Default.Home,
                                     contentDescription = strings.home,
                                     modifier = Modifier.size(20.dp)
                                 )
-                            },
-                            label = null,
-                            selected = currentRoute == Screen.Home.route ||
-                                currentRoute?.startsWith("module/") == true,
-                            onClick = {
-                                if (currentRoute != Screen.Home.route) {
-                                    navController.navigate(Screen.Home.route) {
-                                        popUpTo(Screen.Home.route) { saveState = true }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
-                                }
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                            )
-                        )
-                        /* 语言切换按钮 */
-                        NavigationBarItem(
-                            icon = {
+                            }
+                            IconButton(onClick = onToggleLanguage) {
                                 Icon(
-                                    imageVector = Icons.Default.Language,
+                                    Icons.Default.Language,
                                     contentDescription = strings.language,
                                     modifier = Modifier.size(20.dp)
                                 )
-                            },
-                            label = null,
-                            selected = false,
-                            onClick = onToggleLanguage,
-                            colors = NavigationBarItemDefaults.colors(
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                            )
-                        )
-                        /* 主题切换按钮 */
-                        NavigationBarItem(
-                            icon = {
+                            }
+                            IconButton(onClick = onToggleTheme) {
                                 Icon(
                                     imageVector = if (isDarkMode) Icons.Default.LightMode else Icons.Default.DarkMode,
                                     contentDescription = if (isDarkMode) strings.lightMode else strings.darkMode,
                                     modifier = Modifier.size(20.dp)
                                 )
-                            },
-                            label = null,
-                            selected = false,
-                            onClick = onToggleTheme,
-                            colors = NavigationBarItemDefaults.colors(
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                            )
-                        )
-                    }
-                }
+                            }
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+                )
             }
         ) { innerPadding ->
             NavHost(
@@ -300,48 +432,12 @@ fun FANDEXApp(
             ) {
                 /* 首页路由 */
                 composable(Screen.Home.route) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        /* 首页顶部栏：菜单按钮 + 标题 */
-                        TopAppBar(
-                            title = {
-                                Text(
-                                    text = "FANDEX",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            },
-                            navigationIcon = {
-                                IconButton(onClick = {
-                                    scope.launch {
-                                        try {
-                                            drawerState.open()
-                                        } catch (_: Exception) { /* 打开失败静默处理 */ }
-                                    }
-                                }) {
-                                    Icon(
-                                        Icons.Default.Menu,
-                                        contentDescription = strings.menu
-                                    )
-                                }
-                            },
-                            colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = MaterialTheme.colorScheme.surface
-                            )
-                        )
-                        /* 首页内容 */
-                        HomeScreen(
-                            language = language,
-                            onNavigateToModule = { moduleId ->
-                                navController.navigate(Screen.Module.createRoute(moduleId))
-                            },
-                            onOpenDrawer = {
-                                scope.launch {
-                                    try { drawerState.open() } catch (_: Exception) { /* 静默处理 */ }
-                                }
-                            }
-                        )
-                    }
+                    HomeScreen(
+                        language = language,
+                        onNavigateToModule = { moduleId ->
+                            navController.navigate(Screen.Module.createRoute(moduleId))
+                        }
+                    )
                 }
 
                 /* 模块详情路由 */
@@ -350,50 +446,13 @@ fun FANDEXApp(
                     arguments = listOf(navArgument("moduleId") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val moduleId = backStackEntry.arguments?.getString("moduleId") ?: ""
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        /* 模块页顶部栏：菜单按钮 + 标题 */
-                        TopAppBar(
-                            title = {
-                                Text(
-                                    text = moduleId,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                            },
-                            navigationIcon = {
-                                IconButton(onClick = {
-                                    scope.launch {
-                                        try {
-                                            drawerState.open()
-                                        } catch (_: Exception) { /* 打开失败静默处理 */ }
-                                    }
-                                }) {
-                                    Icon(
-                                        Icons.Default.Menu,
-                                        contentDescription = strings.menu
-                                    )
-                                }
-                            },
-                            colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = MaterialTheme.colorScheme.surface
-                            )
-                        )
-                        /* 模块详情内容 */
-                        ModuleScreen(
-                            moduleId = moduleId,
-                            language = language,
-                            onNavigateBack = { navController.popBackStack() },
-                            onNavigateToArticle = { mod, slug, title ->
-                                navController.navigate(Screen.Article.createRoute(mod, slug, title))
-                            },
-                            onOpenDrawer = {
-                                scope.launch {
-                                    try { drawerState.open() } catch (_: Exception) { /* 静默处理 */ }
-                                }
-                            }
-                        )
-                    }
+                    ModuleScreen(
+                        moduleId = moduleId,
+                        language = language,
+                        onNavigateToArticle = { mod, slug, title ->
+                            navController.navigate(Screen.Article.createRoute(mod, slug, title))
+                        }
+                    )
                 }
 
                 /* 文章阅读路由 */
@@ -414,92 +473,21 @@ fun FANDEXApp(
                         encodedTitle
                     }
 
-                    /* 文章阅读页：紧凑顶部栏（返回+标题+字体大小按钮+菜单） */
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        TopAppBar(
-                            title = {
-                                Text(
-                                    text = title,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    style = MaterialTheme.typography.titleSmall
-                                )
-                            },
-                            navigationIcon = {
-                                /* 返回按钮 */
-                                IconButton(onClick = { navController.popBackStack() }) {
-                                    Icon(
-                                        Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = strings.back
-                                    )
-                                }
-                            },
-                            actions = {
-                                /* 字体增大按钮 */
-                                IconButton(onClick = {
-                                    val newScale = (fontSizeScale + 0.1f).coerceIn(0.8f, 1.4f)
-                                    onFontSizeChange(newScale)
-                                }) {
-                                    Icon(
-                                        Icons.Default.TextIncrease,
-                                        contentDescription = strings.fontSizeIncrease,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                }
-                                /* 字体缩小按钮 */
-                                IconButton(onClick = {
-                                    val newScale = (fontSizeScale - 0.1f).coerceIn(0.8f, 1.4f)
-                                    onFontSizeChange(newScale)
-                                }) {
-                                    Icon(
-                                        Icons.Default.TextDecrease,
-                                        contentDescription = strings.fontSizeDecrease,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                }
-                                /* 菜单按钮，打开侧边栏 */
-                                IconButton(onClick = {
-                                    scope.launch {
-                                        try {
-                                            drawerState.open()
-                                        } catch (_: Exception) { /* 打开失败静默处理 */ }
-                                    }
-                                }) {
-                                    Icon(
-                                        Icons.Default.Menu,
-                                        contentDescription = strings.menu
-                                    )
-                                }
-                            },
-                            colors = TopAppBarDefaults.topAppBarColors(
-                                containerColor = MaterialTheme.colorScheme.surface
-                            )
-                        )
-                        /* 文章内容 */
-                        ArticleScreen(
-                            moduleId = moduleId,
-                            slug = slug,
-                            title = title,
-                            isDarkMode = isDarkMode,
-                            language = language,
-                            fontSizeScale = fontSizeScale,
-                            onNavigateBack = { navController.popBackStack() },
-                            onNavigateToArticle = { mod, s, t ->
-                                navController.navigate(Screen.Article.createRoute(mod, s, t)) {
-                                    popUpTo(Screen.Article.route) { inclusive = true }
-                                    launchSingleTop = true
-                                }
-                            },
-                            onOpenDrawer = {
-                                scope.launch {
-                                    try { drawerState.open() } catch (_: Exception) { /* 静默处理 */ }
-                                }
-                            },
-                            onFontSizeChange = { newScale ->
-                                onFontSizeChange(newScale)
+                    ArticleScreenContent(
+                        moduleId = moduleId,
+                        slug = slug,
+                        title = title,
+                        isDarkMode = isDarkMode,
+                        language = language,
+                        fontSizeScale = fontSizeScale,
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToArticle = { mod, s, t ->
+                            navController.navigate(Screen.Article.createRoute(mod, s, t)) {
+                                popUpTo(Screen.Article.route) { inclusive = true }
+                                launchSingleTop = true
                             }
-                        )
-                    }
+                        }
+                    )
                 }
             }
         }
@@ -507,17 +495,188 @@ fun FANDEXApp(
 }
 
 /**
- * 侧边栏内容组件
+ * 文章阅读内容组件（不含顶部栏，由 HomeActivity 统一管理）
  *
- * 功能：展示 FANDEX 标题、分类列表、每个分类下的模块（带颜色圆点和文档数）
- * 输入：ContentIndex 数据、语言字符串、模块点击回调
- * 输出：可滚动的侧边栏导航列表
- * 流程：渲染标题 -> 遍历分类 -> 遍历分类下模块 -> 点击触发导航
+ * 功能：使用 MarkdownContent 原生渲染 Markdown 文档内容，支持翻页和返回顶部
+ * 输入：
+ *   - moduleId: 当前模块 ID
+ *   - slug: 文档唯一标识
+ *   - title: 文档标题
+ *   - isDarkMode: 是否暗色模式
+ *   - language: 语言设置
+ *   - fontSizeScale: 字体缩放比例（0.8-1.4）
+ *   - onNavigateBack: 返回上一页回调
+ *   - onNavigateToArticle: 翻页导航回调
+ * 输出：原生 Compose 渲染的文档阅读界面
+ * 流程：
+ *   1. 加载索引，查找当前文档在模块中的位置
+ *   2. 加载 Markdown 文本，传入 MarkdownContent 原生渲染
+ *   3. 底部栏提供上一篇/下一篇翻页及页码显示
+ *   4. 右下角返回顶部悬浮按钮
  */
 @Composable
-fun SidebarContent(
+fun ArticleScreenContent(
+    moduleId: String,
+    slug: String,
+    title: String,
+    isDarkMode: Boolean = true,
+    language: Strings.Language = Strings.Language.ZH,
+    fontSizeScale: Float = 1.0f,
+    onNavigateBack: () -> Unit,
+    onNavigateToArticle: (String, String, String) -> Unit = { _, _, _ -> }
+) {
+    val context = LocalContext.current
+    val strings = Strings.get(language)
+
+    /* 滚动状态，用于返回顶部动画 */
+    val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+
+    /* 加载索引，获取当前模块的文档列表用于翻页 */
+    var contentIndex by remember { mutableStateOf<ContentIndex?>(null) }
+    LaunchedEffect(Unit) {
+        contentIndex = ContentLoader.loadIndex(context)
+    }
+
+    /* 加载当前文档的 Markdown 文本 */
+    var markdownText by remember { mutableStateOf("") }
+    LaunchedEffect(moduleId, slug) {
+        val loaded = ContentLoader.loadDocumentMarkdown(context, moduleId, slug)
+        markdownText = loaded ?: strings.noContent
+    }
+
+    /* 查找当前文档在模块中的位置，计算上一篇/下一篇 */
+    val documents = contentIndex?.documents?.filter { it.module == moduleId } ?: emptyList()
+    val currentIndex = documents.indexOfFirst { it.slug == slug }
+    val prevDoc: Document? = if (currentIndex > 0) documents[currentIndex - 1] else null
+    val nextDoc: Document? = if (currentIndex >= 0 && currentIndex < documents.size - 1) documents[currentIndex + 1] else null
+
+    /* 底部翻页栏高度，用于返回顶部按钮的底部偏移计算 */
+    val bottomBarHeight = if (documents.size > 1) 48.dp else 0.dp
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            /* Markdown 原生渲染内容区 */
+            Box(modifier = Modifier.weight(1f)) {
+                MarkdownContent(
+                    markdown = markdownText,
+                    isDarkMode = isDarkMode,
+                    fontSizeScale = fontSizeScale,
+                    scrollState = scrollState
+                )
+            }
+
+            /* 底部翻页栏：紧凑设计，仅在有多个文档时显示 */
+            if (documents.size > 1) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 2.dp
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 2.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        /* 上一篇按钮 */
+                        TextButton(
+                            onClick = {
+                                prevDoc?.let { doc ->
+                                    onNavigateToArticle(doc.module, doc.slug, doc.title)
+                                }
+                            },
+                            enabled = prevDoc != null,
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                        ) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                contentDescription = strings.previousDoc,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(2.dp))
+                            Text(
+                                text = strings.previousDoc,
+                                style = MaterialTheme.typography.labelSmall,
+                                maxLines = 1
+                            )
+                        }
+
+                        /* 页码指示器 */
+                        Text(
+                            text = "${currentIndex + 1}/${documents.size}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        /* 下一篇按钮 */
+                        TextButton(
+                            onClick = {
+                                nextDoc?.let { doc ->
+                                    onNavigateToArticle(doc.module, doc.slug, doc.title)
+                                }
+                            },
+                            enabled = nextDoc != null,
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                        ) {
+                            Text(
+                                text = strings.nextDoc,
+                                style = MaterialTheme.typography.labelSmall,
+                                maxLines = 1
+                            )
+                            Spacer(modifier = Modifier.width(2.dp))
+                            Icon(
+                                Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                contentDescription = strings.nextDoc,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        /* 返回顶部悬浮按钮：右下角小圆形 */
+        FloatingActionButton(
+            onClick = {
+                coroutineScope.launch {
+                    scrollState.animateScrollTo(0)
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(
+                    end = 12.dp,
+                    bottom = bottomBarHeight + 8.dp
+                )
+                .size(32.dp),
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 2.dp)
+        ) {
+            Icon(
+                Icons.Filled.KeyboardArrowUp,
+                contentDescription = strings.backToTop,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+    }
+}
+
+/**
+ * 首页侧边栏内容
+ *
+ * 功能：展示 FANDEX 应用信息、作者信息、更新时间、数量统计、分类与模块列表
+ * 输入：ContentIndex 数据、语言字符串、深色模式标志、模块点击回调
+ * 输出：可滚动的侧边栏导航列表
+ * 流程：渲染应用信息 -> 统计数据 -> 分类与模块列表
+ */
+@Composable
+fun SidebarHomeContent(
     contentIndex: ContentIndex?,
     strings: Strings.LangStrings,
+    isDarkMode: Boolean,
     onModuleClick: (String) -> Unit
 ) {
     Column(
@@ -533,7 +692,7 @@ fun SidebarContent(
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(2.dp))
         Text(
             text = strings.homeSubtitle,
             style = MaterialTheme.typography.bodySmall,
@@ -541,7 +700,40 @@ fun SidebarContent(
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
+
+        /* 应用信息区 */
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    RoundedCornerShape(8.dp)
+                )
+                .padding(12.dp)
+        ) {
+            /* 版本信息 */
+            InfoRow(label = "v1.3.1-beta", value = "")
+            /* 作者信息 */
+            InfoRow(label = "fanquanpp", value = "")
+            /* 更新时间 */
+            if (contentIndex != null) {
+                InfoRow(label = contentIndex.generatedAt, value = "")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            /* 数量统计 */
+            if (contentIndex != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    StatItem(count = "${contentIndex.categories.size}", label = strings.category)
+                    StatItem(count = "${contentIndex.modules.size}", label = strings.modules)
+                    StatItem(count = "${contentIndex.documents.size}", label = strings.documents)
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(12.dp))
 
         /* 分类与模块列表 */
         if (contentIndex != null) {
@@ -575,6 +767,307 @@ fun SidebarContent(
                 }
             }
         }
+    }
+}
+
+/**
+ * 模块页侧边栏内容
+ *
+ * 功能：展示当前模块的文档列表，支持快速跳转
+ * 输入：ContentIndex 数据、当前模块 ID、语言字符串、文档点击回调、返回主页回调
+ * 输出：模块信息 + 文档列表
+ * 流程：渲染模块标题 -> 返回主页按钮 -> 文档列表
+ */
+@Composable
+fun SidebarModuleContent(
+    contentIndex: ContentIndex?,
+    currentModuleId: String,
+    strings: Strings.LangStrings,
+    onDocumentClick: (String, String, String) -> Unit,
+    onNavigateHome: () -> Unit
+) {
+    val module = contentIndex?.modules?.find { it.id == currentModuleId }
+    val category = module?.let { m ->
+        contentIndex?.categories?.find { it.id == m.category }
+    }
+    val documents = module?.let { m ->
+        contentIndex?.documents?.filter { it.module == m.id }
+    } ?: emptyList()
+
+    val accentColor = remember(category?.color) {
+        category?.color?.let { colorStr ->
+            try { Color(android.graphics.Color.parseColor(colorStr)) } catch (_: Exception) { null }
+        } ?: Color(0xFF4F5BD5)
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        /* 返回主页按钮 */
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onNavigateHome)
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                Icons.Default.Home,
+                contentDescription = strings.home,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = strings.home,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        /* 模块标题 */
+        if (module != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .width(3.dp)
+                        .height(20.dp)
+                        .clip(RoundedCornerShape(1.dp))
+                        .background(accentColor)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = module.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "${documents.size} ${strings.docs}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        /* 文档列表 */
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(vertical = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            items(documents) { document ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onDocumentClick(document.module, document.slug, document.title) }
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(accentColor.copy(alpha = 0.6f))
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = document.title,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 文章页侧边栏内容
+ *
+ * 功能：展示当前模块的文档列表，高亮当前文档，支持快速切换
+ * 输入：ContentIndex 数据、当前模块 ID、语言字符串、文档点击回调、返回主页回调
+ * 输出：模块信息 + 文档列表（高亮当前项）
+ * 流程：渲染返回主页 -> 模块标题 -> 文档列表
+ */
+@Composable
+fun SidebarArticleContent(
+    contentIndex: ContentIndex?,
+    currentModuleId: String,
+    strings: Strings.LangStrings,
+    onDocumentClick: (String, String, String) -> Unit,
+    onNavigateHome: () -> Unit
+) {
+    val module = contentIndex?.modules?.find { it.id == currentModuleId }
+    val category = module?.let { m ->
+        contentIndex?.categories?.find { it.id == m.category }
+    }
+    val documents = module?.let { m ->
+        contentIndex?.documents?.filter { it.module == m.id }
+    } ?: emptyList()
+
+    val accentColor = remember(category?.color) {
+        category?.color?.let { colorStr ->
+            try { Color(android.graphics.Color.parseColor(colorStr)) } catch (_: Exception) { null }
+        } ?: Color(0xFF4F5BD5)
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        /* 返回主页按钮 */
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onNavigateHome)
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                Icons.Default.Home,
+                contentDescription = strings.home,
+                modifier = Modifier.size(18.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = strings.home,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        /* 模块标题 */
+        if (module != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .width(3.dp)
+                        .height(20.dp)
+                        .clip(RoundedCornerShape(1.dp))
+                        .background(accentColor)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = module.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "${documents.size} ${strings.docs}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        /* 文档列表 */
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(vertical = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            items(documents) { document ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onDocumentClick(document.module, document.slug, document.title) }
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(accentColor.copy(alpha = 0.6f))
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = document.title,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 信息行组件
+ *
+ * 功能：显示单行信息文本
+ * 输入：标签文本、值文本
+ * 输出：单行文本
+ */
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 1.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        if (value.isNotBlank()) {
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+/**
+ * 统计项组件
+ *
+ * 功能：显示数量 + 标签的统计信息
+ * 输入：数量字符串、标签字符串
+ * 输出：居中的统计项
+ */
+@Composable
+private fun StatItem(count: String, label: String) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = count,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 

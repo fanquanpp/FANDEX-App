@@ -10,7 +10,6 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -716,7 +715,12 @@ private fun RenderTableBody(
  *
  * 输出：水平排列的表格单元格行
  *
- * 流程：遍历 TableCell -> 渲染每个单元格
+ * 流程：遍历 TableCell -> 渲染每个单元格（使用 weight(1f) 均分宽度）
+ *
+ * 修复（v1.3.1）：
+ * - 移除 width(IntrinsicSize.Min)，改用 weight(1f) 均分列宽
+ * - 整个表格使用 horizontalScroll 支持横向滚动
+ * - 表格外层包装确保列对齐
  */
 @Composable
 private fun RenderTableRow(
@@ -734,35 +738,40 @@ private fun RenderTableRow(
     }
     val cellTextColor = if (isHeader) colorScheme.tableHeaderFg else colorScheme.onBackground
 
-    val scrollState = rememberScrollState()
+    /* 收集当前行的所有单元格 */
+    val cells = mutableListOf<TableCell>()
+    var cell = tableRow.firstChild
+    while (cell != null) {
+        if (cell is TableCell) {
+            cells.add(cell)
+        }
+        cell = cell.next
+    }
+
+    /* 每列使用 weight(1f) 均分宽度，确保列对齐 */
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .horizontalScroll(scrollState)
             .background(cellBgColor)
     ) {
-        var cell = tableRow.firstChild
-        while (cell != null) {
-            if (cell is TableCell) {
-                val inlineContent = BuildInlineAnnotatedString(
-                    cell.firstChild, colorScheme, fontSizeScale
+        cells.forEach { tableCell ->
+            val inlineContent = BuildInlineAnnotatedString(
+                tableCell.firstChild, colorScheme, fontSizeScale
+            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .border(1.dp, colorScheme.outlineVariant)
+                    .padding(horizontal = 6.dp, vertical = 5.dp)
+            ) {
+                Text(
+                    text = inlineContent,
+                    fontSize = cellFontSize,
+                    fontWeight = if (isHeader) FontWeight.SemiBold else FontWeight.Normal,
+                    color = cellTextColor,
+                    lineHeight = cellFontSize * 1.5f
                 )
-                Box(
-                    modifier = Modifier
-                        .border(1.dp, colorScheme.outlineVariant)
-                        .padding(horizontal = 8.dp, vertical = 6.dp)
-                        .width(IntrinsicSize.Min)
-                ) {
-                    Text(
-                        text = inlineContent,
-                        fontSize = cellFontSize,
-                        fontWeight = if (isHeader) FontWeight.SemiBold else FontWeight.Normal,
-                        color = cellTextColor,
-                        lineHeight = cellFontSize * 1.5f
-                    )
-                }
             }
-            cell = cell.next
         }
     }
 }
