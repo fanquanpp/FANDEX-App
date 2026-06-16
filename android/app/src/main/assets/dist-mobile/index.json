@@ -1,0 +1,16 @@
+{
+  "version": "4.0.0",
+  "generatedAt": "",
+  "categories": [
+    { "id": "tools", "label": "工具链", "color": "#4f5bd5" },
+    { "id": "frontend", "label": "前端技术", "color": "#d63031" },
+    { "id": "backend", "label": "后端技术", "color": "#e17055" },
+    { "id": "database", "label": "数据库", "color": "#00b894" },
+    { "id": "cs", "label": "计算机科学", "color": "#8854d0" },
+    { "id": "math", "label": "数学", "color": "#6c5ce7" },
+    { "id": "cloud", "label": "云与基础设施", "color": "#e05a2b" },
+    { "id": "ai", "label": "人工智能", "color": "#f9a825" }
+  ],
+  "modules": [],
+  "documents": []
+}
