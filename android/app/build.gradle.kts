@@ -33,6 +33,19 @@ android {
         }
     }
 
+    /**
+     * 自定义 APK 输出文件名
+     * 格式：FANDEX-v{versionName}.apk（如 FANDEX-v1.3.1-beta.apk）
+     * 确保下载和分发时文件名具有可辨识的版本标识
+     */
+    applicationVariants.all {
+        val variant = this
+        variant.outputs.all {
+            val output = this as com.android.build.gradle.internal.api.ApkVariantOutputImpl
+            output.outputFileName = "FANDEX-v${variant.versionName}.apk"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
