@@ -31,6 +31,8 @@ sdk-tmp/
 # 二进制产物 / 安装包
 *.apk
 *.aab
+# 允许 docs 目录下的 APK（用于 GitHub Pages 下载）
+!docs/*.apk
 
 # IDE / 编辑器
 .vscode/
