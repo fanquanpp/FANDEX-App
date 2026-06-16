@@ -52,11 +52,4 @@ sealed class Screen(val route: String) {
             return "article/$moduleId/$slug/$encodedTitle"
         }
     }
-
-    /**
-     * 复习路由
-     *
-     * 展示复习卡片和答题交互
-     */
-    data object Review : Screen("review")
 }
