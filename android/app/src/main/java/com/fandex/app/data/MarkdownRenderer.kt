@@ -40,18 +40,34 @@ object MarkdownRenderer {
         val tableBorder = if (isDarkMode) "#333" else "#ddd"
         val thBg = if (isDarkMode) "#252538" else "#f5f5f5"
 
-        var html = escapeHtml(markdown)
-
-        // 代码块（必须在行内代码之前处理）
-        html = html.replace(Regex("```(\\w*)\\n([\\s\\S]*?)```")) { match ->
+        /* 先提取代码块，避免 escapeHtml 转义代码内容 */
+        val codeBlocks = mutableListOf<String>()
+        var processed = markdown
+        processed = processed.replace(Regex("```(\\w*)\\n([\\s\\S]*?)```")) { match ->
             val lang = match.groupValues[1]
-            val code = match.groupValues[2].trim()
-            """<pre><code class="language-$lang">$code</code></pre>"""
+            val code = escapeHtml(match.groupValues[2].trim())
+            val placeholder = "%%CODEBLOCK_${codeBlocks.size}%%"
+            codeBlocks.add("""<pre><code class="language-$lang">$code</code></pre>""")
+            placeholder
         }
 
-        // 行内代码
-        html = html.replace(Regex("`([^`]+)`")) { match ->
-            """<code>${match.groupValues[1]}</code>"""
+        /* 提取行内代码 */
+        val inlineCodes = mutableListOf<String>()
+        processed = processed.replace(Regex("`([^`]+)`")) { match ->
+            val placeholder = "%%INLINECODE_${inlineCodes.size}%%"
+            inlineCodes.add("""<code>${escapeHtml(match.groupValues[1])}</code>""")
+            placeholder
+        }
+
+        /* 转义 HTML 特殊字符 */
+        var html = escapeHtml(processed)
+
+        /* 还原代码块占位符 */
+        codeBlocks.forEachIndexed { index, block ->
+            html = html.replace("%%CODEBLOCK_$index%%", block)
+        }
+        inlineCodes.forEachIndexed { index, code ->
+            html = html.replace("%%INLINECODE_$index%%", code)
         }
 
         // 标题

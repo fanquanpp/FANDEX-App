@@ -21,7 +21,7 @@ import com.fandex.app.data.MarkdownRenderer
  * 功能：使用 WebView 渲染 Markdown 转 HTML 的文档内容
  * 输入：模块 ID、文档 slug、文档标题
  * 输出：WebView 展示渲染后的文档
- * 流程：接收参数 -> 加载 Markdown -> 转换为 HTML -> WebView 渲染
+ * 流程：接收参数 -> AndroidView factory 中加载 Markdown -> 转换为 HTML -> WebView 渲染
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,15 +32,6 @@ fun ArticleScreen(
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
-    var webView by remember { mutableStateOf<WebView?>(null) }
-
-    /* 加载文档内容并渲染 */
-    LaunchedEffect(moduleId, slug) {
-        val markdown = ContentLoader.loadDocumentMarkdown(context, moduleId, slug)
-        val content = markdown ?: "No content available"
-        val html = MarkdownRenderer.render(title, content)
-        webView?.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
-    }
 
     Scaffold(
         topBar = {
@@ -70,25 +61,17 @@ fun ArticleScreen(
                     settings.javaScriptEnabled = false
                     settings.domStorageEnabled = true
                     webViewClient = WebViewClient()
-                    webView = this
+
+                    /* 在 factory 中一次性加载文档内容 */
+                    val markdown = ContentLoader.loadDocumentMarkdown(context, moduleId, slug)
+                    val content = markdown ?: "No content available"
+                    val html = MarkdownRenderer.render(title, content)
+                    loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
                 }
             },
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            update = { view ->
-                val markdown = ContentLoader.loadDocumentMarkdown(context, moduleId, slug)
-                val content = markdown ?: "No content available"
-                val html = MarkdownRenderer.render(title, content)
-                view.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
-            }
+                .padding(paddingValues)
         )
-    }
-
-    /* 清理 WebView */
-    DisposableEffect(Unit) {
-        onDispose {
-            webView?.destroy()
-        }
     }
 }

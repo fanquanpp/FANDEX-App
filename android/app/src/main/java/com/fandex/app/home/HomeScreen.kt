@@ -1,41 +1,407 @@
 package com.fandex.app.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.fandex.app.data.Category
+import com.fandex.app.data.ContentIndex
+import com.fandex.app.data.ContentLoader
+import com.fandex.app.data.Document
+import com.fandex.app.data.Module
 
 /**
  * 首页界面组件
  *
- * 功能：按分类展示模块列表
- * 输入：模块分类数据
+ * 功能：按分类展示模块列表，支持搜索和分类筛选
+ * 输入：模块分类数据（从 assets 加载）、导航回调
  * 输出：可滚动的分类-模块列表
- * 流程：遍历分类 -> 渲染分类标题 -> 渲染模块卡片
+ * 流程：加载索引 -> 渲染搜索栏 -> 渲染分类筛选 -> 渲染模块卡片
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreen(
+    onNavigateToModule: (String) -> Unit,
+    onNavigateToReview: () -> Unit
+) {
+    val context = LocalContext.current
+    var index by remember { mutableStateOf<ContentIndex?>(null) }
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
+
+    /* 首次渲染时加载索引数据 */
+    LaunchedEffect(Unit) {
+        index = ContentLoader.loadIndex(context)
+    }
+
+    val contentIndex = index
+
+    if (contentIndex == null) {
+        /* 加载中状态 */
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "FANDEX",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Loading...",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        return
+    }
+
+    /* 根据搜索和筛选条件过滤模块 */
+    val filteredModules = remember(contentIndex, searchQuery, selectedCategory) {
+        var modules = contentIndex.modules
+        if (selectedCategory != null) {
+            modules = modules.filter { it.category == selectedCategory }
+        }
+        if (searchQuery.isNotBlank()) {
+            val query = searchQuery.lowercase()
+            modules = modules.filter {
+                it.title.lowercase().contains(query) ||
+                it.id.lowercase().contains(query) ||
+                it.description.lowercase().contains(query)
+            }
+        }
+        modules
+    }
+
+    /* 根据搜索条件过滤文档 */
+    val filteredDocuments = remember(contentIndex, searchQuery) {
+        if (searchQuery.isBlank()) emptyList()
+        else {
+            val query = searchQuery.lowercase()
+            contentIndex.documents.filter {
+                it.title.lowercase().contains(query) ||
+                it.slug.lowercase().contains(query)
+            }
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 80.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            /* 标题区域 */
+            item {
+                Text(
+                    text = "FANDEX",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "${contentIndex.documents.size} docs / ${contentIndex.modules.size} modules",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            /* 搜索栏 */
+            item {
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("Search modules or docs") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                    ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = { /* 触发搜索 */ })
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+            /* 分类筛选条 */
+            item {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    item {
+                        FilterChip(
+                            selected = selectedCategory == null,
+                            onClick = { selectedCategory = null },
+                            label = { Text("All") }
+                        )
+                    }
+                    items(contentIndex.categories) { category ->
+                        val catColor = remember(category.color) {
+                            try { Color(android.graphics.Color.parseColor(category.color)) }
+                            catch (_: Exception) { Color(0xFF4F5BD5) }
+                        }
+                        FilterChip(
+                            selected = selectedCategory == category.id,
+                            onClick = {
+                                selectedCategory = if (selectedCategory == category.id) null else category.id
+                            },
+                            label = { Text(category.label) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = catColor.copy(alpha = 0.15f),
+                                selectedLabelColor = catColor
+                            )
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+            /* 搜索结果 - 文档列表 */
+            if (searchQuery.isNotBlank() && filteredDocuments.isNotEmpty()) {
+                item {
+                    Text(
+                        text = "Documents (${filteredDocuments.size})",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                }
+                items(filteredDocuments.take(20)) { document ->
+                    DocumentSearchResult(
+                        document = document,
+                        categories = contentIndex.categories,
+                        onClick = { onNavigateToModule(document.module) }
+                    )
+                }
+            }
+
+            /* 模块卡片列表 - 按分类分组 */
+            if (filteredModules.isNotEmpty()) {
+                val groupedModules = filteredModules.groupBy { it.category }
+                val orderedCategories = contentIndex.categories.filter { groupedModules.containsKey(it.id) }
+
+                items(orderedCategories) { category ->
+                    val categoryModules = groupedModules[category.id] ?: emptyList()
+                    CategoryModuleSection(
+                        category = category,
+                        modules = categoryModules,
+                        onModuleClick = onNavigateToModule
+                    )
+                }
+            } else if (searchQuery.isNotBlank()) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No results found", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 分类模块区块
+ *
+ * 功能：展示某分类下的所有模块卡片
+ * 输入：Category 和该分类下的模块列表
+ * 输出：分类标题 + 模块卡片列表
  */
 @Composable
-fun HomeScreen() {
-    // TODO: 从 assets/dist-mobile/index.json 加载模块数据
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item {
-            Text(
-                text = "FANDEX",
-                style = MaterialTheme.typography.headlineLarge
+fun CategoryModuleSection(
+    category: Category,
+    modules: List<Module>,
+    onModuleClick: (String) -> Unit
+) {
+    val cardColor = remember(category.color) {
+        try { Color(android.graphics.Color.parseColor(category.color)) }
+        catch (_: Exception) { Color(0xFF4F5BD5) }
+    }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        /* 分类标题 */
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(bottom = 8.dp, top = 12.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(4.dp)
+                    .height(20.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(cardColor)
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "循序渐进，从第一行代码到理解整个世界",
-                style = MaterialTheme.typography.bodyMedium,
+                text = category.label,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "${modules.size} modules",
+                style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(modifier = Modifier.height(16.dp))
         }
-        // TODO: 按分类渲染模块卡片
+
+        /* 模块卡片 */
+        modules.forEach { module ->
+            ModuleCard(
+                module = module,
+                accentColor = cardColor,
+                onClick = { onModuleClick(module.id) }
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+        }
+    }
+}
+
+/**
+ * 模块卡片
+ *
+ * 功能：展示单个模块信息，点击进入模块详情
+ * 输入：Module 对象和强调色
+ * 输出：可点击的模块卡片
+ */
+@Composable
+fun ModuleCard(
+    module: Module,
+    accentColor: Color,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            /* 模块颜色圆点 */
+            Box(
+                modifier = Modifier
+                    .size(10.dp)
+                    .clip(CircleShape)
+                    .background(accentColor)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = module.title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "${module.documents.size} docs",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 文档搜索结果项
+ *
+ * 功能：展示搜索匹配的文档条目
+ * 输入：Document 对象
+ * 输出：可点击的文档条目
+ */
+@Composable
+fun DocumentSearchResult(
+    document: Document,
+    categories: List<Category>,
+    onClick: () -> Unit
+) {
+    val accentColor = remember(document.category, categories) {
+        val colorStr = categories.find { it.id == document.category }?.color
+        try { colorStr?.let { Color(android.graphics.Color.parseColor(it)) } ?: Color(0xFF4F5BD5) }
+        catch (_: Exception) { Color(0xFF4F5BD5) }
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(accentColor)
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = document.title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = document.module,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }
