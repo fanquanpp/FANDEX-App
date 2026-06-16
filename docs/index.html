@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FANDEX App - 下载</title>
+    <title>FANDEX-Android App</title>
     <style>
         /* ========== 全局重置 ========== */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -31,8 +31,10 @@
             --spacing-md: 16px;
             --spacing-lg: 24px;
             --spacing-xl: 32px;
+            --spacing-2xl: 48px;
             --font-display: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
             --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
             --transition-fast: 0.12s ease;
             --transition-base: 0.22s ease;
         }
@@ -74,7 +76,6 @@
 
         a { color: var(--color-primary); text-decoration: none; }
         a:hover { color: var(--color-primary-hover); }
-
         ::selection { background: var(--color-primary); color: var(--color-text-inverse); }
 
         /* ========== 顶部导航栏 ========== */
@@ -95,15 +96,11 @@
 
         .nav-left { display: flex; align-items: center; gap: var(--spacing-sm); }
 
-        /* Logo：左侧竖色条 + 文字 */
         .nav-logo {
             display: flex;
             align-items: center;
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
+            cursor: default;
         }
-        .nav-logo:hover { opacity: 0.85; }
 
         .logo-mark {
             display: inline-block;
@@ -133,7 +130,6 @@
 
         .nav-right { display: flex; align-items: center; gap: var(--spacing-sm); }
 
-        /* 导航链接按钮 */
         .nav-link {
             display: inline-flex;
             align-items: center;
@@ -154,7 +150,6 @@
             color: var(--color-primary);
         }
 
-        /* 主题切换按钮 */
         .theme-toggle {
             display: inline-flex;
             align-items: center;
@@ -199,26 +194,27 @@
             line-height: 1.6;
         }
 
-        /* ========== 版本卡片网格 ========== */
+        /* ========== 版本卡片网格（与 FANDEX 模块卡片一致） ========== */
         .version-grid {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 1px;
             background: var(--color-border-light);
             border: 1px solid var(--color-border-light);
         }
 
-        @media (min-width: 640px) {
+        @media (max-width: 640px) {
             .version-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
-        /* ========== 版本卡片 ========== */
+        /* ========== 版本卡片（与 FANDEX ModuleCard 一致） ========== */
         .version-card {
             background: var(--color-bg);
             padding: var(--spacing-lg);
             display: flex;
             flex-direction: column;
             gap: var(--spacing-sm);
+            cursor: pointer;
             transition: background var(--transition-fast), transform var(--transition-fast);
             text-decoration: none;
             color: inherit;
@@ -227,41 +223,6 @@
         .version-card:hover {
             background: var(--color-bg-hover);
             transform: translateY(-2px);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .card-version {
-            font-family: var(--font-display);
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--color-text);
-        }
-
-        .card-badge {
-            font-family: var(--font-display);
-            font-size: 0.7rem;
-            font-weight: 500;
-            padding: 2px 8px;
-            border: 1px solid var(--color-tertiary);
-            color: var(--color-tertiary);
-            letter-spacing: 0.05em;
-        }
-
-        .card-desc {
-            font-size: 0.82rem;
-            color: var(--color-text-secondary);
-            line-height: 1.5;
-        }
-
-        .card-meta {
-            font-size: 0.75rem;
-            color: var(--color-text-tertiary);
-            font-family: var(--font-display);
         }
 
         .card-icon {
@@ -274,12 +235,144 @@
             font-family: var(--font-display);
             font-weight: 700;
             font-size: 0.75rem;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            color: var(--color-text);
+            margin: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card-desc {
+            font-size: 0.78rem;
+            color: var(--color-text-secondary);
+            margin: 0;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        /* ========== 版本详情页 ========== */
+        .detail-page { display: none; }
+        .detail-page.active { display: block; }
+        .list-page.hidden { display: none; }
+
+        .detail-back {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--color-border);
+            background: var(--color-bg-card);
+            color: var(--color-text-secondary);
+            font-family: var(--font-display);
+            font-size: 0.82em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            margin-bottom: var(--spacing-lg);
+        }
+        .detail-back:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .detail-header {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .detail-version {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--color-text);
+        }
+
+        .detail-badge {
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 2px 8px;
+            border: 1px solid var(--color-tertiary);
+            color: var(--color-tertiary);
+            letter-spacing: 0.05em;
+            margin-left: var(--spacing-sm);
+        }
+
+        .detail-meta {
+            font-size: 0.82rem;
+            color: var(--color-text-tertiary);
+            margin-top: var(--spacing-xs);
+            font-family: var(--font-display);
+        }
+
+        .detail-changelog {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .detail-changelog h3 {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--color-text);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .detail-changelog ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .detail-changelog li {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            line-height: 1.7;
+            padding-left: var(--spacing-md);
+            position: relative;
+        }
+
+        .detail-changelog li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.7em;
+            width: 4px;
+            height: 4px;
             background: var(--color-primary);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border: 1px solid var(--color-primary);
+            background: var(--color-primary);
+            color: var(--color-text-inverse);
+            font-family: var(--font-display);
+            font-size: 0.88em;
+            font-weight: 600;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            transition: all var(--transition-fast);
+        }
+
+        .download-btn:hover {
+            background: var(--color-primary-hover);
+            border-color: var(--color-primary-hover);
+            color: var(--color-text-inverse);
         }
 
         /* ========== 推荐区域 ========== */
         .recommend-section {
-            margin-top: var(--spacing-2xl, 48px);
+            margin-top: var(--spacing-2xl);
             padding-top: var(--spacing-lg);
             border-top: 1px solid var(--color-border-light);
         }
@@ -294,14 +387,10 @@
 
         .recommend-grid {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 1px;
             background: var(--color-border-light);
             border: 1px solid var(--color-border-light);
-        }
-
-        @media (min-width: 640px) {
-            .recommend-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
         .recommend-card {
@@ -330,20 +419,20 @@
 
         .recommend-card .card-name {
             font-family: var(--font-display);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 700;
             color: var(--color-text);
         }
 
         .recommend-card .card-desc {
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             color: var(--color-text-secondary);
-            line-height: 1.5;
+            line-height: 1.4;
         }
 
         /* ========== 页脚 ========== */
         .page-footer {
-            margin-top: var(--spacing-2xl, 48px);
+            margin-top: var(--spacing-2xl);
             padding-top: var(--spacing-lg);
             border-top: 1px solid var(--color-border-light);
             font-size: 0.78rem;
@@ -391,57 +480,74 @@
     <!-- 主内容区 -->
     <main class="main-content">
 
-        <!-- 页面标题 -->
-        <div class="page-header">
-            <h1 class="page-title">App 下载</h1>
-            <p class="page-desc">Android 离线查阅工具，无需网络，支持中英日三语界面与深浅色双模式</p>
-        </div>
+        <!-- 版本列表页 -->
+        <div class="list-page" id="listPage">
+            <div class="page-header">
+                <h1 class="page-title">版本下载</h1>
+                <p class="page-desc">Android 离线查阅工具，无需网络，支持中英日三语界面与深浅色双模式</p>
+            </div>
 
-        <!-- 版本下载卡片 -->
-        <div class="version-grid">
+            <div class="version-grid">
 
-            <!-- v1.3.1-beta -->
-            <a class="version-card" href="./FANDEX-v1.3.1-beta.apk" download="FANDEX-v1.3.1-beta.apk">
-                <span class="card-icon">A</span>
-                <div class="card-header">
-                    <span class="card-version">v1.3.1-beta</span>
-                    <span class="card-badge">BETA</span>
-                </div>
-                <p class="card-desc">顶部栏整合 / 侧边栏分级 / 表格修复 / 全屏阅读</p>
-                <span class="card-meta">Android 8.0+</span>
-            </a>
-
-            <!-- v1.3.0-beta -->
-            <a class="version-card" href="./FANDEX-v1.3.0-beta.apk" download="FANDEX-v1.3.0-beta.apk">
-                <span class="card-icon" style="background:var(--color-secondary)">A</span>
-                <div class="card-header">
-                    <span class="card-version">v1.3.0-beta</span>
-                    <span class="card-badge">BETA</span>
-                </div>
-                <p class="card-desc">原生 Compose 渲染 / DataStore 持久化 / 侧边栏导航 / 三语界面</p>
-                <span class="card-meta">Android 8.0+</span>
-            </a>
-
-        </div>
-
-        <!-- 互相推荐区域 -->
-        <div class="recommend-section">
-            <h2 class="recommend-title">更多平台</h2>
-            <div class="recommend-grid">
-
-                <a href="https://fanquanpp.github.io/FANDEX/" class="recommend-card">
-                    <span class="card-platform">GITHUB PAGES</span>
-                    <span class="card-name">FANDEX</span>
-                    <p class="card-desc">基于 GitHub Pages 的云端在线查阅平台，双端适配，自动构建部署</p>
+                <!-- v1.3.1-beta -->
+                <a class="version-card" onclick="showDetail('1.3.1')">
+                    <span class="card-icon" style="background:#3366cc">1.3</span>
+                    <h3 class="card-title">v1.3.1-beta</h3>
+                    <p class="card-desc">顶部栏整合 / 侧边栏分级 / 表格修复 / 全屏阅读</p>
                 </a>
 
-                <a href="https://github.com/fanquanpp/FANDEX-App" class="recommend-card">
-                    <span class="card-platform">ANDROID</span>
-                    <span class="card-name">FANDEX-App</span>
-                    <p class="card-desc">完全离线查阅应用，无网络依赖，原生渲染，三语界面</p>
+                <!-- v1.3.0-beta -->
+                <a class="version-card" onclick="showDetail('1.3.0')">
+                    <span class="card-icon" style="background:#00b894">1.3</span>
+                    <h3 class="card-title">v1.3.0-beta</h3>
+                    <p class="card-desc">原生 Compose 渲染 / DataStore 持久化 / 侧边栏导航 / 三语界面</p>
+                </a>
+
+                <!-- v1.2.0-beta -->
+                <a class="version-card" onclick="showDetail('1.2.0')">
+                    <span class="card-icon" style="background:#e05a2b">1.2</span>
+                    <h3 class="card-title">v1.2.0-beta</h3>
+                    <p class="card-desc">三语界面 / 文档编号 / 分类分界线 / 翻页与返回顶部</p>
+                </a>
+
+                <!-- v1.1.1-beta -->
+                <a class="version-card" onclick="showDetail('1.1.1')">
+                    <span class="card-icon" style="background:#6f42c1">1.1</span>
+                    <h3 class="card-title">v1.1.1-beta</h3>
+                    <p class="card-desc">中英双版本 / 模块分界线 / 分类色标识</p>
+                </a>
+
+                <!-- v1.0.0-beta1 -->
+                <a class="version-card" onclick="showDetail('1.0.0')">
+                    <span class="card-icon" style="background:#57606a">1.0</span>
+                    <h3 class="card-title">v1.0.0-beta1</h3>
+                    <p class="card-desc">首个测试版本 / 基础查阅功能 / WebView 渲染</p>
                 </a>
 
             </div>
+
+            <!-- 推荐区域 -->
+            <div class="recommend-section">
+                <h2 class="recommend-title">更多平台</h2>
+                <div class="recommend-grid">
+                    <a href="https://fanquanpp.github.io/FANDEX/" class="recommend-card">
+                        <span class="card-platform">GITHUB PAGES</span>
+                        <span class="card-name">FANDEX</span>
+                        <p class="card-desc">基于 GitHub Pages 的云端在线查阅平台，双端适配，自动构建部署</p>
+                    </a>
+                    <a href="https://github.com/fanquanpp/FANDEX-App" class="recommend-card">
+                        <span class="card-platform">ANDROID</span>
+                        <span class="card-name">FANDEX-App</span>
+                        <p class="card-desc">完全离线查阅应用，无网络依赖，原生渲染，三语界面</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 版本详情页 -->
+        <div class="detail-page" id="detailPage">
+            <button class="detail-back" onclick="showList()">&#8592; 返回版本列表</button>
+            <div id="detailContent"></div>
         </div>
 
         <!-- 页脚 -->
@@ -454,8 +560,140 @@
 
     <script>
         /**
+         * 版本数据
+         * 每个版本包含：版本号、标签、下载链接、更新日志、图标颜色
+         */
+        var versions = {
+            '1.3.1': {
+                version: 'v1.3.1-beta',
+                badge: 'BETA',
+                apk: './FANDEX-v1.3.1-beta.apk',
+                apkName: 'FANDEX-v1.3.1-beta.apk',
+                date: '2026-06-17',
+                size: '7.8 MB',
+                require: 'Android 8.0+',
+                changes: [
+                    '修复顶部导航栏重复显示问题',
+                    '移除底部导航栏，所有功能按钮整合到顶部导航栏',
+                    '侧边栏根据当前页面显示不同内容',
+                    '主页侧边栏显示应用信息、作者、更新时间、数量统计',
+                    '模块页和文档页侧边栏显示文档列表',
+                    '文章阅读页全屏显示，最大化内容区域',
+                    '修复 Markdown 表格渲染崩坏问题',
+                    '清理冗余代码（Room/复习功能/WebView 渲染器）',
+                    'App 图标重新设计，与 FANDEX 主站 Logo 统一'
+                ]
+            },
+            '1.3.0': {
+                version: 'v1.3.0-beta',
+                badge: 'BETA',
+                apk: './FANDEX-v1.3.0-beta.apk',
+                apkName: 'FANDEX-v1.3.0-beta.apk',
+                date: '2026-06-17',
+                size: '7.8 MB',
+                require: 'Android 8.0+',
+                changes: [
+                    '使用原生 Compose 渲染器替代 WebView',
+                    'DataStore 持久化深色模式、语言、字体大小设置',
+                    'ModalNavigationDrawer 侧边栏导航',
+                    '三语界面（中文/英文/日语）',
+                    '深浅色双模式，默认深色',
+                    '字体大小可调节（0.8x-1.4x）',
+                    '文档翻页与返回顶部功能'
+                ]
+            },
+            '1.2.0': {
+                version: 'v1.2.0-beta',
+                badge: 'BETA',
+                apk: null,
+                apkName: 'FANDEX-v1.2.0-beta.apk',
+                date: '2026-06-16',
+                size: '7.6 MB',
+                require: 'Android 8.0+',
+                changes: [
+                    '三语界面（中文/英文/日语），默认中文',
+                    '文档编号圆圈显示',
+                    '分类色短分界线',
+                    '翻页按钮与返回顶部',
+                    '文档阅读界面 UI 优化',
+                    '删除搜索和复习功能'
+                ]
+            },
+            '1.1.1': {
+                version: 'v1.1.1-beta',
+                badge: 'BETA',
+                apk: null,
+                apkName: 'FANDEX-v1.1.1-beta.apk',
+                date: '2026-06-15',
+                size: '-',
+                require: 'Android 8.0+',
+                changes: [
+                    '中英文双版本界面',
+                    '模块间分类色分界线',
+                    '分类色标识优化'
+                ]
+            },
+            '1.0.0': {
+                version: 'v1.0.0-beta1',
+                badge: 'BETA',
+                apk: null,
+                apkName: 'FANDEX-v1.0.0-beta1.apk',
+                date: '2026-06-14',
+                size: '-',
+                require: 'Android 8.0+',
+                changes: [
+                    '首个测试版本',
+                    '基础文档查阅功能',
+                    'WebView 渲染 Markdown',
+                    'Navigation Compose 路由系统'
+                ]
+            }
+        };
+
+        /**
+         * 显示版本详情页
+         * 输入：版本标识字符串（如 "1.3.1"）
+         */
+        function showDetail(id) {
+            var v = versions[id];
+            if (!v) return;
+
+            var html = '<div class="detail-header">';
+            html += '<span class="detail-version">' + v.version + '</span>';
+            html += '<span class="detail-badge">' + v.badge + '</span>';
+            html += '<div class="detail-meta">' + v.date + ' / ' + v.size + ' / ' + v.require + '</div>';
+            html += '</div>';
+
+            html += '<div class="detail-changelog">';
+            html += '<h3>更新内容</h3><ul>';
+            for (var i = 0; i < v.changes.length; i++) {
+                html += '<li>' + v.changes[i] + '</li>';
+            }
+            html += '</ul></div>';
+
+            if (v.apk) {
+                html += '<a class="download-btn" href="' + v.apk + '" download="' + v.apkName + '">下载 APK</a>';
+            } else {
+                html += '<span class="download-btn" style="opacity:0.4;cursor:not-allowed;background:var(--color-bg-card);color:var(--color-text-tertiary);border-color:var(--color-border-light)">暂无安装包</span>';
+            }
+
+            document.getElementById('detailContent').innerHTML = html;
+            document.getElementById('listPage').className = 'list-page hidden';
+            document.getElementById('detailPage').className = 'detail-page active';
+            window.scrollTo(0, 0);
+        }
+
+        /**
+         * 返回版本列表页
+         */
+        function showList() {
+            document.getElementById('listPage').className = 'list-page';
+            document.getElementById('detailPage').className = 'detail-page';
+            window.scrollTo(0, 0);
+        }
+
+        /**
          * 主题切换逻辑
-         * 读取 localStorage 中存储的主题偏好，默认跟随系统
          */
         (function() {
             var stored = localStorage.getItem('fandex-theme');
@@ -473,11 +711,9 @@
                 document.documentElement.removeAttribute('data-theme');
             }
             localStorage.setItem('fandex-theme', next || 'light');
-            /* 更新按钮图标 */
             document.querySelector('.theme-toggle').innerHTML = next === 'dark' ? '&#9788;' : '&#9790;';
         }
 
-        /* 初始化按钮图标 */
         (function() {
             var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             document.querySelector('.theme-toggle').innerHTML = isDark ? '&#9788;' : '&#9790;';
