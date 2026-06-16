@@ -17,15 +17,19 @@ FANDEX 知识体系的 Android 客户端 -- 完全离线的技术知识阅读工
 
 ## 下载
 
+### 移动端（推荐）
+
+直接访问下载页面，点击按钮即可下载 APK：
+
+```
+https://fanquanpp.github.io/FANDEX-App/
+```
+
+### 桌面端
+
 前往 [Releases](https://github.com/fanquanpp/FANDEX-App/releases) 下载最新版本。
 
-**移动端用户**：GitHub 网页版可能不显示下载按钮，请复制以下链接到浏览器地址栏打开：
-
-```
-https://github.com/fanquanpp/FANDEX-App/releases/download/v1.3.0-beta/FANDEX-v1.3.0-beta.apk
-```
-
-或通过 GitHub App 下载。
+> 安装前请在系统设置中允许"安装未知来源应用"权限。
 
 ## 架构
 

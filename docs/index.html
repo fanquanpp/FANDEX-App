@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FANDEX - 下载</title>
+    <style>
+        /* 基础重置与全局样式 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-card: #1c2128;
+            --border-color: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-purple: #bc8cff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px;
+        }
+
+        /* 头部区域 */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 480px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 下载卡片容器 */
+        .download-list {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* 单个下载卡片 */
+        .download-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            transition: border-color 0.2s ease;
+        }
+
+        .download-card:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .version-tag {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .status-beta {
+            background: rgba(188, 140, 255, 0.15);
+            color: var(--accent-purple);
+            border: 1px solid rgba(188, 140, 255, 0.3);
+        }
+
+        .card-meta {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        /* 下载按钮 */
+        .download-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 0;
+            background: linear-gradient(135deg, #238636, #2ea043);
+            color: #ffffff;
+            text-align: center;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s ease, transform 0.1s ease;
+        }
+
+        .download-btn:hover {
+            opacity: 0.9;
+        }
+
+        .download-btn:active {
+            transform: scale(0.98);
+        }
+
+        .download-btn .btn-sub {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 400;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        /* 页脚提示 */
+        .footer-note {
+            margin-top: 32px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        .footer-note a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .footer-note a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>FANDEX</h1>
+        <p>离线技术知识阅读工具 -- 下载 APK 安装包至 Android 设备</p>
+    </div>
+
+    <div class="download-list">
+
+        <!-- v1.3.0-beta -->
+        <div class="download-card">
+            <div class="card-header">
+                <span class="version-tag">v1.3.0-beta</span>
+                <span class="status-badge status-beta">BETA</span>
+            </div>
+            <div class="card-meta">
+                原生 Compose 渲染 / DataStore 持久化 / 侧边栏导航 / 三语界面 / 深浅双模式
+            </div>
+            <a class="download-btn" href="./FANDEX-v1.3.0-beta.apk" download>
+                下载 APK
+                <span class="btn-sub">Android 8.0+ | 约 7.8 MB</span>
+            </a>
+        </div>
+
+        <!-- v1.2.0-beta -->
+        <div class="download-card">
+            <div class="card-header">
+                <span class="version-tag">v1.2.0-beta</span>
+                <span class="status-badge status-beta">BETA</span>
+            </div>
+            <div class="card-meta">
+                三语界面 / 文档编号 / 分类分界线 / 翻页与返回顶部
+            </div>
+            <a class="download-btn" href="./FANDEX-v1.2.0-beta.apk" download>
+                下载 APK
+                <span class="btn-sub">Android 8.0+ | 约 7.6 MB</span>
+            </a>
+        </div>
+
+    </div>
+
+    <div class="footer-note">
+        安装前请允许"安装未知来源应用"权限。<br>
+        源码与更新日志：<a href="https://github.com/fanquanpp/FANDEX-App">GitHub 仓库</a>
+    </div>
+
+</body>
+</html>
