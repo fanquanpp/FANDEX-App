@@ -13,3 +13,6 @@ dist/
 .astro/
 .cache/
 generated/
+.kotlin/
+sdk-tmp/
+Code-Wiki.md
