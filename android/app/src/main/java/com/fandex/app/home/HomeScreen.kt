@@ -28,22 +28,25 @@ import com.fandex.app.data.ContentIndex
 import com.fandex.app.data.ContentLoader
 import com.fandex.app.data.Document
 import com.fandex.app.data.Module
+import com.fandex.app.data.Strings
 
 /**
  * 首页界面组件
  *
  * 功能：按分类展示模块列表，支持搜索和分类筛选
- * 输入：模块分类数据（从 assets 加载）、导航回调
+ * 输入：模块分类数据（从 assets 加载）、导航回调、语言设置
  * 输出：可滚动的分类-模块列表
  * 流程：加载索引 -> 渲染搜索栏 -> 渲染分类筛选 -> 渲染模块卡片
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    language: Strings.Language = Strings.Language.ZH,
     onNavigateToModule: (String) -> Unit,
     onNavigateToReview: () -> Unit
 ) {
     val context = LocalContext.current
+    val strings = Strings.get(language)
     var index by remember { mutableStateOf<ContentIndex?>(null) }
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf<String?>(null) }
@@ -75,7 +78,7 @@ fun HomeScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Loading...",
+                    text = strings.loading,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -129,7 +132,7 @@ fun HomeScreen(
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "${contentIndex.documents.size} docs / ${contentIndex.modules.size} modules",
+                    text = "${contentIndex.documents.size} ${strings.docs} / ${contentIndex.modules.size} ${strings.modules}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -142,7 +145,7 @@ fun HomeScreen(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Search modules or docs") },
+                    placeholder = { Text(strings.searchHint) },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
@@ -165,7 +168,7 @@ fun HomeScreen(
                         FilterChip(
                             selected = selectedCategory == null,
                             onClick = { selectedCategory = null },
-                            label = { Text("All") }
+                            label = { Text(strings.all) }
                         )
                     }
                     items(contentIndex.categories) { category ->
@@ -193,7 +196,7 @@ fun HomeScreen(
             if (searchQuery.isNotBlank() && filteredDocuments.isNotEmpty()) {
                 item {
                     Text(
-                        text = "Documents (${filteredDocuments.size})",
+                        text = "${strings.documents} (${filteredDocuments.size})",
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(bottom = 4.dp)
@@ -218,6 +221,7 @@ fun HomeScreen(
                     CategoryModuleSection(
                         category = category,
                         modules = categoryModules,
+                        strings = strings,
                         onModuleClick = onNavigateToModule
                     )
                 }
@@ -227,7 +231,7 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxWidth().padding(32.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("No results found", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(strings.noResults, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -238,7 +242,7 @@ fun HomeScreen(
 /**
  * 分类模块区块
  *
- * 功能：展示某分类下的所有模块卡片
+ * 功能：展示某分类下的所有模块卡片，模块间以分类色短分界线分隔
  * 输入：Category 和该分类下的模块列表
  * 输出：分类标题 + 模块卡片列表
  */
@@ -246,6 +250,7 @@ fun HomeScreen(
 fun CategoryModuleSection(
     category: Category,
     modules: List<Module>,
+    strings: Strings.LangStrings,
     onModuleClick: (String) -> Unit
 ) {
     val cardColor = remember(category.color) {
@@ -274,20 +279,31 @@ fun CategoryModuleSection(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "${modules.size} modules",
+                text = "${modules.size} ${strings.modules}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
-        /* 模块卡片 */
-        modules.forEach { module ->
+        /* 模块卡片，模块间以分类色短分界线分隔 */
+        modules.forEachIndexed { index, module ->
             ModuleCard(
                 module = module,
                 accentColor = cardColor,
+                strings = strings,
                 onClick = { onModuleClick(module.id) }
             )
-            Spacer(modifier = Modifier.height(6.dp))
+            /* 模块间短分界线（最后一个不加） */
+            if (index < modules.size - 1) {
+                Box(
+                    modifier = Modifier
+                        .padding(start = 24.dp, top = 4.dp, bottom = 4.dp)
+                        .width(32.dp)
+                        .height(2.dp)
+                        .clip(RoundedCornerShape(1.dp))
+                        .background(cardColor.copy(alpha = 0.3f))
+                )
+            }
         }
     }
 }
@@ -303,6 +319,7 @@ fun CategoryModuleSection(
 fun ModuleCard(
     module: Module,
     accentColor: Color,
+    strings: Strings.LangStrings,
     onClick: () -> Unit
 ) {
     Card(
@@ -338,7 +355,7 @@ fun ModuleCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "${module.documents.size} docs",
+                    text = "${module.documents.size} ${strings.docs}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

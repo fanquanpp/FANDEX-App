@@ -23,13 +23,14 @@ import kotlinx.coroutines.launch
  * 复习页面
  *
  * 功能：展示待复习文档列表，支持点击进入答题模式
- * 输入：Room 数据库中的复习进度
+ * 输入：Room 数据库中的复习进度、语言设置
  * 输出：待复习列表和统计数据
  * 流程：加载复习进度 -> 展示待复习列表 -> 用户选择 -> 进入答题
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewScreen(
+    language: Strings.Language = Strings.Language.ZH,
     onNavigateBack: () -> Unit,
     onNavigateToArticle: (String, String, String) -> Unit
 ) {
@@ -37,6 +38,7 @@ fun ReviewScreen(
     val scope = rememberCoroutineScope()
     val db = remember { AppDatabase.getInstance(context) }
     val dao = remember { db.reviewDao() }
+    val strings = Strings.get(language)
 
     var dueReviews by remember { mutableStateOf<List<ReviewProgress>>(emptyList()) }
     var allReviews by remember { mutableStateOf<List<ReviewProgress>>(emptyList()) }
@@ -58,6 +60,7 @@ fun ReviewScreen(
     if (showQuiz && currentReview != null) {
         QuizScreen(
             review = currentReview!!,
+            language = language,
             onAnswer = { quality ->
                 scope.launch {
                     val updated = Sm2Algorithm.calculateNextReview(currentReview!!, quality)
@@ -81,10 +84,10 @@ fun ReviewScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Review") },
+                title = { Text(strings.review) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = strings.back)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -105,19 +108,19 @@ fun ReviewScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 StatCard(
-                    title = "Due",
+                    title = strings.due,
                     value = dueReviews.size.toString(),
                     modifier = Modifier.weight(1f),
                     color = MaterialTheme.colorScheme.error
                 )
                 StatCard(
-                    title = "Learning",
+                    title = strings.learning,
                     value = allReviews.size.toString(),
                     modifier = Modifier.weight(1f),
                     color = MaterialTheme.colorScheme.tertiary
                 )
                 StatCard(
-                    title = "Mastered",
+                    title = strings.mastered,
                     value = masteredCount.toString(),
                     modifier = Modifier.weight(1f),
                     color = MaterialTheme.colorScheme.primary
@@ -156,7 +159,7 @@ fun ReviewScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Add docs to review")
+                    Text(strings.addDocsToReview)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -169,13 +172,13 @@ fun ReviewScreen(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = if (allReviews.isEmpty()) "No review items" else "All caught up!",
+                            text = if (allReviews.isEmpty()) strings.noReviewItems else strings.allCaughtUp,
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = if (allReviews.isEmpty()) "Add documents to start reviewing" else "Come back later for more reviews",
+                            text = if (allReviews.isEmpty()) strings.addDocsHint else strings.comeBackLater,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -183,7 +186,7 @@ fun ReviewScreen(
                 }
             } else {
                 Text(
-                    text = "Due for review (${dueReviews.size})",
+                    text = "${strings.dueForReview} (${dueReviews.size})",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -196,6 +199,7 @@ fun ReviewScreen(
                     items(dueReviews) { review ->
                         ReviewItemCard(
                             review = review,
+                            strings = strings,
                             onClick = {
                                 currentReview = review
                                 showQuiz = true
@@ -250,12 +254,13 @@ fun StatCard(
  * 复习项卡片
  *
  * 功能：展示待复习的文档条目
- * 输入：ReviewProgress 对象
+ * 输入：ReviewProgress 对象、语言字符串
  * 输出：可点击的复习卡片
  */
 @Composable
 fun ReviewItemCard(
     review: ReviewProgress,
+    strings: Strings.LangStrings,
     onClick: () -> Unit
 ) {
     Card(
@@ -279,13 +284,13 @@ fun ReviewItemCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "${review.module} / reviewed ${review.reviewCount}x",
+                    text = "${review.module} / ${strings.reviewed} ${review.reviewCount}x",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Text(
-                text = "${review.intervalDays}d",
+                text = "${review.intervalDays}${strings.day}",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -297,7 +302,7 @@ fun ReviewItemCard(
  * 答题页面
  *
  * 功能：展示自评界面，用户评估自己的记忆程度
- * 输入：当前复习进度
+ * 输入：当前复习进度、语言设置
  * 输出：答题质量（0-5）
  * 流程：展示文档标题 -> 用户自评 -> 返回质量分数
  */
@@ -305,16 +310,19 @@ fun ReviewItemCard(
 @Composable
 fun QuizScreen(
     review: ReviewProgress,
+    language: Strings.Language = Strings.Language.ZH,
     onAnswer: (Int) -> Unit,
     onBack: () -> Unit
 ) {
+    val strings = Strings.get(language)
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Review", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                title = { Text(strings.review, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = strings.back)
                     }
                 }
             )
@@ -343,7 +351,7 @@ fun QuizScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Previously reviewed ${review.reviewCount} times",
+                text = "${strings.previouslyReviewed} ${review.reviewCount}x",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -352,7 +360,7 @@ fun QuizScreen(
 
             /* 自评提示 */
             Text(
-                text = "How well did you remember?",
+                text = strings.howWellDidYouRemember,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -360,12 +368,12 @@ fun QuizScreen(
 
             /* 自评按钮 */
             val ratings = listOf(
-                0 to "Forgot",
-                1 to "Barely",
-                2 to "Hard",
-                3 to "OK",
-                4 to "Easy",
-                5 to "Perfect"
+                0 to strings.forgot,
+                1 to strings.barely,
+                2 to strings.hard,
+                3 to strings.ok,
+                4 to strings.easy,
+                5 to strings.perfect
             )
 
             ratings.forEach { (quality, label) ->

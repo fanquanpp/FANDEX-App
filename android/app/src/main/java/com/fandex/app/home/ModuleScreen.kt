@@ -22,23 +22,26 @@ import androidx.compose.ui.unit.dp
 import com.fandex.app.data.ContentIndex
 import com.fandex.app.data.ContentLoader
 import com.fandex.app.data.Document
+import com.fandex.app.data.Strings
 
 /**
  * 模块详情页面
  *
- * 功能：展示指定模块下的所有文档列表（含编号）
- * 输入：模块 ID、导航回调
- * 输出：带编号的文档卡片列表
+ * 功能：展示指定模块下的所有文档列表（含编号），文档间以分类色短分界线分隔
+ * 输入：模块 ID、语言设置、导航回调
+ * 输出：带编号和分界线的文档卡片列表
  * 流程：加载索引 -> 查找模块 -> 渲染带编号的文档列表
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModuleScreen(
     moduleId: String,
+    language: Strings.Language = Strings.Language.ZH,
     onNavigateBack: () -> Unit,
     onNavigateToArticle: (String, String, String) -> Unit
 ) {
     val context = LocalContext.current
+    val strings = Strings.get(language)
     var index by remember { mutableStateOf<ContentIndex?>(null) }
 
     LaunchedEffect(Unit) {
@@ -79,7 +82,7 @@ fun ModuleScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = strings.back)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -123,7 +126,7 @@ fun ModuleScreen(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "${documents.size} docs",
+                            text = "${documents.size} ${strings.docs}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -138,11 +141,18 @@ fun ModuleScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
-                Spacer(modifier = Modifier.height(8.dp))
+                /* 模块信息与文档列表间的分类色短分界线 */
+                Box(
+                    modifier = Modifier
+                        .padding(start = 0.dp, top = 4.dp, bottom = 8.dp)
+                        .width(48.dp)
+                        .height(2.dp)
+                        .clip(RoundedCornerShape(1.dp))
+                        .background(accentColor.copy(alpha = 0.4f))
+                )
             }
 
-            /* 文档列表（带编号） */
+            /* 文档列表（带编号和分界线） */
             itemsIndexed(documents) { index, document ->
                 DocumentListItem(
                     document = document,
@@ -152,6 +162,17 @@ fun ModuleScreen(
                         onNavigateToArticle(document.module, document.slug, document.title)
                     }
                 )
+                /* 文档间短分界线（最后一个不加） */
+                if (index < documents.size - 1) {
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 28.dp, top = 2.dp, bottom = 2.dp)
+                            .width(24.dp)
+                            .height(1.dp)
+                            .clip(RoundedCornerShape(0.5.dp))
+                            .background(accentColor.copy(alpha = 0.2f))
+                    )
+                }
             }
         }
     }
