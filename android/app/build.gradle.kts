@@ -12,8 +12,8 @@ android {
         applicationId = "com.fandex.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 8
-        versionName = "1.3.1-beta"
+        versionCode = 9
+        versionName = "1.4.0-beta"
     }
 
     signingConfigs {
@@ -35,7 +35,7 @@ android {
 
     /**
      * 自定义 APK 输出文件名
-     * 格式：FANDEX-v{versionName}.apk（如 FANDEX-v1.3.1-beta.apk）
+     * 格式：FANDEX-v{versionName}.apk（如 FANDEX-v1.4.0-beta.apk）
      * 确保下载和分发时文件名具有可辨识的版本标识
      */
     applicationVariants.all {

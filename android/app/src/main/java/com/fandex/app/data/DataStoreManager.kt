@@ -37,6 +37,12 @@ object DataStoreManager {
     /** 字体缩放偏好键 */
     private val KEY_FONT_SIZE_SCALE = floatPreferencesKey("font_size_scale")
 
+    /** 启动页开关偏好键 */
+    private val KEY_IS_SPLASH_ENABLED = booleanPreferencesKey("is_splash_enabled")
+
+    /** 图标选择偏好键（"default" 或 "classic"） */
+    private val KEY_ICON_STYLE = stringPreferencesKey("icon_style")
+
     /**
      * 读取深色模式设置
      *
@@ -96,5 +102,45 @@ object DataStoreManager {
     suspend fun saveFontSizeScale(context: Context, scale: Float) {
         val clamped = scale.coerceIn(0.8f, 1.4f)
         context.dataStore.edit { it[KEY_FONT_SIZE_SCALE] = clamped }
+    }
+
+    /**
+     * 读取启动页开关设置
+     *
+     * 输入：Context
+     * 输出：Flow<Boolean>，默认 true（开启启动页）
+     */
+    fun getSplashEnabled(context: Context): Flow<Boolean> {
+        return context.dataStore.data.map { it[KEY_IS_SPLASH_ENABLED] ?: true }
+    }
+
+    /**
+     * 保存启动页开关设置
+     *
+     * 输入：Context、是否开启启动页
+     * 输出：无（异步写入）
+     */
+    suspend fun saveSplashEnabled(context: Context, enabled: Boolean) {
+        context.dataStore.edit { it[KEY_IS_SPLASH_ENABLED] = enabled }
+    }
+
+    /**
+     * 读取图标选择设置
+     *
+     * 输入：Context
+     * 输出：Flow<String>，默认 "default"（新图标）
+     */
+    fun getIconStyle(context: Context): Flow<String> {
+        return context.dataStore.data.map { it[KEY_ICON_STYLE] ?: "default" }
+    }
+
+    /**
+     * 保存图标选择设置
+     *
+     * 输入：Context、图标风格代码（"default" 或 "classic"）
+     * 输出：无（异步写入）
+     */
+    suspend fun saveIconStyle(context: Context, style: String) {
+        context.dataStore.edit { it[KEY_ICON_STYLE] = style }
     }
 }

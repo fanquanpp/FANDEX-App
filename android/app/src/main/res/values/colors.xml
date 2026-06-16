@@ -5,4 +5,5 @@
     <color name="surface">#FFFAFAFA</color>
     <color name="on_surface">#FF1C1B1F</color>
     <color name="ic_launcher_background">#FF0d0d0d</color>
+    <color name="ic_launcher_classic_background">#FF4F5BD5</color>
 </resources>

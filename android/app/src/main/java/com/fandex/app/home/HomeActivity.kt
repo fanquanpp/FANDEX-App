@@ -1,10 +1,13 @@
 package com.fandex.app.home
 
+import android.content.ComponentName
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,6 +50,7 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -112,6 +116,14 @@ class HomeActivity : ComponentActivity() {
             val fontSizeScale by DataStoreManager.getFontSizeScale(context)
                 .collectAsState(initial = 1.0f)
 
+            /* 从 DataStore 读取图标选择偏好，默认 "default" */
+            val iconStyle by DataStoreManager.getIconStyle(context)
+                .collectAsState(initial = "default")
+
+            /* 从 DataStore 读取启动页开关偏好，默认 true */
+            val isSplashEnabled by DataStoreManager.getSplashEnabled(context)
+                .collectAsState(initial = true)
+
             /* 将语言字符串转换为枚举 */
             val language = remember(languageStr) {
                 when (languageStr) {
@@ -157,6 +169,56 @@ class HomeActivity : ComponentActivity() {
                                 DataStoreManager.saveFontSizeScale(context, newScale)
                             } catch (_: Exception) { /* 写入失败静默处理 */ }
                         }
+                    },
+                    iconStyle = iconStyle,
+                    onIconChange = { newStyle ->
+                        /* 图标切换：持久化偏好 + 运行时切换 activity-alias */
+                        scope.launch {
+                            try {
+                                DataStoreManager.saveIconStyle(context, newStyle)
+                                /* 通过 PackageManager 启用/禁用 activity-alias 实现桌面图标切换 */
+                                val pkgManager = context.packageManager
+                                val defaultAlias = ComponentName(context, "com.fandex.app.home.HomeActivityDefault")
+                                val classicAlias = ComponentName(context, "com.fandex.app.home.HomeActivityClassic")
+                                when (newStyle) {
+                                    "classic" -> {
+                                        /* 启用经典图标别名，禁用默认图标别名 */
+                                        pkgManager.setComponentEnabledSetting(
+                                            classicAlias,
+                                            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                                            PackageManager.DONT_KILL_APP
+                                        )
+                                        pkgManager.setComponentEnabledSetting(
+                                            defaultAlias,
+                                            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                                            PackageManager.DONT_KILL_APP
+                                        )
+                                    }
+                                    else -> {
+                                        /* 启用默认图标别名，禁用经典图标别名 */
+                                        pkgManager.setComponentEnabledSetting(
+                                            defaultAlias,
+                                            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                                            PackageManager.DONT_KILL_APP
+                                        )
+                                        pkgManager.setComponentEnabledSetting(
+                                            classicAlias,
+                                            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                                            PackageManager.DONT_KILL_APP
+                                        )
+                                    }
+                                }
+                            } catch (_: Exception) { /* 切换失败静默处理 */ }
+                        }
+                    },
+                    isSplashEnabled = isSplashEnabled,
+                    onSplashToggle = { enabled ->
+                        /* 启动页开关变更并持久化 */
+                        scope.launch {
+                            try {
+                                DataStoreManager.saveSplashEnabled(context, enabled)
+                            } catch (_: Exception) { /* 写入失败静默处理 */ }
+                        }
                     }
                 )
             }
@@ -185,7 +247,11 @@ fun FANDEXApp(
     language: Strings.Language = Strings.Language.ZH,
     onToggleLanguage: () -> Unit = {},
     fontSizeScale: Float = 1.0f,
-    onFontSizeChange: (Float) -> Unit = {}
+    onFontSizeChange: (Float) -> Unit = {},
+    iconStyle: String = "default",
+    onIconChange: (String) -> Unit = {},
+    isSplashEnabled: Boolean = true,
+    onSplashToggle: (Boolean) -> Unit = {}
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -278,6 +344,8 @@ fun FANDEXApp(
                         contentIndex = contentIndex,
                         strings = strings,
                         isDarkMode = isDarkMode,
+                        iconStyle = iconStyle,
+                        isSplashEnabled = isSplashEnabled,
                         onModuleClick = { moduleId ->
                             scope.launch {
                                 try { drawerState.close() } catch (_: Exception) { /* 静默处理 */ }
@@ -287,7 +355,9 @@ fun FANDEXApp(
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        }
+                        },
+                        onIconChange = onIconChange,
+                        onSplashToggle = onSplashToggle
                     )
                 }
             }
@@ -677,7 +747,11 @@ fun SidebarHomeContent(
     contentIndex: ContentIndex?,
     strings: Strings.LangStrings,
     isDarkMode: Boolean,
-    onModuleClick: (String) -> Unit
+    iconStyle: String,
+    isSplashEnabled: Boolean,
+    onModuleClick: (String) -> Unit,
+    onIconChange: (String) -> Unit,
+    onSplashToggle: (Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -713,7 +787,7 @@ fun SidebarHomeContent(
                 .padding(12.dp)
         ) {
             /* 版本信息 */
-            InfoRow(label = "v1.3.1-beta", value = "")
+            InfoRow(label = "v1.4.0-beta", value = "")
             /* 作者信息 */
             InfoRow(label = "fanquanpp", value = "")
             /* 更新时间 */
@@ -732,6 +806,71 @@ fun SidebarHomeContent(
                     StatItem(count = "${contentIndex.documents.size}", label = strings.documents)
                 }
             }
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+
+        /* 图标切换区 */
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    RoundedCornerShape(8.dp)
+                )
+                .padding(12.dp)
+        ) {
+            Text(
+                text = "App Icon",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                /* 新图标（默认） */
+                IconOption(
+                    label = "FANDEX",
+                    isSelected = iconStyle == "default",
+                    accentColor = Color(0xFF3366cc),
+                    onClick = { onIconChange("default") }
+                )
+                /* 经典图标 */
+                IconOption(
+                    label = "Classic",
+                    isSelected = iconStyle == "classic",
+                    accentColor = Color(0xFF4F5BD5),
+                    onClick = { onIconChange("classic") }
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        /* 启动页开关 */
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    RoundedCornerShape(8.dp)
+                )
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Splash Screen",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Switch(
+                checked = isSplashEnabled,
+                onCheckedChange = onSplashToggle,
+                modifier = Modifier.height(24.dp)
+            )
         }
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -1160,6 +1299,69 @@ fun ModuleSidebarItem(
             text = "${module.documents.size}",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+/**
+ * 图标选项组件
+ *
+ * 功能：展示可选的 App 图标样式，选中时显示强调色边框
+ * 输入：标签、是否选中、强调色、点击回调
+ * 输出：可点击的图标选项按钮
+ */
+@Composable
+private fun IconOption(
+    label: String,
+    isSelected: Boolean,
+    accentColor: Color,
+    onClick: () -> Unit
+) {
+    val borderColor = if (isSelected) accentColor else MaterialTheme.colorScheme.outlineVariant
+    val bgColor = if (isSelected) accentColor.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface
+
+    Column(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .background(bgColor, RoundedCornerShape(6.dp))
+            .border(1.5.dp, borderColor, RoundedCornerShape(6.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        /* 图标预览：小方块模拟图标样式 */
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .background(
+                    if (label == "FANDEX") Color(0xFF0d0d0d) else Color(0xFF4F5BD5),
+                    RoundedCornerShape(4.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            if (label == "FANDEX") {
+                /* 新图标预览：竖色条 */
+                Box(
+                    modifier = Modifier
+                        .width(3.dp)
+                        .height(16.dp)
+                        .background(Color(0xFF3366cc), RoundedCornerShape(1.dp))
+                )
+            } else {
+                /* 经典图标预览：F 字母 */
+                Text(
+                    text = "F",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+            color = if (isSelected) accentColor else MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

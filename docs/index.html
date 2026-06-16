@@ -231,10 +231,54 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
+            overflow: hidden;
+        }
+
+        .card-icon-inner {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 新图标预览：深色底 + 蓝色竖条 + 白色文字区 */
+        .icon-new {
+            background: #0d0d0d;
+        }
+
+        .icon-new .icon-bar {
+            width: 4px;
+            height: 100%;
+            background: #3366cc;
+        }
+
+        .icon-new .icon-text {
+            flex: 1;
+            height: 100%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-family: var(--font-display);
             font-weight: 700;
-            font-size: 0.75rem;
+            font-size: 7px;
+            color: #0d0d0d;
+            letter-spacing: 0.5px;
+        }
+
+        /* 经典图标预览：蓝色底 + 白色 F */
+        .icon-classic {
+            background: #4F5BD5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 18px;
+            color: #fff;
+            width: 36px;
+            height: 36px;
         }
 
         .card-title {
@@ -489,37 +533,44 @@
 
             <div class="version-grid">
 
+                <!-- v1.4.0-beta -->
+                <a class="version-card" onclick="showDetail('1.4.0')">
+                    <span class="card-icon"><span class="card-icon-inner icon-new"><span class="icon-bar"></span><span class="icon-text">F</span></span></span>
+                    <h3 class="card-title">v1.4.0-beta</h3>
+                    <p class="card-desc">双图标切换 / 启动页 / 图标持久化</p>
+                </a>
+
                 <!-- v1.3.1-beta -->
                 <a class="version-card" onclick="showDetail('1.3.1')">
-                    <span class="card-icon" style="background:#3366cc">1.3</span>
+                    <span class="card-icon"><span class="card-icon-inner icon-new"><span class="icon-bar"></span><span class="icon-text">F</span></span></span>
                     <h3 class="card-title">v1.3.1-beta</h3>
                     <p class="card-desc">顶部栏整合 / 侧边栏分级 / 表格修复 / 全屏阅读</p>
                 </a>
 
                 <!-- v1.3.0-beta -->
                 <a class="version-card" onclick="showDetail('1.3.0')">
-                    <span class="card-icon" style="background:#00b894">1.3</span>
+                    <span class="card-icon"><span class="icon-classic">F</span></span>
                     <h3 class="card-title">v1.3.0-beta</h3>
                     <p class="card-desc">原生 Compose 渲染 / DataStore 持久化 / 侧边栏导航 / 三语界面</p>
                 </a>
 
                 <!-- v1.2.0-beta -->
                 <a class="version-card" onclick="showDetail('1.2.0')">
-                    <span class="card-icon" style="background:#e05a2b">1.2</span>
+                    <span class="card-icon"><span class="icon-classic">F</span></span>
                     <h3 class="card-title">v1.2.0-beta</h3>
                     <p class="card-desc">三语界面 / 文档编号 / 分类分界线 / 翻页与返回顶部</p>
                 </a>
 
                 <!-- v1.1.1-beta -->
                 <a class="version-card" onclick="showDetail('1.1.1')">
-                    <span class="card-icon" style="background:#6f42c1">1.1</span>
+                    <span class="card-icon"><span class="icon-classic">F</span></span>
                     <h3 class="card-title">v1.1.1-beta</h3>
                     <p class="card-desc">中英双版本 / 模块分界线 / 分类色标识</p>
                 </a>
 
                 <!-- v1.0.0-beta1 -->
                 <a class="version-card" onclick="showDetail('1.0.0')">
-                    <span class="card-icon" style="background:#57606a">1.0</span>
+                    <span class="card-icon"><span class="icon-classic">F</span></span>
                     <h3 class="card-title">v1.0.0-beta1</h3>
                     <p class="card-desc">首个测试版本 / 基础查阅功能 / WebView 渲染</p>
                 </a>
@@ -564,6 +615,23 @@
          * 每个版本包含：版本号、标签、下载链接、更新日志、图标颜色
          */
         var versions = {
+            '1.4.0': {
+                version: 'v1.4.0-beta',
+                badge: 'BETA',
+                apk: './FANDEX-v1.4.0-beta.apk',
+                apkName: 'FANDEX-v1.4.0-beta.apk',
+                date: '2026-06-17',
+                size: '7.9 MB',
+                require: 'Android 8.0+',
+                changes: [
+                    '双图标切换：新图标（竖色条 + FANDEX）与经典图标（蓝色 + F），侧边栏自由切换',
+                    '图标选择持久化：DataStore 保存用户偏好，重启不重置',
+                    '启动页：3 秒品牌展示页，含应用名称、标语、性质说明、作者信息',
+                    '启动页开关：侧边栏可关闭启动页，直接进入主页',
+                    '下载页显示双图标预览',
+                    'APK 文件不再被 .gitignore 忽略'
+                ]
+            },
             '1.3.1': {
                 version: 'v1.3.1-beta',
                 badge: 'BETA',
