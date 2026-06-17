@@ -500,6 +500,13 @@
 
             <div class="version-grid">
 
+                <!-- v2.0.0-beta -->
+                <a class="version-card" onclick="showDetail('2.0.0')">
+                    <span class="card-icon"><span class="icon-classic">F</span></span>
+                    <h3 class="card-title">v2.0.0-beta</h3>
+                    <p class="card-desc">架构重构 / 空壳85KB / 原生View</p>
+                </a>
+
                 <!-- v1.5.0-beta -->
                 <a class="version-card" onclick="showDetail('1.5.0')">
                     <span class="card-icon"><span class="icon-classic">F</span></span>
@@ -596,6 +603,25 @@
          * 每个版本包含：版本号、标签、下载链接、更新日志、图标颜色
          */
         var versions = {
+            '2.0.0': {
+                version: 'v2.0.0-beta',
+                badge: 'BETA',
+                apk: './FANDEX-v2.0.0-beta.apk',
+                apkName: 'FANDEX-v2.0.0-beta.apk',
+                date: '2026-06-17',
+                size: '6.6 MB',
+                require: 'Android 8.0+',
+                changes: [
+                    '架构重构：从 Jetpack Compose 迁移至原生 View 体系',
+                    '空壳体积从 7.9MB 降至 85KB（不含文档）',
+                    '移除 AppCompat/Material/Compose 等重量级依赖',
+                    '手写极简 Markdown/LaTeX 渲染器（零第三方依赖）',
+                    '手写 JSON 解析（org.json，无 Gson 依赖）',
+                    'DrawerLayout 抽屉导航 + ListView 列表',
+                    'ProGuard 混淆 + 资源压缩 + 语言裁剪',
+                    '后续仅需更新 assets 文档，无需改动代码'
+                ]
+            },
             '1.5.0': {
                 version: 'v1.5.0-beta',
                 badge: 'BETA',

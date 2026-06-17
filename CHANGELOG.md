@@ -2,6 +2,17 @@
 
 所有版本均为测试版。
 
+## v2.0.0-beta
+
+- 架构重构：从 Jetpack Compose 迁移至原生 View 体系
+- 空壳体积从 7.9MB 降至 85KB（不含文档）
+- 移除 AppCompat/Material/Compose/Navigation/DataStore/commonmark 等重量级依赖
+- 手写极简 Markdown/LaTeX 渲染器（SpannableStringBuilder，零第三方依赖）
+- 手写 JSON 解析（org.json，无 Gson 依赖）
+- DrawerLayout 抽屉导航 + ListView 列表
+- ProGuard 混淆 + 资源压缩 + 语言裁剪（仅 zh-rCN）
+- 后续仅需更新 assets 文档，无需改动代码
+
 ## v1.5.0-beta
 
 - 修复 Markdown 表格渲染失败：表格行内的 LaTeX 公式不再被替换为行内代码，避免反引号破坏表格语法

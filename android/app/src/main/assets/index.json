@@ -1,0 +1,13 @@
+{
+  "version": "4.0.0",
+  "generatedAt": "2026-06-17",
+  "modules": [
+    {
+      "name": "Markdown语法",
+      "docs": [
+        { "title": "基础语法", "path": "markdown/basics.md" },
+        { "title": "代码块", "path": "markdown/code-blocks.md" }
+      ]
+    }
+  ]
+}
