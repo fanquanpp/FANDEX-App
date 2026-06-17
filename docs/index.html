@@ -500,6 +500,13 @@
 
             <div class="version-grid">
 
+                <!-- v1.5.0-beta -->
+                <a class="version-card" onclick="showDetail('1.5.0')">
+                    <span class="card-icon"><span class="icon-classic">F</span></span>
+                    <h3 class="card-title">v1.5.0-beta</h3>
+                    <p class="card-desc">表格渲染修复 / 增量日志 / 中文化</p>
+                </a>
+
                 <!-- v1.4.1-beta -->
                 <a class="version-card" onclick="showDetail('1.4.1')">
                     <span class="card-icon"><span class="icon-classic">F</span></span>
@@ -589,6 +596,21 @@
          * 每个版本包含：版本号、标签、下载链接、更新日志、图标颜色
          */
         var versions = {
+            '1.5.0': {
+                version: 'v1.5.0-beta',
+                badge: 'BETA',
+                apk: './FANDEX-v1.5.0-beta.apk',
+                apkName: 'FANDEX-v1.5.0-beta.apk',
+                date: '2026-06-17',
+                size: '7.9 MB',
+                require: 'Android 8.0+',
+                changes: [
+                    '修复 Markdown 表格渲染失败（表格内 LaTeX 公式不再破坏表格结构）',
+                    '更新日志改为增量记录，补全所有历史版本',
+                    '复制按钮文本中文化（复制 / 已复制）',
+                    '代码块无语言标签时显示"代码"'
+                ]
+            },
             '1.4.1': {
                 version: 'v1.4.1-beta',
                 badge: 'BETA',

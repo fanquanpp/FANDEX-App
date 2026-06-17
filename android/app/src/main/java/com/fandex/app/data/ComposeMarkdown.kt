@@ -100,23 +100,33 @@ private val markdownParser: Parser = Parser.builder()
  * 流程：
  * 1. 块级公式 $$...$$ -> 围栏代码块 ```math ... ```
  * 2. 行内公式 $...$ -> 行内代码 `...`（带 $ 前后缀标记）
+ *    注意：表格行内的行内公式不替换，避免反引号破坏表格语法
  * 3. [TOC] / [[toc]] / {:toc} -> 移除（目录标记在离线应用中无法跳转）
  */
 private fun PreprocessMarkdown(markdown: String): String {
-    var result = markdown
-
     /* 第一步：处理块级公式 $$...$$（必须先处理，避免被行内公式匹配干扰） */
     /* 使用非贪婪匹配，支持多行公式 */
-    result = Regex("""\$\$\s*([\s\S]*?)\s*\$\$""").replace(result) { match ->
+    var result = Regex("""\$\$\s*([\s\S]*?)\s*\$\$""").replace(markdown) { match ->
         val formula = match.groupValues[1].trim()
         "```math\n${formula}\n```"
     }
 
-    /* 第二步：处理行内公式 $...$ */
-    /* 匹配单个 $ 包裹的行内公式，排除 $$（已处理）和货币符号场景 */
-    result = Regex("""(?<!\$)\$(?!\$)(.+?)(?<!\$)\$(?!\$)""").replace(result) { match ->
-        val formula = match.groupValues[1]
-        "`$${formula}$`"
+    /* 第二步：逐行处理行内公式 $...$，跳过表格行 */
+    /* 表格行以 | 开头，其中的 $...$ 是公式，替换为行内代码会插入反引号破坏表格语法 */
+    val blockFormulaPattern = Regex("""```math[\s\S]*?```""")
+    result = result.lineSequence().joinToString("\n") { line ->
+        if (line.trimStart().startsWith("|")) {
+            /* 表格行：保留原始 $...$ 不替换，commonmark 会将其作为普通文本渲染 */
+            line
+        } else {
+            /* 非表格行：替换行内公式为行内代码 */
+            blockFormulaPattern.replace(line) { it.value }.let { processedLine ->
+                Regex("""(?<!\$)\$(?!\$)(.+?)(?<!\$)\$(?!\$)""").replace(processedLine) { match ->
+                    val formula = match.groupValues[1]
+                    "`$${formula}$`"
+                }
+            }
+        }
     }
 
     /* 第三步：移除 [TOC] / [[toc]] / {:toc} 目录标记 */
@@ -564,7 +574,7 @@ private fun RenderFencedCodeBlock(
                 Text(
                     text = when {
                         language == "math" -> "LaTeX"
-                        language.isBlank() -> "code"
+                        language.isBlank() -> "代码"
                         else -> language
                     },
                     fontSize = 11.sp * fontSizeScale,
@@ -583,7 +593,7 @@ private fun RenderFencedCodeBlock(
                     modifier = Modifier.height(28.dp)
                 ) {
                     Text(
-                        text = if (isCopied.value) "Copied" else "Copy",
+                        text = if (isCopied.value) "已复制" else "复制",
                         fontSize = 11.sp * fontSizeScale,
                         color = if (isCopied.value) colorScheme.primary else colorScheme.onSurfaceVariant
                     )
