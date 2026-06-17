@@ -92,6 +92,42 @@ private val markdownParser: Parser = Parser.builder()
     .build()
 
 /**
+ * Markdown 预处理：转换 LaTeX 数学公式和 [TOC] 目录标记
+ *
+ * 输入：原始 Markdown 文本
+ * 输出：处理后的 Markdown 文本
+ *
+ * 流程：
+ * 1. 块级公式 $$...$$ -> 围栏代码块 ```math ... ```
+ * 2. 行内公式 $...$ -> 行内代码 `...`（带 $ 前后缀标记）
+ * 3. [TOC] / [[toc]] / {:toc} -> 移除（目录标记在离线应用中无法跳转）
+ */
+private fun PreprocessMarkdown(markdown: String): String {
+    var result = markdown
+
+    /* 第一步：处理块级公式 $$...$$（必须先处理，避免被行内公式匹配干扰） */
+    /* 使用非贪婪匹配，支持多行公式 */
+    result = Regex("""\$\$\s*([\s\S]*?)\s*\$\$""").replace(result) { match ->
+        val formula = match.groupValues[1].trim()
+        "```math\n${formula}\n```"
+    }
+
+    /* 第二步：处理行内公式 $...$ */
+    /* 匹配单个 $ 包裹的行内公式，排除 $$（已处理）和货币符号场景 */
+    result = Regex("""(?<!\$)\$(?!\$)(.+?)(?<!\$)\$(?!\$)""").replace(result) { match ->
+        val formula = match.groupValues[1]
+        "`$${formula}$`"
+    }
+
+    /* 第三步：移除 [TOC] / [[toc]] / {:toc} 目录标记 */
+    result = result.replace(Regex("""^\[TOC\]\s*$""", RegexOption.MULTILINE), "")
+    result = result.replace(Regex("""^\[\[toc\]\]\s*$""", RegexOption.MULTILINE), "")
+    result = result.replace(Regex("""^\{:toc\}\s*$""", RegexOption.MULTILINE), "")
+
+    return result
+}
+
+/**
  * Markdown 内容主 Composable
  *
  * 输入：
@@ -111,7 +147,8 @@ fun MarkdownContent(
     scrollState: ScrollState = rememberScrollState()
 ) {
     val clampedScale = fontSizeScale.coerceIn(0.8f, 1.4f)
-    val document = remember(markdown) { markdownParser.parse(markdown) }
+    val processedMarkdown = remember(markdown) { PreprocessMarkdown(markdown) }
+    val document = remember(markdown) { markdownParser.parse(processedMarkdown) }
     val colorScheme = MarkdownColorScheme.resolve(isDarkMode)
 
     Column(
@@ -525,7 +562,11 @@ private fun RenderFencedCodeBlock(
             ) {
                 /* 语言标签 */
                 Text(
-                    text = language.ifBlank { "code" },
+                    text = when {
+                        language == "math" -> "LaTeX"
+                        language.isBlank() -> "code"
+                        else -> language
+                    },
                     fontSize = 11.sp * fontSizeScale,
                     fontFamily = FontFamily.Monospace,
                     color = colorScheme.onSurfaceVariant,
@@ -979,6 +1020,11 @@ private fun ApplySyntaxHighlight(
     colorScheme: MarkdownColorScheme
 ): AnnotatedString {
     if (code.isBlank()) return AnnotatedString(code)
+
+    /* LaTeX 数学公式：不做语法高亮，直接返回纯文本 */
+    if (language.lowercase() == "math") {
+        return AnnotatedString(code)
+    }
 
     val builder = AnnotatedString.Builder()
     val tokens = mutableListOf<TokenSpan>()

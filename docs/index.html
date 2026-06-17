@@ -500,6 +500,13 @@
 
             <div class="version-grid">
 
+                <!-- v1.4.1-beta -->
+                <a class="version-card" onclick="showDetail('1.4.1')">
+                    <span class="card-icon"><span class="icon-classic">F</span></span>
+                    <h3 class="card-title">v1.4.1-beta</h3>
+                    <p class="card-desc">LaTeX 公式修复 / TOC 标记修复 / 分类筛选保持</p>
+                </a>
+
                 <!-- v1.4.0-beta -->
                 <a class="version-card" onclick="showDetail('1.4.0')">
                     <span class="card-icon"><span class="icon-classic">F</span></span>
@@ -582,6 +589,22 @@
          * 每个版本包含：版本号、标签、下载链接、更新日志、图标颜色
          */
         var versions = {
+            '1.4.1': {
+                version: 'v1.4.1-beta',
+                badge: 'BETA',
+                apk: './FANDEX-v1.4.1-beta.apk',
+                apkName: 'FANDEX-v1.4.1-beta.apk',
+                date: '2026-06-17',
+                size: '7.9 MB',
+                require: 'Android 8.0+',
+                changes: [
+                    '修复 LaTeX 数学公式渲染失效问题',
+                    '块级公式 $$...$$ 以代码块样式显示',
+                    '行内公式 $...$ 以行内代码样式显示',
+                    '移除 [TOC] 目录标记避免渲染异常',
+                    '分类筛选状态保持：模块返回后保持之前的分类筛选'
+                ]
+            },
             '1.4.0': {
                 version: 'v1.4.0-beta',
                 badge: 'BETA',
