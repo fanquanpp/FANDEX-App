@@ -4,371 +4,359 @@
 
 ---
 
-## 自定义错误类
+## Error 基础
 
-**基础自定义错误**：继承 Error 类
-`class <错误类> extends Error { constructor(<消息>) { super(<消息>); this.name = <名称>; } }`
+**基本写法：创建 Error**
+`new Error("<消息>")`
 ```javascript
-class AppError extends Error {
-  constructor(message, options = {}) {
-    super(message);
-    this.name = this.constructor.name;
-    this.code = options.code || 'UNKNOWN_ERROR';
-    this.statusCode = options.statusCode || 500;
-    this.details = options.details || null;
-    Object.setPrototypeOf(this, new.target.prototype);
-  }
-}
-
-// 使用
-const error = new AppError('操作失败', {
-  code: 'OPERATION_FAILED',
-  statusCode: 500,
-});
-console.log(error.message);      // '操作失败'
-console.log(error.code);         // 'OPERATION_FAILED'
-console.log(error.statusCode);   // 500
+// 创建错误对象
+let error = new Error("Something went wrong");
 ```
 
 ---
 
-**错误类型层次**：构建错误类型体系
-`class <子错误> extends <父错误> { constructor(<消息>, <选项>) { super(<消息>, { code: '...', ...<选项> }); } }`
+**基本写法：省略 new**
+`Error("<消息>")`
 ```javascript
-class NetworkError extends AppError {
-  constructor(message, options = {}) {
-    super(message, { code: 'NETWORK_ERROR', ...options });
-  }
-}
-
-class TimeoutError extends NetworkError {
-  constructor(message, options = {}) {
-    super(message, { code: 'TIMEOUT_ERROR', ...options });
-  }
-}
-
-class ValidationError extends AppError {
-  constructor(message, options = {}) {
-    super(message, { code: 'VALIDATION_ERROR', ...options });
-    this.fields = options.fields || [];
-  }
-}
-
-// instanceof 正常工作
-const err = new TimeoutError('请求超时');
-console.log(err instanceof TimeoutError);  // true
-console.log(err instanceof NetworkError);  // true
-console.log(err instanceof AppError);      // true
-console.log(err instanceof Error);          // true
+// 省略 new 创建错误对象
+let error = Error("Something went wrong");
 ```
 
 ---
 
-## 错误链（Error Cause）
-
-**ES2022 cause 属性**：传递原始错误
-`new Error(<消息>, { cause: <原始错误> })`
+**基本写法：throw Error**
+`throw new Error("<消息>")`
 ```javascript
-try {
-  JSON.parse('invalid');
-} catch (e) {
-  throw new AppError('数据解析失败', { cause: e });
-}
+// 抛出错误
+throw new Error("Invalid input");
+```
 
-// 获取原始错误
+---
+
+**基本写法：Error message 属性**
+`<error>.message`
+```javascript
+// 获取错误消息
+let message = error.message;
+```
+
+---
+
+**基本写法：Error name 属性**
+`<error>.name`
+```javascript
+// 获取错误名称
+let name = error.name;
+```
+
+---
+
+**基本写法：Error stack 属性**
+`<error>.stack`
+```javascript
+// 获取错误堆栈信息
+let stack = error.stack;
+```
+
+---
+
+## 内置 Error 类型
+
+**基本写法：TypeError**
+`new TypeError("<消息>")`
+```javascript
+// 创建类型错误
+throw new TypeError("Expected a number");
+```
+
+---
+
+**基本写法：RangeError**
+`new RangeError("<消息>")`
+```javascript
+// 创建范围错误
+throw new RangeError("Value must be positive");
+```
+
+---
+
+**基本写法：SyntaxError**
+`new SyntaxError("<消息>")`
+```javascript
+// 创建语法错误
+throw new SyntaxError("Invalid syntax");
+```
+
+---
+
+**基本写法：ReferenceError**
+`new ReferenceError("<消息>")`
+```javascript
+// 创建引用错误
+throw new ReferenceError("Variable is not defined");
+```
+
+---
+
+**基本写法：URIError**
+`new URIError("<消息>")`
+```javascript
+// 创建 URI 错误
+throw new URIError("Malformed URI");
+```
+
+---
+
+**基本写法：EvalError**
+`new EvalError("<消息>")`
+```javascript
+// 创建 eval 错误
+throw new EvalError("Eval failed");
+```
+
+---
+
+## 自定义 Error 类
+
+**基本写法：继承 Error**
+`class <自定义错误> extends Error { }`
+```javascript
+// 继承 Error 创建自定义错误
+class CustomError extends Error {
+}
+```
+
+---
+
+**换行写法：带构造方法的自定义错误**
+`class <自定义错误> extends Error { constructor(<参数>) { super(<参数>); this.name = <名称>; } }`
+```javascript
+// 自定义错误带构造方法
+class ValidationError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "ValidationError";
+    }
+}
+```
+
+---
+
+**换行写法：带额外属性的自定义错误**
+`class <自定义错误> extends Error { constructor(<参数1>, <参数2>) { super(<参数1>); this.<属性> = <参数2>; } }`
+```javascript
+// 自定义错误带额外属性
+class ApiError extends Error {
+    constructor(message, statusCode) {
+        super(message);
+        this.name = "ApiError";
+        this.statusCode = statusCode;
+    }
+}
+```
+
+---
+
+**基本写法：使用自定义错误**
+`throw new <自定义错误>("<消息>")`
+```javascript
+// 抛出自定义错误
+throw new ValidationError("Email is required");
+```
+
+---
+
+## 错误处理
+
+**基本写法：try-catch**
+`try { } catch (<错误>) { }`
+```javascript
+// 捕获错误
 try {
-  // 可能失败的代码
+    riskyOperation();
 } catch (error) {
-  if (error.cause) {
-    console.error('原始错误:', error.cause);
-  }
 }
 ```
 
 ---
 
-**错误链遍历**：获取完整错误链
-`class <错误类> extends Error { get chain() { ... } get rootCause() { ... } }`
+**基本写法：try-catch-finally**
+`try { } catch (<错误>) { } finally { }`
 ```javascript
-class ChainedError extends Error {
-  constructor(message, options = {}) {
-    super(message, options);
-    this.name = this.constructor.name;
-  }
-
-  get chain() {
-    const errors = [this];
-    let current = this.cause;
-    while (current) {
-      errors.push(current);
-      current = current.cause;
-    }
-    return errors;
-  }
-
-  get rootCause() {
-    let current = this.cause;
-    while (current?.cause) {
-      current = current.cause;
-    }
-    return current;
-  }
-}
-
-// 使用
+// finally 块无论是否异常都执行
 try {
-  try {
-    JSON.parse('invalid');
-  } catch (e) {
-    throw new ChainedError('解析失败', { cause: e });
-  }
-} catch (e) {
-  console.log(e.chain);       // [ChainedError, SyntaxError]
-  console.log(e.rootCause);   // SyntaxError
-}
-```
-
----
-
-## 聚合错误（AggregateError）
-
-**创建 AggregateError**：聚合多个错误
-`new AggregateError(<错误数组>[, <消息>])`
-```javascript
-const errors = [new Error('错误 A'), new Error('错误 B')];
-const aggregate = new AggregateError(errors, '多个错误发生');
-console.log(aggregate.errors.length);  // 2
-console.log(aggregate.message);        // '多个错误发生'
-```
-
----
-
-**Promise.any 失败**：产生 AggregateError
-`Promise.any([<rejected promises>]).catch(<aggregateError>)`
-```javascript
-Promise.any([
-  Promise.reject(new Error('A 失败')),
-  Promise.reject(new Error('B 失败')),
-  Promise.reject(new Error('C 失败')),
-]).catch((err) => {
-  console.log(err instanceof AggregateError);  // true
-  console.log(err.errors);  // [Error: A 失败, Error: B 失败, Error: C 失败]
-  err.errors.forEach((e) => console.error(e.message));
-});
-```
-
----
-
-## 错误处理模式
-
-**try-catch 捕获**：根据错误类型处理
-`try { ... } catch (<错误>) { if (<错误> instanceof <类型>) { ... } }`
-```javascript
-try {
-  // 可能抛出多种错误的代码
-  const data = await fetchData();
 } catch (error) {
-  if (error instanceof ValidationError) {
-    console.error('验证错误:', error.fields);
-  } else if (error instanceof NetworkError) {
-    console.error('网络错误:', error.message);
-  } else if (error instanceof TimeoutError) {
-    console.error('超时错误，请重试');
-  } else {
-    console.error('未知错误:', error);
-  }
+} finally {
 }
 ```
 
 ---
 
-**错误转换**：分层错误处理
-`catch (<技术错误>) { throw new <业务错误>(<消息>, { cause: <技术错误> }); }`
+**基本写法：catch 无参数**
+`try { } catch { }`
 ```javascript
-// 数据访问层
-class UserRepository {
-  async findById(id) {
-    try {
-      const response = await fetch(`/api/users/${id}`);
-      return await response.json();
-    } catch (error) {
-      throw new NetworkError('获取用户失败', { cause: error });
-    }
-  }
-}
-
-// 业务逻辑层
-class UserService {
-  async getUser(id) {
-    try {
-      const user = await this.userRepo.findById(id);
-      if (!user) {
-        throw new ValidationError('用户不存在', { fields: ['id'] });
-      }
-      return user;
-    } catch (error) {
-      if (error instanceof NetworkError) {
-        throw new AppError('服务暂时不可用', {
-          code: 'SERVICE_UNAVAILABLE',
-          statusCode: 503,
-          cause: error,
-        });
-      }
-      throw error;
-    }
-  }
+// ES2019+ catch 可省略参数
+try {
+} catch {
 }
 ```
 
 ---
 
-## 错误工厂
-
-**错误工厂函数**：统一创建错误
-`function createError(<类型>, <消息>, <选项>) { ... }`
+**基本写法：捕获特定错误类型**
+`catch (<错误>) { if (<错误> instanceof <类型>) { } }`
 ```javascript
-const ErrorFactory = {
-  validation(message, fields = []) {
-    return new ValidationError(message, { fields });
-  },
+// 捕获特定类型的错误
+try {
+} catch (error) {
+    if (error instanceof TypeError) {
+    }
+}
+```
 
-  network(message, statusCode = 500) {
-    return new NetworkError(message, { statusCode });
-  },
+---
 
-  timeout(message, timeout) {
-    return new TimeoutError(message, { timeout });
-  },
+**基本写法：重新抛出错误**
+`catch (<错误>) { throw <错误>; }`
+```javascript
+// 捕获后重新抛出错误
+try {
+} catch (error) {
+    throw error;
+}
+```
 
-  notFound(resource) {
-    return new AppError(`${resource} 不存在`, {
-      code: 'NOT_FOUND',
-      statusCode: 404,
-    });
-  },
-};
+---
 
-// 使用
-throw ErrorFactory.validation('邮箱格式不正确', ['email']);
-throw ErrorFactory.notFound('用户');
+**基本写法：抛出新错误**
+`catch (<错误>) { throw new <错误类型>("<消息>", { cause: <错误> }); }`
+```javascript
+// 抛出新错误并保留原始错误
+try {
+} catch (error) {
+    throw new Error("Operation failed", { cause: error });
+}
+```
+
+---
+
+## Error.cause
+
+**基本写法：Error cause 选项**
+`new Error("<消息>", { cause: <原因> })`
+```javascript
+// ES2022+ 创建带原因的错误
+let error = new Error("Failed", { cause: originalError });
+```
+
+---
+
+**基本写法：访问 cause**
+`<error>.cause`
+```javascript
+// 获取错误的原始原因
+let cause = error.cause;
+```
+
+---
+
+## AggregateError
+
+**基本写法：创建 AggregateError**
+`new AggregateError([<错误1>, <错误2>], "<消息>")`
+```javascript
+// 创建聚合错误
+let error = new AggregateError([err1, err2], "Multiple errors");
+```
+
+---
+
+**基本写法：访问 errors**
+`<error>.errors`
+```javascript
+// 获取聚合错误中的所有错误
+let errors = aggregateError.errors;
+```
+
+---
+
+**基本写法：Promise.any 触发 AggregateError**
+`Promise.any([<promise1>, <promise2>]).catch(<回调>)`
+```javascript
+// Promise.any 全部失败时抛出 AggregateError
+Promise.any([p1, p2]).catch(error => {
+    if (error instanceof AggregateError) {
+    }
+});
 ```
 
 ---
 
 ## 错误断言
 
-**断言函数**：条件检查
-`function assert(<条件>, <错误>) { if (!<条件>) throw <错误>; }`
+**基本写法：自定义断言函数**
+`function <断言>(<条件>, "<消息>") { if (!<条件>) throw new Error("<消息>"); }`
 ```javascript
-function assert(condition, error) {
-  if (!condition) {
-    throw error;
-  }
-}
-
-function assertValidUser(user) {
-  assert(user, ErrorFactory.notFound('用户'));
-  assert(user.name, ErrorFactory.validation('用户名不能为空', ['name']));
-  assert(user.age >= 0, ErrorFactory.validation('年龄不能为负数', ['age']));
-}
-
-// 使用
-try {
-  assertValidUser({ name: '', age: -1 });
-} catch (error) {
-  if (error instanceof ValidationError) {
-    console.error('验证失败:', error.fields);
-  }
-}
-```
-
----
-
-## 错误日志
-
-**错误日志记录**：统一记录错误
-`function logError(<错误>) { ... }`
-```javascript
-function logError(error) {
-  const errorInfo = {
-    name: error.name,
-    message: error.message,
-    code: error.code,
-    statusCode: error.statusCode,
-    stack: error.stack,
-    cause: error.cause ? {
-      name: error.cause.name,
-      message: error.cause.message,
-    } : null,
-    timestamp: new Date().toISOString(),
-  };
-  console.error(JSON.stringify(errorInfo, null, 2));
-  // 发送到错误监控系统
-}
-
-// 使用
-try {
-  // 可能出错的代码
-} catch (error) {
-  logError(error);
-  throw error;  // 重新抛出
-}
-```
-
----
-
-## 错误边界
-
-**异步错误边界**：捕获异步错误
-`async function withErrorBoundary(<异步函数>) { try { ... } catch (<错误>) { ... } }`
-```javascript
-async function withErrorBoundary(asyncFn, fallback = null) {
-  try {
-    return await asyncFn();
-  } catch (error) {
-    logError(error);
-    if (error instanceof ValidationError) {
-      // 验证错误可以恢复
-      return fallback;
+// 实现断言函数
+function assert(condition, message) {
+    if (!condition) {
+        throw new Error(message);
     }
-    if (error instanceof NetworkError) {
-      // 网络错误可以重试
-      return fallback;
-    }
-    // 其他错误向上抛出
-    throw error;
-  }
 }
-
-// 使用
-const data = await withErrorBoundary(
-  () => fetchData(),
-  { default: true }
-);
 ```
 
 ---
 
-## 错误序列化
-
-**错误转 JSON**：序列化错误信息
-`function errorToJSON(<错误>) { ... }`
+**基本写法：console.assert**
+`console.assert(<条件>, "<消息>")`
 ```javascript
-function errorToJSON(error) {
-  return {
-    name: error.name,
-    message: error.message,
-    code: error.code,
-    statusCode: error.statusCode,
-    details: error.details,
-    fields: error.fields,
-    cause: error.cause ? errorToJSON(error.cause) : null,
-  };
-}
+// 条件为假时输出错误
+console.assert(value > 0, "Value must be positive");
+```
 
-// 使用
-const error = new ValidationError('验证失败', {
-  fields: ['email', 'password'],
-});
-console.log(JSON.stringify(errorToJSON(error)));
+---
+
+## 错误转换
+
+**基本写法：错误转字符串**
+`<error>.toString()`
+```javascript
+// 将错误转换为字符串
+let str = error.toString();
+```
+
+---
+
+**基本写法：JSON 序列化错误**
+`JSON.stringify(<错误>, Object.getOwnPropertyNames(<错误>))`
+```javascript
+// 序列化错误对象包含所有属性
+let json = JSON.stringify(error, Object.getOwnPropertyNames(error));
+```
+
+---
+
+## 错误链
+
+**基本写法：错误链模式**
+`try { } catch (<错误>) { throw new <错误类型>("<消息>", { cause: <错误> }); }`
+```javascript
+// 错误链保留原始错误信息
+try {
+    operation();
+} catch (error) {
+    throw new AppError("Operation failed", { cause: error });
+}
+```
+
+---
+
+**基本写法：遍历错误链**
+`let <当前> = <错误>; while (<当前>.cause) { <当前> = <当前>.cause; }`
+```javascript
+// 遍历错误链获取根本原因
+let current = error;
+while (current.cause) {
+    current = current.cause;
+}
 ```

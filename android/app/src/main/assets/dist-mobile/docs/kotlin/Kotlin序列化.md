@@ -4,340 +4,378 @@
 
 ---
 
-## 插件与依赖
+## 序列化基础
 
-**build.gradle.kts 配置**
-`plugins { kotlin("plugin.serialization") } dependencies { implementation("...") }`
+**基本写法：@Serializable 注解**
+`@Serializable data class <Name>(val <prop>: <Type>)`
 ```kotlin
-plugins {
-    kotlin("jvm") version "2.0.0";
-    // 必须添加序列化编译器插件
-    kotlin("plugin.serialization") version "2.0.0";
-};
-dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3");
-};
-```
-
----
-
-## 基本序列化
-
-**@Serializable 标记数据类**
-`@Serializable data class <Name>(val <prop>: <Type>, ...)`
-```kotlin
-import kotlinx.serialization.*;
-import kotlinx.serialization.json.*;
-// 用 @Serializable 标记数据类
+// 标记类为可序列化
 @Serializable
 data class User(val name: String, val age: Int);
-fun main() {
-    // 序列化：对象 -> JSON 字符串
-    val user = User("Alice", 25);
-    val jsonString = Json.encodeToString(user);
-    println(jsonString);  // {"name":"Alice","age":25}
-    // 反序列化：JSON 字符串 -> 对象
-    val decoded = Json.decodeFromString<User>("""{"name":"Bob","age":30}""");
-    println(decoded);  // User(name=Bob, age=30)
-};
 ```
 
----
-
-## 配置 Json 对象
-
-**自定义配置**
-`val <json> = Json { <options> }`
+**基本写法：encodeToString 序列化为字符串**
+`Json.encodeToString(<obj>)`
 ```kotlin
-// 创建自定义配置的 Json 实例
+// 序列化对象为 JSON 字符串
+val json = Json.encodeToString(User("Alice", 25));
+```
+
+**基本写法：decodeFromString 反序列化**
+`Json.decodeFromString<<Type>>(<json>)`
+```kotlin
+// 从 JSON 字符串反序列化
+val user = Json.decodeFromString<User>("""{"name":"Alice","age":25}""");
+```
+
+**基本写法：Json 配置**
+`Json { <options> }`
+```kotlin
+// 自定义 Json 配置
 val json = Json {
-    ignoreUnknownKeys = true;    // 忽略 JSON 中有但类中没有的字段
-    prettyPrint = true;          // 格式化输出，方便阅读
-    isLenient = true;            // 宽松模式，允许非标准 JSON
-    encodeDefaults = true;       // 编码默认值
-    coerceInputValues = true;    // 将无效值强制转为默认值
-};
-// 使用自定义配置
-val user = json.decodeFromString<User>("""{"name":"Alice","age":25,"extra":"ignored"}""");
-// extra 字段会被忽略，因为 ignoreUnknownKeys = true
+    ignoreUnknownKeys = true;
+    prettyPrint = true;
+}
 ```
 
 ---
 
-## 可选字段与默认值
+## 字段配置
 
-**默认值与可空字段**
-`@Serializable data class <Name>(val <prop>: <Type> = <default>, val <prop2>: <Type>? = null)`
+**基本写法：@SerialName 自定义字段名**
+`@SerialName("<name>") val <prop>: <Type>`
 ```kotlin
+// 自定义 JSON 字段名
 @Serializable
-data class Profile(
+data class User(
+    @SerialName("user_name") val name: String,
+    @SerialName("user_age") val age: Int
+);
+```
+
+**基本写法：@Transient 忽略字段**
+`@Transient val <prop>: <Type> = <default>`
+```kotlin
+// 忽略字段不参与序列化
+@Serializable
+data class User(
     val name: String,
-    val age: Int = 0,              // 默认值，JSON 中可以省略
-    val email: String? = null,     // 可空类型，可以传 null 或省略
-    val role: String = "user"      // 默认角色
+    @Transient val temp: String = ""
 );
-fun main() {
-    // JSON 中省略了 age 和 email，会使用默认值
-    val profile = Json.decodeFromString<Profile>("""{"name":"Alice"}""");
-    println(profile);  // Profile(name=Alice, age=0, email=null, role=user)
-    // 序列化时，默认值默认不会输出（节省空间）
-    val json = Json { encodeDefaults = true; };
-    println(json.encodeToString(profile));
-    // 加了 encodeDefaults 后会输出所有字段
-};
 ```
 
----
-
-## 嵌套对象和列表
-
-**嵌套对象**
-`@Serializable data class <Name>(val <prop>: <OtherClass>, val <list>: List<<Type>>)`
+**基本写法：@Optional 可选字段**
+`@Optional val <prop>: <Type> = <default>`
 ```kotlin
+// 可选字段，缺失时使用默认值
 @Serializable
-data class Address(val city: String, val street: String);
-@Serializable
-data class Person(
+data class User(
     val name: String,
-    val address: Address,          // 嵌套对象
-    val hobbies: List<String>      // 列表
+    val email: String? = null
 );
-fun main() {
-    val person = Person(
-        name = "Alice",
-        address = Address("Beijing", "Chaoyang Road"),
-        hobbies = listOf("Reading", "Coding")
-    );
-    val jsonString = Json.encodeToString(person);
-    println(jsonString);
-    // {"name":"Alice","address":{"city":"Beijing","street":"Chaoyang Road"},"hobbies":["Reading","Coding"]}
-    val decoded = Json.decodeFromString<Person>(jsonString);
-    println(decoded.address.city);  // Beijing
-};
 ```
 
----
-
-## 自定义字段名
-
-**@SerialName 映射字段名**
-`@SerialName("<json_name>") val <prop>: <Type>`
+**基本写法：默认值字段**
+`val <prop>: <Type> = <default>`
 ```kotlin
+// 带默认值的字段
 @Serializable
-data class ApiResponse(
-    @SerialName("status_code")
-    val statusCode: Int,           // JSON 中是 status_code，Kotlin 中是 statusCode
-    @SerialName("user_name")
-    val userName: String
+data class Config(
+    val host: String = "localhost",
+    val port: Int = 8080
 );
-fun main() {
-    val json = """{"status_code":200,"user_name":"Alice"}""";
-    val response = Json.decodeFromString<ApiResponse>(json);
-    println(response.statusCode);  // 200
-    println(response.userName);    // Alice
-};
 ```
 
 ---
 
-## 枚举和密封类的序列化
+## 多态序列化
 
-**枚举序列化**
-`@Serializable enum class <Name> { <VALUES> }`
+**基本写法：@Polymorphic 多态标记**
+`@Polymorphic open class <Name>`
 ```kotlin
+// 标记类支持多态序列化
 @Serializable
-enum class Status { ACTIVE, INACTIVE, SUSPENDED };
-@Serializable
-data class Account(val name: String, val status: Status);
-fun main() {
-    val account = Account("Alice", Status.ACTIVE);
-    val json = Json.encodeToString(account);
-    println(json);  // {"name":"Alice","status":"ACTIVE"}
-};
+@Polymorphic
+open class Animal;
 ```
 
-**密封类的多态序列化**
-`@Serializable sealed class <Name> { @Serializable @SerialName(<name>) data class <Sub>(...): <Name>() }`
+**基本写法：@SerialName 子类注册**
+`@Serializable @SerialName("<name>") class <SubName> : <BaseName>()`
 ```kotlin
+// 子类使用 @SerialName 注册
 @Serializable
-sealed class Message {
-    abstract val id: String;
-    @Serializable
-    @SerialName("text")
-    data class Text(override val id: String, val content: String) : Message();
-    @Serializable
-    @SerialName("image")
-    data class Image(override val id: String, val url: String) : Message();
-};
-fun main() {
-    val messages: List<Message> = listOf(
-        Message.Text("1", "Hello"),
-        Message.Image("2", "https://example.com/img.png")
-    );
-    val json = Json.encodeToString(messages);
-    // 会自动添加 type 字段区分子类
-};
+@SerialName("dog")
+class Dog : Animal();
 ```
 
----
-
-## 手动构建和解析 JSON
-
-**手动构建 JSON 对象**
-`buildJsonObject { put(<key>, <value>) }`
+**换行写法：SerializersModule 序列化模块**
+`SerializersModule { polymorphic(<Base>::class) { subclass(<Sub>::class) } }`
 ```kotlin
-import kotlinx.serialization.json.*;
-fun main() {
-    // 手动构建 JSON 对象
-    val jsonObject = buildJsonObject {
-        put("name", "Alice");
-        put("age", 25);
-        put("isStudent", true);
-        put("hobbies", buildJsonArray {
-            add("Reading");
-            add("Coding");
-        });
-        put("address", buildJsonObject {
-            put("city", "Beijing");
-        });
-    };
-    println(jsonObject.toString());
-};
+// 注册多态子类
+val module = SerializersModule {
+    polymorphic(Animal::class) {
+        subclass(Dog::class);
+        subclass(Cat::class);
+    }
+}
 ```
 
-**手动解析 JSON**
-`Json.parseToJsonElement(<jsonString>).jsonObject["<key>"]`
+**基本写法：使用多态模块**
+`Json { serializersModule = <module> }`
 ```kotlin
-// 手动解析 JSON
-val jsonElement = Json.parseToJsonElement("""{"name":"Bob","scores":[90,85,92]}""");
-// 读取字段
-val name = jsonElement.jsonObject["name"]?.jsonPrimitive?.content;  // "Bob"
-val scores = jsonElement.jsonObject["scores"]?.jsonArray
-    ?.map { it.jsonPrimitive.int };  // [90, 85, 92]
-println("Name: $name, Scores: $scores");
+// 使用多态模块
+val json = Json {
+    serializersModule = module;
+}
 ```
 
 ---
 
-## 封装网络请求的响应格式
+## 集合序列化
 
-**泛型响应封装**
-`@Serializable data class <Result><T>(val <code>: Int, val <message>: String, val <data>: T? = null)`
+**基本写法：List 序列化**
+`@Serializable data class <Name>(val <prop>: List<<Type>>)`
 ```kotlin
+// 序列化包含 List 的对象
 @Serializable
-data class ApiResult<T>(
-    val code: Int,
-    val message: String,
-    val data: T? = null
-);
-@Serializable
-data class Article(val id: Int, val title: String, val content: String);
-fun main() {
-    val json = """{"code":200,"message":"success","data":{"id":1,"title":"Hello","content":"World"}}""";
-    val result = Json.decodeFromString<ApiResult<Article>>(json);
-    result.data?.let { article ->
-        println("文章: ${article.title} - ${article.content}");
-    };
-};
+data class UserList(val users: List<User>);
 ```
 
----
-
-## 本地数据持久化
-
-**保存设置到文件**
-`fun <name>(<settings>: <Type>, <filePath>: String) { File(<filePath>).writeText(<json>.encodeToString(<settings>)) }`
+**基本写法：Map 序列化**
+`@Serializable data class <Name>(val <prop>: Map<<KeyType>, <ValueType>>)`
 ```kotlin
-import java.io.File;
+// 序列化包含 Map 的对象
 @Serializable
-data class AppSettings(
-    val theme: String = "light",
-    val fontSize: Int = 14,
-    val recentFiles: List<String> = emptyList()
-);
-// 保存设置到文件
-fun saveSettings(settings: AppSettings, filePath: String) {
-    val json = Json { prettyPrint = true; };
-    File(filePath).writeText(json.encodeToString(settings));
-};
-// 从文件读取设置
-fun loadSettings(filePath: String): AppSettings {
-    val text = File(filePath).readText();
-    return Json.decodeFromString(text);
-};
+data class Config(val settings: Map<String, String>);
+```
+
+**基本写法：嵌套对象序列化**
+`@Serializable data class <Outer>(val <inner>: <Inner>)`
+```kotlin
+// 序列化嵌套对象
+@Serializable
+data class Order(val id: String, val user: User);
+```
+
+**基本写法：可空字段序列化**
+`@Serializable data class <Name>(val <prop>: <Type>?)`
+```kotlin
+// 序列化可空字段
+@Serializable
+data class User(val name: String, val email: String? = null);
 ```
 
 ---
 
 ## 自定义序列化器
 
-**KSerializer 自定义序列化器**
-`object <Serializer> : KSerializer<<Type>> { override val descriptor / serialize / deserialize }`
+**基本写法：KSerializer 自定义序列化器**
+`object <Name>Serializer : KSerializer<<Type>> { override fun serialize(...); override fun deserialize(...) }`
 ```kotlin
-import kotlinx.serialization.*;
-import kotlinx.serialization.descriptors.*;
-import kotlinx.serialization.encoding.*;
-// 为 Date 类自定义序列化器
-object DateSerializer : KSerializer<java.util.Date> {
-    // 描述符：序列化后的类型是 LONG
-    override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("Date", PrimitiveKind.LONG);
-    // 反序列化：从时间戳还原 Date
-    override fun deserialize(decoder: Decoder): java.util.Date {
-        return java.util.Date(decoder.decodeLong());
-    };
-    // 序列化：将 Date 转为时间戳
-    override fun serialize(encoder: Encoder, value: java.util.Date) {
-        encoder.encodeLong(value.time);
-    };
-};
+// 自定义序列化器
+object DateSerializer : KSerializer<Date> {
+    override val descriptor = PrimitiveSerialDescriptor("Date", PrimitiveKind.STRING);
+    override fun serialize(encoder: Encoder, value: Date) {
+        encoder.encodeString(value.toString());
+    }
+    override fun deserialize(decoder: Decoder): Date {
+        return Date(decoder.decodeString());
+    }
+}
+```
+
+**基本写法：@Serializable with 自定义序列化器**
+`@Serializable(with = <Serializer>::class) val <prop>: <Type>`
+```kotlin
 // 使用自定义序列化器
 @Serializable
 data class Event(
-    val title: String,
-    @Serializable(with = DateSerializer::class)
-    val date: java.util.Date
+    @Serializable(with = DateSerializer::class) val date: Date
 );
 ```
 
----
-
-## 多格式支持
-
-**Protobuf 支持**
-`ProtoBuf.encodeToByteArray(<obj>) | ProtoBuf.decodeFromByteArray<<Type>>(<bytes>)`
+**基本写法：@Serializer 文件级注册**
+`@file:UseSerializers(<Serializer>::class)`
 ```kotlin
-// Protobuf 支持（需要添加对应依赖）
-dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.6.3");
-};
-import kotlinx.serialization.protobuf.*;
-@Serializable
-data class ProtoMessage(val id: Int, val text: String);
-fun main() {
-    val message = ProtoMessage(1, "Hello");
-    // 序列化为 Protobuf 二进制格式
-    val bytes = ProtoBuf.encodeToByteArray(message);
-    // 从二进制还原
-    val decoded = ProtoBuf.decodeFromByteArray<ProtoMessage>(bytes);
-};
+// 文件级注册序列化器
+@file:UseSerializers(DateSerializer::class);
 ```
 
 ---
 
-## 泛型序列化
+## 编码器与解码器
 
-**泛型类的序列化**
-`@Serializable data class <Box><T>(val value: T)`
+**基本写法：encode 编码**
+`<encoder>.encode<<Type>>(<value>)`
 ```kotlin
-// 泛型类的序列化
+// 使用编码器编码值
+encoder.encodeInt(42);
+encoder.encodeString("Hello");
+```
+
+**基本写法：decode 解码**
+`<decoder>.decode<<Type>>()`
+```kotlin
+// 使用解码器解码值
+val num = decoder.decodeInt();
+val text = decoder.decodeString();
+```
+
+**基本写法：encodeNullable 编码可空值**
+`<encoder>.encodeNullableValue(<value>)`
+```kotlin
+// 编码可空值
+encoder.encodeNullableSerializableElement(descriptor, 0, value);
+```
+
+**基本写法：CompositeEncoder 复合编码**
+`<encoder>.beginStructure(<descriptor>)`
+```kotlin
+// 复合编码器
+val composite = encoder.beginStructure(descriptor);
+composite.encodeStringElement(descriptor, 0, value.name);
+composite.endStructure();
+```
+
+---
+
+## JSON 配置选项
+
+**基本写法：ignoreUnknownKeys 忽略未知键**
+`Json { ignoreUnknownKeys = true }`
+```kotlin
+// 忽略 JSON 中未知的键
+val json = Json { ignoreUnknownKeys = true };
+```
+
+**基本写法：prettyPrint 美化输出**
+`Json { prettyPrint = true }`
+```kotlin
+// 美化 JSON 输出
+val json = Json { prettyPrint = true };
+```
+
+**基本写法：encodeDefaults 编码默认值**
+`Json { encodeDefaults = true }`
+```kotlin
+// 编码默认值字段
+val json = Json { encodeDefaults = true };
+```
+
+**基本写法：explicitNulls 显式 null**
+`Json { explicitNulls = false }`
+```kotlin
+// 不编码 null 值
+val json = Json { explicitNulls = false };
+```
+
+**基本写法：coerceInputValues 强制输入值**
+`Json { coerceInputValues = true }`
+```kotlin
+// 强制输入值（无效值使用默认值）
+val json = Json { coerceInputValues = true };
+```
+
+**基本写法：classDiscriminator 类标识符**
+`Json { classDiscriminator = "<name>" }`
+```kotlin
+// 自定义多态类标识符
+val json = Json { classDiscriminator = "type" };
+```
+
+---
+
+## 流式序列化
+
+**基本写法：encodeToStream 编码到流**
+`<format>.encodeToStream(<obj>, <stream>)`
+```kotlin
+// 编码到输出流
+val stream = ByteArrayOutputStream();
+Json.encodeToStream(User("Alice", 25), stream);
+```
+
+**基本写法：decodeFromStream 从流解码**
+`<format>.decodeFromStream<<Type>>(<stream>)`
+```kotlin
+// 从输入流解码
+val stream = ByteArrayInputStream(json.toByteArray());
+val user = Json.decodeFromStream<User>(stream);
+```
+
+---
+
+## 其他格式
+
+**基本写法：ProtoBuf 序列化**
+`ProtoBuf.encodeToString(<obj>)`
+```kotlin
+// ProtoBuf 序列化
+val proto = ProtoBuf.encodeToString(User("Alice", 25));
+```
+
+**基本写法：ProtoBuf 反序列化**
+`ProtoBuf.decodeFromString<<Type>>(<proto>)`
+```kotlin
+// ProtoBuf 反序列化
+val user = ProtoBuf.decodeFromString<User>(proto);
+```
+
+**基本写法：@ProtoNumber 自定义字段编号**
+`@ProtoNumber(<n>) val <prop>: <Type>`
+```kotlin
+// 自定义 ProtoBuf 字段编号
 @Serializable
-data class Box<T>(val value: T);
-fun main() {
-    // 需要显式指定泛型类型
-    val box = Box(User("Alice", 25));
-    val json = Json.encodeToString(Box.serializer(User.serializer()), box);
-    // 反序列化时也需要指定
-    val decoded = Json.decodeFromString(Box.serializer(User.serializer()), json);
-};
+data class User(
+    @ProtoNumber(1) val name: String,
+    @ProtoNumber(2) val age: Int
+);
+```
+
+**基本写法：CBOR 序列化**
+`Cbor.encodeToByteArray(<obj>)`
+```kotlin
+// CBOR 序列化
+val cbor = Cbor.encodeToByteArray(User("Alice", 25));
+```
+
+**基本写法：CBOR 反序列化**
+`Cbor.decodeFromByteArray<<Type>>(<cbor>)`
+```kotlin
+// CBOR 反序列化
+val user = Cbor.decodeFromByteArray<User>(cbor);
+```
+
+---
+
+## 实战应用
+
+**基本写法：网络请求响应解析**
+`suspend fun <name>(<params>): <ReturnType> = withContext(Dispatchers.IO) { Json.decodeFromString<<Type>>(<response>) }`
+```kotlin
+// 解析网络请求响应
+suspend fun fetchUser(id: String): User = withContext(Dispatchers.IO) {
+    val response = api.getUser(id);
+    Json.decodeFromString<User>(response);
+}
+```
+
+**基本写法：列表数据解析**
+`Json.decodeFromString<List<<Type>>>(<json>)`
+```kotlin
+// 解析 JSON 数组
+val users = Json.decodeFromString<List<User>>(jsonArray);
+```
+
+**换行写法：复杂嵌套对象解析**
+`@Serializable data class <Response>(val <data>: <Data>); @Serializable data class <Data>(<fields>)`
+```kotlin
+// 解析复杂嵌套 JSON
+@Serializable
+data class ApiResponse(
+    val code: Int,
+    val message: String,
+    val data: User
+);
+val response = Json.decodeFromString<ApiResponse>(json);
 ```

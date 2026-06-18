@@ -6,370 +6,345 @@
 
 ## Promise 创建
 
-**基本创建**：使用 new Promise
-`const <变量名> = new Promise((<resolve>, <reject>) => { ... });`
+**基本写法：创建 Promise**
+`new Promise((<resolve>, <reject>) => { })`
 ```javascript
-const promise = new Promise((resolve, reject) => {
-  // 异步操作
-  const success = true;
-  if (success) {
-    resolve('操作成功');
-  } else {
-    reject('操作失败');
-  }
+// 创建 Promise 对象
+let promise = new Promise((resolve, reject) => {
 });
 ```
 
 ---
 
-**带参数的 Promise**：传递参数给执行器
-`new Promise((<resolve>, <reject>) => { <使用参数> })`
+**基本写法：resolve 完成**
+`new Promise((resolve) => { resolve(<值>); })`
 ```javascript
-function createPromise(value, shouldResolve) {
-  return new Promise((resolve, reject) => {
-    if (shouldResolve) {
-      resolve(value);
-    } else {
-      reject(new Error(`Failed with value: ${value}`));
-    }
-  });
-}
+// 创建已完成的 Promise
+let p = new Promise((resolve) => {
+    resolve("success");
+});
+```
+
+---
+
+**基本写法：reject 拒绝**
+`new Promise((_, reject) => { reject(<错误>); })`
+```javascript
+// 创建已拒绝的 Promise
+let p = new Promise((_, reject) => {
+    reject(new Error("failed"));
+});
 ```
 
 ---
 
 ## Promise 状态
 
-**pending 状态**：初始状态
-`new Promise(() => {})`
+**基本写法：pending 状态**
+`new Promise(() => { })`
 ```javascript
-const pendingPromise = new Promise(() => {
-  // 不调用 resolve 或 reject，Promise 永远处于 pending 状态
+// 创建 pending 状态的 Promise 永不落定
+let p = new Promise(() => {
 });
-console.log(pendingPromise);  // Promise { <pending> }
 ```
 
 ---
 
-**fulfilled 状态**：操作成功
+**基本写法：fulfilled 状态**
 `Promise.resolve(<值>)`
 ```javascript
-const fulfilledPromise = Promise.resolve('成功');
-console.log(fulfilledPromise);  // Promise { '成功' }
+// 创建 fulfilled 状态的 Promise
+let p = Promise.resolve(42);
 ```
 
 ---
 
-**rejected 状态**：操作失败
-`Promise.reject(<原因>)`
+**基本写法：rejected 状态**
+`Promise.reject(<错误>)`
 ```javascript
-const rejectedPromise = Promise.reject('失败');
-console.log(rejectedPromise);  // Promise { <rejected> '失败' }
+// 创建 rejected 状态的 Promise
+let p = Promise.reject(new Error("error"));
 ```
 
 ---
 
-## resolve 调用
+## then 方法
 
-**resolve 基本用法**：传递成功值
-`resolve(<值>)`
+**基本写法：then 成功回调**
+`<promise>.then(<回调>)`
 ```javascript
-const promise = new Promise((resolve) => {
-  setTimeout(() => {
-    resolve({ name: '张三', age: 30 });
-  }, 1000);
-});
-promise.then((data) => {
-  console.log(data);  // { name: '张三', age: 30 }
+// 处理 Promise 成功结果
+promise.then(result => {
 });
 ```
 
 ---
 
-**resolve 另一个 Promise**：Promise 链式传递
-`resolve(<另一个Promise>)`
+**基本写法：then 成功和失败回调**
+`<promise>.then(<成功回调>, <失败回调>)`
 ```javascript
-const promise1 = Promise.resolve('第一个');
-const promise2 = new Promise((resolve) => {
-  resolve(promise1);  // resolve 一个 Promise
-});
-promise2.then((result) => {
-  console.log(result);  // '第一个'
-});
-```
-
----
-
-**resolve thenable 对象**：转换 thenable 为 Promise
-`resolve(<thenable对象>)`
-```javascript
-const thenable = {
-  then(resolve, reject) {
-    resolve('thenable 结果');
-  },
-};
-const promise = Promise.resolve(thenable);
-promise.then((result) => {
-  console.log(result);  // 'thenable 结果'
-});
-```
-
----
-
-## reject 调用
-
-**reject 基本用法**：传递错误原因
-`reject(<原因>)`
-```javascript
-const promise = new Promise((resolve, reject) => {
-  setTimeout(() => {
-    reject(new Error('操作失败'));
-  }, 1000);
-});
-promise.catch((error) => {
-  console.error(error.message);  // '操作失败'
-});
-```
-
----
-
-**reject 传递错误对象**：推荐使用 Error 对象
-`reject(new Error(<消息>))`
-```javascript
-function validateAge(age) {
-  return new Promise((resolve, reject) => {
-    if (age < 0) {
-      reject(new Error('年龄不能为负数'));
-    } else if (age > 150) {
-      reject(new Error('年龄不能超过 150'));
-    } else {
-      resolve(age);
-    }
-  });
-}
-```
-
----
-
-## 执行器函数
-
-**执行器同步执行**：Promise 构造器立即执行
-`new Promise((resolve, reject) => { <同步代码> })`
-```javascript
-console.log('1. 开始');
-const promise = new Promise((resolve) => {
-  console.log('2. 执行器同步执行');
-  resolve('完成');
-});
-console.log('3. Promise 创建完成');
-promise.then((result) => {
-  console.log('4. ' + result);
-});
-// 输出顺序: 1 -> 2 -> 3 -> 4
-```
-
----
-
-**执行器异步操作**：在异步回调中调用 resolve
-`new Promise((resolve, reject) => { setTimeout(() => resolve(<值>), <延迟>); })`
-```javascript
-function delay(value, ms) {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(value), ms);
-  });
-}
-delay('延迟结果', 1000).then((result) => {
-  console.log(result);  // 1秒后输出: 延迟结果
-});
-```
-
----
-
-## Promise 包装回调函数
-
-**Promise 包装 setTimeout**：将回调转为 Promise
-`new Promise((resolve) => setTimeout(resolve, <延迟>))`
-```javascript
-function delay(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-delay(1000).then(() => {
-  console.log('1秒后执行');
-});
-```
-
----
-
-**Promise 包装事件监听**：将事件转为 Promise
-`new Promise((resolve) => { <元素>.addEventListener(<事件>, resolve, { once: true }); })`
-```javascript
-function waitForEvent(element, eventName) {
-  return new Promise((resolve) => {
-    element.addEventListener(eventName, resolve, { once: true });
-  });
-}
-// 使用
-const button = document.querySelector('button');
-waitForEvent(button, 'click').then((event) => {
-  console.log('按钮被点击', event);
-});
-```
-
----
-
-**Promise 包装 XMLHttpRequest**：将 XHR 转为 Promise
-`new Promise((resolve, reject) => { <XHR操作> })`
-```javascript
-function fetchJSON(url) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', url);
-    xhr.onload = function () {
-      if (xhr.status === 200) {
-        try {
-          resolve(JSON.parse(xhr.responseText));
-        } catch (e) {
-          reject(e);
-        }
-      } else {
-        reject(new Error(xhr.statusText));
-      }
-    };
-    xhr.onerror = function () {
-      reject(new Error('网络错误'));
-    };
-    xhr.send();
-  });
-}
-```
-
----
-
-## Promise.withResolvers
-
-**传统写法**：手动提取 resolve/reject
-`let resolve, reject; const promise = new Promise((res, rej) => { resolve = res; reject = rej; });`
-```javascript
-let resolve, reject;
-const promise = new Promise((res, rej) => {
-  resolve = res;
-  reject = rej;
-});
-// 在外部使用
-resolve('done');
-```
-
----
-
-**withResolvers 写法**：ES2024+，一步到位
-`const { promise, resolve, reject } = Promise.withResolvers();`
-```javascript
-const { promise, resolve, reject } = Promise.withResolvers();
-// resolve 和 reject 可以在 Promise 外部使用
-setTimeout(() => resolve('done'), 1000);
-const result = await promise;  // 'done'
-```
-
----
-
-**事件包装**：使用 withResolvers
-`const { promise, resolve } = Promise.withResolvers();`
-```javascript
-function waitForEvent(element, eventName) {
-  const { promise, resolve } = Promise.withResolvers();
-  element.addEventListener(eventName, resolve, { once: true });
-  return promise;
-}
-// 使用
-const click = await waitForEvent(button, 'click');
-```
-
----
-
-**超时控制**：使用 withResolvers
-`const { promise: timeoutPromise, resolve } = Promise.withResolvers();`
-```javascript
-function withTimeout(promise, ms) {
-  const { promise: timeoutPromise, resolve } = Promise.withResolvers();
-  const timer = setTimeout(() => resolve('timeout'), ms);
-  return Promise.race([promise.finally(() => clearTimeout(timer)), timeoutPromise]);
-}
-```
-
----
-
-**一次性信号**：使用 withResolvers 实现信号
-`class Signal { constructor() { const { promise, resolve } = Promise.withResolvers(); ... } }`
-```javascript
-class Signal {
-  #promise;
-  #resolve;
-  constructor() {
-    const { promise, resolve } = Promise.withResolvers();
-    this.#promise = promise;
-    this.#resolve = resolve;
-  }
-  wait() {
-    return this.#promise;
-  }
-  emit(value) {
-    this.#resolve(value);
-  }
-}
-const ready = new Signal();
-ready.emit('data');
-const data = await ready.wait();  // 'data'
-```
-
----
-
-## Promise 缓存
-
-**缓存 Promise**：避免重复请求
-`const cache = new Map();`
-```javascript
-function createCachedFetcher() {
-  const cache = new Map();
-  return function fetchWithCache(url) {
-    if (cache.has(url)) {
-      return cache.get(url).promise;
-    }
-    const { promise, resolve, reject } = Promise.withResolvers();
-    cache.set(url, { promise });
-    fetch(url)
-      .then((res) => res.json())
-      .then(resolve)
-      .catch(reject);
-    return promise;
-  };
-}
-```
-
----
-
-## 可取消的异步操作
-
-**可取消任务**：使用 withResolvers
-`function createCancellableTask(<异步函数>) { ... }`
-```javascript
-function createCancellableTask(asyncFn) {
-  const { promise, resolve, reject } = Promise.withResolvers();
-  let cancelled = false;
-  asyncFn()
-    .then((result) => {
-      if (!cancelled) resolve(result);
-    })
-    .catch((error) => {
-      if (!cancelled) reject(error);
-    });
-  return {
-    promise,
-    cancel() {
-      cancelled = true;
-      reject(new Error('Task cancelled'));
+// 同时处理成功和失败
+promise.then(
+    result => {
     },
-  };
+    error => {
+    }
+);
+```
+
+---
+
+**基本写法：then 返回值**
+`<promise>.then(<回调>).then(<回调>)`
+```javascript
+// then 返回值传递给下一个 then
+promise.then(result => result * 2).then(doubled => {
+});
+```
+
+---
+
+**基本写法：then 返回 Promise**
+`<promise>.then(() => <Promise>)`
+```javascript
+// then 返回 Promise 会等待完成
+promise.then(result => {
+    return anotherPromise;
+});
+```
+
+---
+
+## catch 方法
+
+**基本写法：catch 错误处理**
+`<promise>.catch(<错误回调>)`
+```javascript
+// 捕获 Promise 错误
+promise.catch(error => {
+});
+```
+
+---
+
+**基本写法：catch 链式**
+`<promise>.then(<回调>).catch(<回调>)`
+```javascript
+// then 后接 catch 捕获错误
+promise.then(result => {
+}).catch(error => {
+});
+```
+
+---
+
+**基本写法：catch 恢复**
+`<promise>.catch(() => <恢复值>)`
+```javascript
+// catch 返回值可以恢复链
+promise.catch(() => "default value").then(result => {
+});
+```
+
+---
+
+## finally 方法
+
+**基本写法：finally 最终处理**
+`<promise>.finally(<回调>)`
+```javascript
+// 无论成功失败都执行
+promise.finally(() => {
+});
+```
+
+---
+
+**基本写法：finally 链式**
+`<promise>.then(<回调>).catch(<回调>).finally(<回调>)`
+```javascript
+// 完整的 Promise 链
+promise
+    .then(result => {
+    })
+    .catch(error => {
+    })
+    .finally(() => {
+    });
+```
+
+---
+
+## Promise 链
+
+**基本写法：链式调用**
+`<promise>.then(<回调1>).then(<回调2>).then(<回调3>)`
+```javascript
+// 多个 then 链式调用
+promise.then(step1).then(step2).then(step3);
+```
+
+---
+
+**换行写法：长链式调用**
+`<promise>.then(<回调>).then(<回调>).then(<回调>)`
+```javascript
+// 换行书写长链式调用
+promise
+    .then(result => process(result))
+    .then(processed => transform(processed))
+    .then(transformed => save(transformed));
+```
+
+---
+
+**基本写法：链中抛出错误**
+`<promise>.then(() => { throw new Error("<消息>"); })`
+```javascript
+// then 中抛出错误会被 catch 捕获
+promise.then(() => {
+    throw new Error("Something went wrong");
+}).catch(error => {
+});
+```
+
+---
+
+## Promise 组合
+
+**基本写法：Promise.all**
+`Promise.all([<promise1>, <promise2>])`
+```javascript
+// 等待所有 Promise 完成
+Promise.all([p1, p2]).then(results => {
+});
+```
+
+---
+
+**基本写法：Promise.race**
+`Promise.race([<promise1>, <promise2>])`
+```javascript
+// 返回第一个完成的 Promise
+Promise.race([p1, p2]).then(result => {
+});
+```
+
+---
+
+**基本写法：Promise.allSettled**
+`Promise.allSettled([<promise1>, <promise2>])`
+```javascript
+// 等待所有 Promise 落定
+Promise.allSettled([p1, p2]).then(results => {
+});
+```
+
+---
+
+**基本写法：Promise.any**
+`Promise.any([<promise1>, <promise2>])`
+```javascript
+// 返回第一个成功的 Promise
+Promise.any([p1, p2]).then(result => {
+});
+```
+
+---
+
+## Promise 静态方法
+
+**基本写法：Promise.resolve**
+`Promise.resolve(<值>)`
+```javascript
+// 创建已完成的 Promise
+let p = Promise.resolve(42);
+```
+
+---
+
+**基本写法：Promise.reject**
+`Promise.reject(<错误>)`
+```javascript
+// 创建已拒绝的 Promise
+let p = Promise.reject(new Error("error"));
+```
+
+---
+
+**基本写法：Promise.resolve thenable**
+`Promise.resolve(<thenable对象>)`
+```javascript
+// 将 thenable 对象转换为 Promise
+let p = Promise.resolve({ then: (resolve) => resolve(42) });
+```
+
+---
+
+## 错误处理
+
+**基本写法：throw 错误**
+`throw new Error("<消息>")`
+```javascript
+// 在 Promise 中抛出错误
+new Promise(() => {
+    throw new Error("Failed");
+});
+```
+
+---
+
+**基本写法：reject 错误**
+`reject(new Error("<消息>"))`
+```javascript
+// 使用 reject 拒绝 Promise
+new Promise((_, reject) => {
+    reject(new Error("Failed"));
+});
+```
+
+---
+
+**基本写法：捕获特定错误**
+`<promise>.catch(<错误> => { if (<错误> instanceof <类型>) { } })`
+```javascript
+// 捕获特定类型的错误
+promise.catch(error => {
+    if (error instanceof TypeError) {
+    }
+});
+```
+
+---
+
+## Promise 实用模式
+
+**基本写法：Promise 超时**
+`Promise.race([<promise>, <超时Promise>])`
+```javascript
+// 实现 Promise 超时
+Promise.race([
+    fetchData(),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 5000))
+]);
+```
+
+---
+
+**基本写法：Promise 重试**
+`function <重试函数>(<函数>, <次数>) { return <函数>().catch(() => <次数> > 0 ? <重试函数>(<函数>, <次数> - 1) : Promise.reject()); }`
+```javascript
+// 实现 Promise 重试机制
+function retry(fn, times) {
+    return fn().catch(() => times > 0 ? retry(fn, times - 1) : Promise.reject());
 }
+```
+
+---
+
+**基本写法：Promise 顺序执行**
+`<数组>.reduce((<链>, <promise>) => <链>.then(() => <promise>()), Promise.resolve())`
+```javascript
+// 顺序执行 Promise 数组
+promises.reduce((chain, promise) => chain.then(() => promise()), Promise.resolve());
 ```

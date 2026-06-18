@@ -4,537 +4,817 @@
 
 ---
 
-## 文件操作基础
+## 文件打开与关闭
 
-**open() 函数：打开文件**
-`open(<文件路径>, mode=<模式>, [encoding=<编码>])`
+**基本写法：使用 open() 打开文件**
+`open(<文件路径>, <模式>)`
 
 ```python
-# 打开模式
-# r: 读取（默认）
-# w: 写入（覆盖）
-# a: 追加
-# x: 独占创建
-# b: 二进制模式
-# t: 文本模式（默认）
-# +: 读写模式
-
-# 基本文件操作
-file = open("example.txt", "r", encoding="utf-8")
+# 使用 open() 打开文件
+file = open("test.txt", "r")
 content = file.read()
 file.close()
-
-# 使用 with 语句（推荐）
-with open("example.txt", "r", encoding="utf-8") as file:
-    content = file.read()
-# 文件自动关闭
-
-# 写入文件
-with open("output.txt", "w", encoding="utf-8") as file:
-    file.write("Hello, World!\n")
-    file.write("This is a test.")
-
-# 追加内容
-with open("output.txt", "a", encoding="utf-8") as file:
-    file.write("\nAppended line.")
 ```
 
 ---
 
-## 读取文件
+**基本写法：使用 with 语句自动关闭**
+`with open(<文件路径>, <模式>) as <变量>: <语句>`
 
-**读取方法：read、readline、readlines**
-`<文件>.read([size])`
+```python
+# 使用 with 语句自动管理文件资源
+with open("test.txt", "r") as f:
+    content = f.read()
+```
+
+---
+
+## 文件读取
+
+**基本写法：读取整个文件**
+`<文件>.read()`
+
+```python
+# 读取整个文件内容
+with open("test.txt", "r") as f:
+    content = f.read()
+```
+
+---
+
+**基本写法：读取指定字节数**
+`<文件>.read(<字节数>)`
+
+```python
+# 读取指定字节数
+with open("test.txt", "r") as f:
+    content = f.read(100)
+```
+
+---
+
+**基本写法：逐行读取**
+`for <行> in <文件>: <语句>`
+
+```python
+# 逐行读取文件
+with open("test.txt", "r") as f:
+    for line in f:
+        print(line.strip())
+```
+
+---
+
+**基本写法：使用 readline() 读取一行**
 `<文件>.readline()`
+
+```python
+# 使用 readline() 读取一行
+with open("test.txt", "r") as f:
+    first_line = f.readline()
+```
+
+---
+
+**基本写法：使用 readlines() 读取所有行**
 `<文件>.readlines()`
 
 ```python
-# 读取整个文件
-with open("example.txt", "r", encoding="utf-8") as file:
-    content = file.read()
-    print(content)
-
-# 读取指定字节数
-with open("example.txt", "r", encoding="utf-8") as file:
-    chunk = file.read(100)  # 读取 100 个字符
-    print(chunk)
-
-# 逐行读取
-with open("example.txt", "r", encoding="utf-8") as file:
-    for line in file:
-        print(line.strip())
-
-# 读取所有行到列表
-with open("example.txt", "r", encoding="utf-8") as file:
-    lines = file.readlines()
-    print(lines)  # ['line1\n', 'line2\n', ...]
-
-# 读取单行
-with open("example.txt", "r", encoding="utf-8") as file:
-    first_line = file.readline()
-    second_line = file.readline()
+# 使用 readlines() 读取所有行为列表
+with open("test.txt", "r") as f:
+    lines = f.readlines()
 ```
 
 ---
 
-## 写入文件
+## 文件写入
 
-**写入方法：write、writelines**
+**基本写法：写入字符串**
 `<文件>.write(<字符串>)`
+
+```python
+# 写入字符串到文件
+with open("test.txt", "w") as f:
+    f.write("Hello, World!")
+```
+
+---
+
+**基本写法：写入多行**
 `<文件>.writelines(<字符串列表>)`
 
 ```python
-# 写入字符串
-with open("output.txt", "w", encoding="utf-8") as file:
-    file.write("Hello, World!\n")
-    file.write("Python file I/O")
-
-# 写入多行
-lines = ["Line 1\n", "Line 2\n", "Line 3\n"]
-with open("output.txt", "w", encoding="utf-8") as file:
-    file.writelines(lines)
-
-# 追加写入
-with open("output.txt", "a", encoding="utf-8") as file:
-    file.write("Appended line\n")
-
-# 读写模式
-with open("example.txt", "r+", encoding="utf-8") as file:
-    content = file.read()
-    file.write("\nNew content")
+# 写入多行到文件
+lines = ["line1\n", "line2\n", "line3\n"]
+with open("test.txt", "w") as f:
+    f.writelines(lines)
 ```
 
 ---
 
-## 二进制文件操作
-
-**二进制模式：处理图片、音频等**
-`open(<文件路径>, "rb")` / `open(<文件路径>, "wb")`
+**基本写法：追加写入**
+`with open(<文件路径>, "a") as <变量>: <语句>`
 
 ```python
-# 读取二进制文件
-with open("image.png", "rb") as file:
-    data = file.read()
-    print(f"File size: {len(data)} bytes")
+# 追加写入到文件
+with open("test.txt", "a") as f:
+    f.write("追加的内容\n")
+```
 
-# 写入二进制文件
-with open("copy.png", "wb") as file:
-    file.write(data)
+---
 
-# 分块读取大文件
-def read_in_chunks(filename, chunk_size=1024):
-    """分块读取文件"""
-    with open(filename, "rb") as file:
-        while True:
-            chunk = file.read(chunk_size)
-            if not chunk:
-                break
-            yield chunk
+## 文件模式
 
-for chunk in read_in_chunks("large_file.bin"):
-    process(chunk)
+**基本写法：读取模式**
+`open(<文件路径>, "r")`
+
+```python
+# 读取模式（默认）
+with open("test.txt", "r") as f:
+    content = f.read()
+```
+
+---
+
+**基本写法：写入模式**
+`open(<文件路径>, "w")`
+
+```python
+# 写入模式（覆盖原有内容）
+with open("test.txt", "w") as f:
+    f.write("新内容")
+```
+
+---
+
+**基本写法：追加模式**
+`open(<文件路径>, "a")`
+
+```python
+# 追加模式（在文件末尾添加）
+with open("test.txt", "a") as f:
+    f.write("追加内容")
+```
+
+---
+
+**基本写法：二进制读取模式**
+`open(<文件路径>, "rb")`
+
+```python
+# 二进制读取模式
+with open("image.png", "rb") as f:
+    data = f.read()
+```
+
+---
+
+**基本写法：二进制写入模式**
+`open(<文件路径>, "wb")`
+
+```python
+# 二进制写入模式
+with open("data.bin", "wb") as f:
+    f.write(b"\x00\x01\x02")
+```
+
+---
+
+**基本写法：读写模式**
+`open(<文件路径>, "r+")`
+
+```python
+# 读写模式
+with open("test.txt", "r+") as f:
+    content = f.read()
+    f.write("新内容")
 ```
 
 ---
 
 ## 文件指针操作
 
-**文件指针：seek、tell**
-`<文件>.seek(<偏移量>, [<起始位置>])`
-`<文件>.tell()`
+**基本写法：移动文件指针**
+`<文件>.seek(<偏移量>)`
 
 ```python
-# 起始位置:
-# 0: 文件开头（默认）
-# 1: 当前位置
-# 2: 文件末尾
-
-with open("example.txt", "r", encoding="utf-8") as file:
-    # 获取当前位置
-    print(file.tell())  # 0
-    
-    # 读取 10 个字符
-    content = file.read(10)
-    print(file.tell())  # 10
-    
-    # 移动到文件开头
-    file.seek(0)
-    print(file.tell())  # 0
-    
-    # 移动到文件末尾
-    file.seek(0, 2)
-    print(file.tell())  # 文件大小
-    
-    # 相对当前位置移动
-    file.seek(0)
-    file.read(5)
-    file.seek(3, 1)  # 从当前位置向后移动 3 个字符
+# 移动文件指针到指定位置
+with open("test.txt", "r") as f:
+    f.seek(10)
+    content = f.read()
 ```
 
 ---
 
-## CSV 文件处理
-
-**csv 模块：读写 CSV 文件**
-`import csv`
-`csv.reader(<文件>)` / `csv.writer(<文件>)`
+**基本写法：获取文件指针位置**
+`<文件>.tell()`
 
 ```python
-import csv
+# 获取当前文件指针位置
+with open("test.txt", "r") as f:
+    f.read(10)
+    position = f.tell()
+```
 
-# 读取 CSV 文件
-with open("data.csv", "r", encoding="utf-8", newline="") as file:
-    reader = csv.reader(file)
-    for row in reader:
-        print(row)  # ['Name', 'Age', 'City']
+---
 
-# 使用 DictReader
-with open("data.csv", "r", encoding="utf-8", newline="") as file:
-    reader = csv.DictReader(file)
-    for row in reader:
-        print(row["Name"], row["Age"])
+## 文件与目录操作
 
-# 写入 CSV 文件
-data = [
-    ["Name", "Age", "City"],
-    ["Alice", "30", "New York"],
-    ["Bob", "25", "London"]
-]
+**基本写法：检查文件是否存在**
+`os.path.exists(<路径>)`
 
-with open("output.csv", "w", encoding="utf-8", newline="") as file:
-    writer = csv.writer(file)
-    writer.writerows(data)
+```python
+# 检查文件是否存在
+import os
+if os.path.exists("test.txt"):
+    print("文件存在")
+```
 
-# 使用 DictWriter
-data = [
-    {"Name": "Alice", "Age": 30, "City": "New York"},
-    {"Name": "Bob", "Age": 25, "City": "London"}
-]
+---
 
-with open("output.csv", "w", encoding="utf-8", newline="") as file:
-    fieldnames = ["Name", "Age", "City"]
-    writer = csv.DictWriter(file, fieldnames=fieldnames)
-    writer.writeheader()
-    writer.writerows(data)
+**基本写法：创建目录**
+`os.makedirs(<目录路径>)`
+
+```python
+# 创建目录（包括父目录）
+import os
+os.makedirs("path/to/directory")
+```
+
+---
+
+**基本写法：删除文件**
+`os.remove(<文件路径>)`
+
+```python
+# 删除文件
+import os
+os.remove("test.txt")
+```
+
+---
+
+**基本写法：删除目录**
+`os.rmdir(<目录路径>)`
+
+```python
+# 删除空目录
+import os
+os.rmdir("empty_directory")
+```
+
+---
+
+**基本写法：重命名文件**
+`os.rename(<旧路径>, <新路径>)`
+
+```python
+# 重命名文件
+import os
+os.rename("old.txt", "new.txt")
+```
+
+---
+
+**基本写法：列出目录内容**
+`os.listdir(<目录路径>)`
+
+```python
+# 列出目录内容
+import os
+files = os.listdir(".")
+```
+
+---
+
+**基本写法：使用 pathlib 操作路径**
+`Path(<路径>)`
+
+```python
+# 使用 pathlib 操作路径
+from pathlib import Path
+path = Path("test.txt")
+if path.exists():
+    print("文件存在")
+```
+
+---
+
+**基本写法：使用 pathlib 读取文件**
+`Path(<路径>).read_text()`
+
+```python
+# 使用 pathlib 读取文件内容
+from pathlib import Path
+content = Path("test.txt").read_text()
+```
+
+---
+
+**基本写法：使用 pathlib 写入文件**
+`Path(<路径>).write_text(<内容>)`
+
+```python
+# 使用 pathlib 写入文件内容
+from pathlib import Path
+Path("test.txt").write_text("Hello, World!")
 ```
 
 ---
 
 ## JSON 文件处理
 
-**json 模块：读写 JSON 文件**
-`import json`
-`json.load(<文件>)` / `json.dump(<对象>, <文件>)`
+**基本写法：读取 JSON 文件**
+`json.load(<文件>)`
 
 ```python
-import json
-
 # 读取 JSON 文件
-with open("data.json", "r", encoding="utf-8") as file:
-    data = json.load(file)
-    print(data)
+import json
+with open("data.json", "r") as f:
+    data = json.load(f)
+```
 
+---
+
+**基本写法：写入 JSON 文件**
+`json.dump(<对象>, <文件>)`
+
+```python
 # 写入 JSON 文件
-data = {
-    "name": "Alice",
-    "age": 30,
-    "hobbies": ["reading", "swimming"],
-    "address": {
-        "city": "New York",
-        "country": "USA"
-    }
-}
-
-with open("output.json", "w", encoding="utf-8") as file:
-    json.dump(data, file, indent=4, ensure_ascii=False)
-
-# JSON 字符串转换
-json_str = json.dumps(data, indent=4)
-parsed_data = json.loads(json_str)
+import json
+data = {"name": "Alice", "age": 30}
+with open("data.json", "w") as f:
+    json.dump(data, f)
 ```
 
 ---
 
-## pickle 序列化
-
-**pickle 模块：Python 对象序列化**
-`import pickle`
-`pickle.dump(<对象>, <文件>)` / `pickle.load(<文件>)`
+**基本写法：JSON 字符串与对象转换**
+`json.loads(<字符串>)`
 
 ```python
-import pickle
-
-# 序列化对象到文件
-data = {
-    "name": "Alice",
-    "scores": [85, 92, 78],
-    "nested": {"a": 1, "b": [2, 3]}
-}
-
-with open("data.pkl", "wb") as file:
-    pickle.dump(data, file)
-
-# 从文件反序列化
-with open("data.pkl", "rb") as file:
-    loaded_data = pickle.load(file)
-    print(loaded_data)
-
-# 序列化到字符串
-data_bytes = pickle.dumps(data)
-restored_data = pickle.loads(data_bytes)
+# JSON 字符串转换为 Python 对象
+import json
+json_str = '{"name": "Alice", "age": 30}'
+data = json.loads(json_str)
 ```
 
 ---
 
-## os 和 pathlib 路径操作
-
-**os.path 模块：路径操作**
-`import os`
-`os.path.<方法>(<路径>)`
+**基本写法：Python 对象转换为 JSON 字符串**
+`json.dumps(<对象>)`
 
 ```python
-import os
-
-# 路径操作
-path = "/home/user/documents/file.txt"
-
-# 获取文件名
-print(os.path.basename(path))  # file.txt
-
-# 获取目录名
-print(os.path.dirname(path))  # /home/user/documents
-
-# 分离扩展名
-print(os.path.splitext(path))  # ('/home/user/documents/file', '.txt')
-
-# 拼接路径
-new_path = os.path.join("/home", "user", "documents", "file.txt")
-
-# 检查路径存在
-print(os.path.exists(path))  # True/False
-
-# 检查是否为文件
-print(os.path.isfile(path))
-
-# 检查是否为目录
-print(os.path.isdir(path))
-
-# 获取文件大小
-print(os.path.getsize(path))
-
-# 获取绝对路径
-print(os.path.abspath("file.txt"))
-
-# 目录操作
-os.mkdir("new_directory")  # 创建目录
-os.makedirs("path/to/dir", exist_ok=True)  # 递归创建目录
-os.rmdir("new_directory")  # 删除空目录
-os.remove("file.txt")  # 删除文件
-
-# 列出目录内容
-print(os.listdir("."))
+# Python 对象转换为 JSON 字符串
+import json
+data = {"name": "Alice", "age": 30}
+json_str = json.dumps(data)
 ```
 
 ---
 
-**pathlib 模块：面向对象的路径操作**
-`from pathlib import Path`
-`Path(<路径>)`
+**基本写法：格式化 JSON 输出**
+`json.dumps(<对象>, indent=<n>)`
 
 ```python
-from pathlib import Path
+# 格式化 JSON 输出
+import json
+data = {"name": "Alice", "age": 30}
+json_str = json.dumps(data, indent=2)
+```
 
-# 创建 Path 对象
-path = Path("/home/user/documents/file.txt")
-current_dir = Path.cwd()
-home_dir = Path.home()
+---
 
-# 路径属性
-print(path.name)        # file.txt
-print(path.stem)        # file
-print(path.suffix)      # .txt
-print(path.parent)      # /home/user/documents
-print(path.parts)       # ('/', 'home', 'user', 'documents', 'file.txt')
+## CSV 文件处理
 
-# 路径操作
-new_path = Path("/home") / "user" / "documents" / "file.txt"
+**基本写法：读取 CSV 文件**
+`csv.reader(<文件>)`
 
-# 检查路径
-print(path.exists())    # True/False
-print(path.is_file())   # True/False
-print(path.is_dir())    # True/False
+```python
+# 读取 CSV 文件
+import csv
+with open("data.csv", "r") as f:
+    reader = csv.reader(f)
+    for row in reader:
+        print(row)
+```
 
-# 文件操作
-print(path.stat().st_size)  # 文件大小
+---
 
-# 遍历目录
-for file_path in Path(".").iterdir():
-    print(file_path)
+**基本写法：使用 DictReader 读取 CSV**
+`csv.DictReader(<文件>)`
 
-# 递归查找文件
-for py_file in Path(".").rglob("*.py"):
-    print(py_file)
+```python
+# 使用 DictReader 读取 CSV 为字典
+import csv
+with open("data.csv", "r") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        print(row["name"], row["age"])
+```
 
-# 创建和删除
-Path("new_dir").mkdir(parents=True, exist_ok=True)
-Path("file.txt").touch()
-Path("file.txt").unlink()
+---
+
+**基本写法：写入 CSV 文件**
+`csv.writer(<文件>)`
+
+```python
+# 写入 CSV 文件
+import csv
+with open("output.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["name", "age"])
+    writer.writerow(["Alice", 30])
+```
+
+---
+
+**基本写法：使用 DictWriter 写入 CSV**
+`csv.DictWriter(<文件>, fieldnames=[<字段>])`
+
+```python
+# 使用 DictWriter 写入 CSV
+import csv
+with open("output.csv", "w", newline="") as f:
+    writer = csv.DictWriter(f, fieldnames=["name", "age"])
+    writer.writeheader()
+    writer.writerow({"name": "Alice", "age": 30})
 ```
 
 ---
 
 ## 上下文管理器
 
-**with 语句：自动管理资源**
-`with <上下文管理器> [as <变量>]: <语句>`
+**换行写法：自定义上下文管理器类**
+`class <上下文管理器>:`
+`    def __enter__(self): <语句>`
+`    def __exit__(self, exc_type, exc_val, exc_tb): <语句>`
 
 ```python
-# 文件操作
-with open("example.txt", "r") as file:
-    content = file.read()
-# 文件自动关闭
-
-# 多个上下文管理器
-with open("input.txt", "r") as infile, open("output.txt", "w") as outfile:
-    content = infile.read()
-    outfile.write(content)
-
-# 数据库连接
-with database_connection() as conn:
-    conn.execute("SELECT * FROM users")
-
-# 锁
-from threading import Lock
-lock = Lock()
-with lock:
-    # 临界区代码
-    pass
-```
-
----
-
-**自定义上下文管理器：实现 __enter__ 和 __exit__**
-`class <类>: def __enter__(self): ...; def __exit__(self, ...): ...`
-
-```python
+# 自定义上下文管理器类
 class FileManager:
     def __init__(self, filename, mode):
         self.filename = filename
         self.mode = mode
-        self.file = None
-    
+
     def __enter__(self):
-        print(f"Opening file: {self.filename}")
         self.file = open(self.filename, self.mode)
         return self.file
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.file:
-            self.file.close()
-        print(f"File closed: {self.filename}")
-        if exc_type:
-            print(f"Exception occurred: {exc_val}")
-        return False  # 不抑制异常
-
-# 使用自定义上下文管理器
-with FileManager("example.txt", "w") as f:
-    f.write("Hello, World!")
-
-# 计时器上下文管理器
-import time
-
-class Timer:
-    def __enter__(self):
-        self.start = time.time()
-        return self
-    
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.end = time.time()
-        print(f"Execution time: {self.end - self.start:.4f} seconds")
-
-with Timer():
-    time.sleep(1)
+        self.file.close()
 ```
 
 ---
 
-**contextlib 模块：使用生成器创建上下文管理器**
-`from contextlib import contextmanager`
-`@contextmanager def <函数>(): ...`
+**基本写法：使用自定义上下文管理器**
+`with <上下文管理器>(<参数>) as <变量>: <语句>`
 
 ```python
+# 使用自定义上下文管理器
+with FileManager("test.txt", "r") as f:
+    content = f.read()
+```
+
+---
+
+**换行写法：使用 contextlib.contextmanager**
+`@contextmanager`
+`def <函数名>(<参数>):`
+`    <前置处理>`
+`    yield <值>`
+`    <后置处理>`
+
+```python
+# 使用 contextlib.contextmanager 装饰器
 from contextlib import contextmanager
 
 @contextmanager
 def open_file(filename, mode):
-    """文件上下文管理器"""
     f = open(filename, mode)
     try:
         yield f
     finally:
         f.close()
-
-with open_file("example.txt", "w") as f:
-    f.write("Hello, World!")
-
-@contextmanager
-def timer():
-    """计时器上下文管理器"""
-    import time
-    start = time.time()
-    try:
-        yield
-    finally:
-        end = time.time()
-        print(f"Execution time: {end - start:.4f} seconds")
-
-with timer():
-    time.sleep(1)
-
-@contextmanager
-def change_directory(path):
-    """切换目录上下文管理器"""
-    import os
-    old_dir = os.getcwd()
-    os.chdir(path)
-    try:
-        yield
-    finally:
-        os.chdir(old_dir)
 ```
 
 ---
 
-## 临时文件
-
-**tempfile 模块：创建临时文件**
-`import tempfile`
-`tempfile.NamedTemporaryFile()`
-`tempfile.mkdtemp()`
+**基本写法：使用 contextmanager 创建的上下文**
+`with <函数名>(<参数>) as <变量>: <语句>`
 
 ```python
-import tempfile
-import os
+# 使用 contextmanager 创建的上下文管理器
+with open_file("test.txt", "r") as f:
+    content = f.read()
+```
 
+---
+
+## contextlib 模块工具
+
+**基本写法：使用 suppress 抑制异常**
+`with suppress(<异常>): <语句>`
+
+```python
+# 使用 suppress 抑制特定异常
+from contextlib import suppress
+
+with suppress(FileNotFoundError):
+    with open("nonexistent.txt", "r") as f:
+        content = f.read()
+```
+
+---
+
+**基本写法：使用 redirect_stdout 重定向输出**
+`with redirect_stdout(<目标>): <语句>`
+
+```python
+# 使用 redirect_stdout 重定向标准输出
+from contextlib import redirect_stdout
+import io
+
+output = io.StringIO()
+with redirect_stdout(output):
+    print("这会被重定向")
+print(output.getvalue())
+```
+
+---
+
+**基本写法：使用 redirect_stderr 重定向错误**
+`with redirect_stderr(<目标>): <语句>`
+
+```python
+# 使用 redirect_stderr 重定向标准错误
+from contextlib import redirect_stderr
+import io
+
+error_output = io.StringIO()
+with redirect_stderr(error_output):
+    import sys
+    sys.stderr.write("错误信息")
+```
+
+---
+
+**基本写法：使用 closing 自动关闭**
+`with closing(<对象>) as <变量>: <语句>`
+
+```python
+# 使用 closing 自动关闭对象
+from contextlib import closing
+from urllib.request import urlopen
+
+with closing(urlopen("http://example.com")) as response:
+    content = response.read()
+```
+
+---
+
+## 临时文件与目录
+
+**基本写法：创建临时文件**
+`tempfile.NamedTemporaryFile()`
+
+```python
 # 创建临时文件
-with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".txt") as f:
-    f.write("Temporary content")
-    temp_filename = f.name
-    print(f"Temporary file created: {temp_filename}")
+import tempfile
+with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
+    f.write("临时内容")
+    print(f.name)
+```
 
-# 使用后手动删除
-os.unlink(temp_filename)
+---
 
+**基本写法：创建临时目录**
+`tempfile.TemporaryDirectory()`
+
+```python
 # 创建临时目录
-with tempfile.TemporaryDirectory() as temp_dir:
-    print(f"Temporary directory: {temp_dir}")
-    # 在临时目录中工作
-    temp_file = os.path.join(temp_dir, "temp.txt")
-    with open(temp_file, "w") as f:
-        f.write("Content")
-# 临时目录自动删除
+import tempfile
+with tempfile.TemporaryDirectory() as tmpdir:
+    print(f"临时目录: {tmpdir}")
+```
 
-# 获取临时文件路径
-temp_path = tempfile.gettempdir()
-print(f"System temp directory: {temp_path}")
+---
+
+## 文件编码处理
+
+**基本写法：指定编码打开文件**
+`open(<文件路径>, <模式>, encoding=<编码>)`
+
+```python
+# 指定编码打开文件
+with open("test.txt", "r", encoding="utf-8") as f:
+    content = f.read()
+```
+
+---
+
+**基本写法：处理编码错误**
+`open(<文件路径>, <模式>, encoding=<编码>, errors=<策略>)`
+
+```python
+# 处理编码错误
+with open("test.txt", "r", encoding="utf-8", errors="ignore") as f:
+    content = f.read()
+```
+
+---
+
+## 二进制文件处理
+
+**基本写法：读取二进制文件**
+`open(<文件路径>, "rb")`
+
+```python
+# 读取二进制文件
+with open("image.png", "rb") as f:
+    data = f.read()
+```
+
+---
+
+**基本写法：写入二进制文件**
+`open(<文件路径>, "wb")`
+
+```python
+# 写入二进制文件
+with open("data.bin", "wb") as f:
+    f.write(b"\x00\x01\x02\x03")
+```
+
+---
+
+**基本写法：使用 pickle 序列化对象**
+`pickle.dump(<对象>, <文件>)`
+
+```python
+# 使用 pickle 序列化对象到文件
+import pickle
+data = {"name": "Alice", "age": 30}
+with open("data.pkl", "wb") as f:
+    pickle.dump(data, f)
+```
+
+---
+
+**基本写法：使用 pickle 反序列化**
+`pickle.load(<文件>)`
+
+```python
+# 使用 pickle 从文件反序列化
+import pickle
+with open("data.pkl", "rb") as f:
+    data = pickle.load(f)
+```
+
+---
+
+## 文件路径处理
+
+**基本写法：拼接路径**
+`os.path.join(<路径1>, <路径2>)`
+
+```python
+# 拼接路径
+import os
+path = os.path.join("folder", "subfolder", "file.txt")
+```
+
+---
+
+**基本写法：获取文件名**
+`os.path.basename(<路径>)`
+
+```python
+# 获取文件名
+import os
+filename = os.path.basename("/path/to/file.txt")
+```
+
+---
+
+**基本写法：获取目录名**
+`os.path.dirname(<路径>)`
+
+```python
+# 获取目录名
+import os
+dirname = os.path.dirname("/path/to/file.txt")
+```
+
+---
+
+**基本写法：分割文件名和扩展名**
+`os.path.splitext(<路径>)`
+
+```python
+# 分割文件名和扩展名
+import os
+name, ext = os.path.splitext("file.txt")
+```
+
+---
+
+**基本写法：使用 pathlib 拼接路径**
+`Path(<路径>) / <子路径>`
+
+```python
+# 使用 pathlib 拼接路径
+from pathlib import Path
+path = Path("folder") / "subfolder" / "file.txt"
+```
+
+---
+
+**基本写法：使用 pathlib 获取文件名**
+`Path(<路径>).name`
+
+```python
+# 使用 pathlib 获取文件名
+from pathlib import Path
+filename = Path("/path/to/file.txt").name
+```
+
+---
+
+**基本写法：使用 pathlib 获取文件后缀**
+`Path(<路径>).suffix`
+
+```python
+# 使用 pathlib 获取文件后缀
+from pathlib import Path
+ext = Path("file.txt").suffix
+```
+
+---
+
+## 文件遍历
+
+**基本写法：使用 os.walk 遍历目录**
+`for <根>, <目录>, <文件> in os.walk(<路径>): <语句>`
+
+```python
+# 使用 os.walk 遍历目录树
+import os
+for root, dirs, files in os.walk("."):
+    for file in files:
+        print(os.path.join(root, file))
+```
+
+---
+
+**基本写法：使用 pathlib 遍历目录**
+`Path(<路径>).rglob(<模式>)`
+
+```python
+# 使用 pathlib 递归遍历目录
+from pathlib import Path
+for file in Path(".").rglob("*.py"):
+    print(file)
+```
+
+---
+
+**基本写法：使用 glob 模块匹配文件**
+`glob.glob(<模式>, recursive=True)`
+
+```python
+# 使用 glob 模块匹配文件
+import glob
+files = glob.glob("**/*.py", recursive=True)
+```
+
+---
+
+## 异步文件IO
+
+**换行写法：使用 aiofiles 异步读写**
+`import aiofiles`
+`async with aiofiles.open(<路径>, <模式>) as f: await f.read()`
+
+```python
+# 使用 aiofiles 异步读写文件
+import asyncio
+import aiofiles
+
+async def read_file(path):
+    async with aiofiles.open(path, "r") as f:
+        content = await f.read()
+    return content
+```
+
+---
+
+**基本写法：异步写入文件**
+`await f.write(<内容>)`
+
+```python
+# 异步写入文件
+async def write_file(path, content):
+    async with aiofiles.open(path, "w") as f:
+        await f.write(content)
 ```

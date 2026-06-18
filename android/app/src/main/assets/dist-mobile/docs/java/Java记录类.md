@@ -6,261 +6,222 @@
 
 ## 记录类定义
 
-**基本记录类**：Java 14+，简化数据载体类
-`public record <记录名>(<类型> <字段1>, <类型> <字段2>) { }`
+**单行写法：简单记录类**
+`public record <记录名>(<类型1> <字段1>, <类型2> <字段2>) { }`
 ```java
+// 单行定义简单记录类
 public record Point(int x, int y) { }
+```
 
-// 使用
+---
+
+**换行写法：多字段记录类**
+`public record <记录名>(<类型1> <字段1>, <类型2> <字段2>, <类型3> <字段3>) { }`
+```java
+// 换行定义多字段记录类
+public record User(
+        String name,
+        int age,
+        String email
+) { }
+```
+
+---
+
+**基本写法：使用记录类**
+`<记录名> <变量> = new <记录名>(<值1>, <值2>);`
+```java
+// 创建记录类实例
 Point p = new Point(10, 20);
-int x = p.x();  // 访问字段
+```
+
+---
+
+## 访问器方法
+
+**基本写法：访问字段**
+`<记录变量>.<字段名>()`
+```java
+// 获取记录类字段值
+int x = p.x();
+```
+
+---
+
+**基本写法：访问多个字段**
+`<记录变量>.<字段1>(); <记录变量>.<字段2>();`
+```java
+// 获取多个字段值
+int x = p.x();
 int y = p.y();
-System.out.println(p);  // Point[x=10, y=20]
 ```
 
 ---
 
-**多字段记录类**：包含多个字段
-`public record <记录名>(<类型1> <字段1>, <类型2> <字段2>, ...) { }`
-```java
-public record User(String name, int age, String email) { }
+## 自动生成方法
 
-// 使用
-User user = new User("Alice", 25, "alice@example.com");
-String name = user.name();
-int age = user.age();
-String email = user.email();
+**基本写法：toString**
+`<记录变量>.toString()`
+```java
+// 自动生成的 toString 方法
+String str = p.toString();
 ```
 
 ---
 
-## 紧凑构造器
-
-**紧凑构造器**：用于参数验证
-`public <记录名> { if (<条件>) throw new <异常>(); }`
+**基本写法：equals**
+`<记录变量1>.equals(<记录变量2>)`
 ```java
-public record Range(int start, int end) {
-    public Range {
-        if (start > end) {
-            throw new IllegalArgumentException("Start must be less than or equal to end");
+// 自动生成的 equals 方法比较字段值
+boolean same = p1.equals(p2);
+```
+
+---
+
+**基本写法：hashCode**
+`<记录变量>.hashCode()`
+```java
+// 自动生成的 hashCode 方法
+int hash = p.hashCode();
+```
+
+---
+
+## 紧凑构造方法
+
+**基本写法：紧凑构造方法验证**
+`public <记录名> { if (<条件>) throw new <异常>; }`
+```java
+// 紧凑构造方法进行参数验证
+public record Age(int value) {
+    public Age {
+        if (value < 0) {
+            throw new IllegalArgumentException("Age cannot be negative");
         }
     }
 }
-
-// 使用
-Range range = new Range(1, 10);  // 正确
-// Range invalid = new Range(10, 1);  // 抛出异常
 ```
 
 ---
 
-## 自定义构造器
-
-**规范构造器**：完整自定义构造器
-`public <记录名>(<类型1> <字段1>, <类型2> <字段2>) { this.<字段1> = <值>; ... }`
+**基本写法：紧凑构造方法规范化**
+`public <记录名> { <字段> = <规范化值>; }`
 ```java
-public record Person(String name, int age) {
-    public Person(String name, int age) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Name cannot be null or blank");
-        }
-        if (age < 0 || age > 150) {
-            throw new IllegalArgumentException("Age must be between 0 and 150");
-        }
-        this.name = name;
-        this.age = age;
+// 紧凑构造方法规范化字段值
+public record Name(String value) {
+    public Name {
+        value = value.trim();
     }
 }
 ```
 
 ---
 
-**自定义规范构造器**：修改字段值
-`public <记录名>(<类型1> <字段1>, <类型2> <字段2>) { this.<字段1> = <规范化值>; ... }`
+## 自定义构造方法
+
+**基本写法：规范构造方法**
+`public <记录名>(<类型1> <参数1>, <类型2> <参数2>) { this.<字段1> = <参数1>; }`
 ```java
-public record Email(String address) {
-    public Email {
-        address = address.toLowerCase().trim();  // 规范化邮箱地址
+// 显式定义规范构造方法
+public record Point(int x, int y) {
+    public Point(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 }
-
-// 使用
-Email email = new Email("  ALICE@EXAMPLE.COM  ");
-System.out.println(email.address());  // alice@example.com
 ```
 
 ---
 
-## 添加方法
-
-**实例方法**：在记录类中添加方法
-`public <返回类型> <方法名>() { ... }`
+**基本写法：自定义构造方法**
+`public <记录名>(<参数>) { this(<默认值>, <默认值>); }`
 ```java
-public record Rectangle(double width, double height) {
-    public double area() {
-        return width * height;
-    }
-
-    public double perimeter() {
-        return 2 * (width + height);
-    }
-
-    public boolean isSquare() {
-        return width == height;
+// 自定义辅助构造方法
+public record Point(int x, int y) {
+    public Point() {
+        this(0, 0);
     }
 }
-
-// 使用
-Rectangle rect = new Rectangle(5.0, 3.0);
-System.out.println(rect.area());       // 15.0
-System.out.println(rect.perimeter());  // 16.0
-System.out.println(rect.isSquare());  // false
 ```
 
 ---
 
-**静态方法**：在记录类中添加静态方法
-`public static <返回类型> <方法名>(<参数>) { ... }`
+## 添加成员方法
+
+**基本写法：添加实例方法**
+`public <返回类型> <方法名>() { }`
 ```java
+// 记录类中添加实例方法
+public record Point(int x, int y) {
+    public double distanceFromOrigin() {
+        return Math.sqrt(x * x + y * y);
+    }
+}
+```
+
+---
+
+**基本写法：添加静态方法**
+`public static <返回类型> <方法名>() { }`
+```java
+// 记录类中添加静态方法
 public record Point(int x, int y) {
     public static Point origin() {
         return new Point(0, 0);
     }
-
-    public static double distance(Point p1, Point p2) {
-        int dx = p2.x() - p1.x();
-        int dy = p2.y() - p1.y();
-        return Math.sqrt(dx * dx + dy * dy);
-    }
 }
-
-// 使用
-Point origin = Point.origin();
-Point p1 = new Point(3, 4);
-double dist = Point.distance(origin, p1);  // 5.0
 ```
 
 ---
 
 ## 实现接口
 
-**记录类实现接口**：实现 Comparable 接口
-`public record <记录名>(<字段>) implements <接口> { @Override ... }`
+**基本写法：记录类实现接口**
+`public record <记录名>(<字段>) implements <接口> { }`
 ```java
-public record Student(String name, int score) implements Comparable<Student> {
+// 记录类实现接口
+public record Point(int x, int y) implements Comparable<Point> {
     @Override
-    public int compareTo(Student other) {
-        return Integer.compare(this.score, other.score);
+    public int compareTo(Point other) {
+        return Integer.compare(this.x, other.x);
     }
 }
-
-// 使用
-List<Student> students = Arrays.asList(
-    new Student("Alice", 85),
-    new Student("Bob", 92),
-    new Student("Charlie", 78)
-);
-Collections.sort(students);
-students.forEach(s -> System.out.println(s.name() + ": " + s.score()));
-```
-
----
-
-## 记录类与继承
-
-**记录类不可继承**：记录类是 final 的
-`public record <记录名>(<字段>) { }` | `// 不能被继承`
-```java
-public record Animal(String name) { }
-
-// 错误：记录类不能被继承
-// public record Dog(String name) extends Animal { }
-
-// 正确：记录类可以实现接口
-public record Dog(String name) extends Animal { }  // 错误
-```
-
----
-
-## 记录类常用方法
-
-**自动生成的方法**：toString、equals、hashCode
-`<记录对象>.toString()` | `<对象1>.equals(<对象2>)`
-```java
-public record Point(int x, int y) { }
-
-Point p1 = new Point(1, 2);
-Point p2 = new Point(1, 2);
-Point p3 = new Point(3, 4);
-
-// toString
-System.out.println(p1.toString());  // Point[x=1, y=2]
-
-// equals
-System.out.println(p1.equals(p2));  // true
-System.out.println(p1.equals(p3));  // false
-
-// hashCode
-System.out.println(p1.hashCode() == p2.hashCode());  // true
 ```
 
 ---
 
 ## 局部记录类
 
-**局部记录类**：在方法内部定义
-`record <记录名>(<字段>) { }`
+**基本写法：方法内定义记录类**
+`record <记录名>(<类型> <字段>) { }`
 ```java
+// 在方法内部定义局部记录类
 public void process() {
-    // 局部记录类
-    record Point(int x, int y) {
-        double distanceFromOrigin() {
-            return Math.sqrt(x * x + y * y);
-        }
-    }
-
-    Point p = new Point(3, 4);
-    System.out.println(p.distanceFromOrigin());  // 5.0
+    record Pair(int a, int b) { }
+    Pair pair = new Pair(1, 2);
 }
 ```
 
 ---
 
-## 记录类与 Stream
+## 记录类与模式匹配
 
-**记录类与 Stream API**：作为数据载体
-`<stream>.map(<记录构造器>)`
+**基本写法：instanceof 模式匹配**
+`if (<对象> instanceof <记录类>(<变量1>, <变量2>)) { }`
 ```java
-public record User(String name, int age) { }
-
-List<String> names = Arrays.asList("Alice", "Bob", "Charlie");
-List<User> users = names.stream()
-    .map(name -> new User(name, name.length()))
-    .collect(Collectors.toList());
-
-users.forEach(u -> System.out.println(u.name() + ": " + u.age()));
+// 记录类与 instanceof 模式匹配
+if (obj instanceof Point(int x, int y)) {
+}
 ```
 
 ---
 
-## 记录类与 JSON
-
-**记录类与 JSON 序列化**：使用 Jackson
-`ObjectMapper <变量> = new ObjectMapper();`
+**基本写法：switch 模式匹配**
+`switch (<对象>) { case <记录类>(<变量1>, <变量2>) -> <结果>; }`
 ```java
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-public record User(String name, int age, String email) { }
-
-// 对象转 JSON
-ObjectMapper mapper = new ObjectMapper();
-User user = new User("Alice", 25, "alice@example.com");
-String json = mapper.writeValueAsString(user);
-System.out.println(json);  // {"name":"Alice","age":25,"email":"alice@example.com"}
-
-// JSON 转对象
-String jsonInput = "{\"name\":\"Bob\",\"age\":30,\"email\":\"bob@example.com\"}";
-User user2 = mapper.readValue(jsonInput, User.class);
-System.out.println(user2.name());  // Bob
+// 记录类与 switch 模式匹配
+String desc = switch (shape) {
+    case Point(int x, int y) -> "Point at " + x + "," + y;
+    default -> "Unknown";
+};
 ```

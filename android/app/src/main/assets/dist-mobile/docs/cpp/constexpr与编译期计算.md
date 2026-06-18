@@ -6,277 +6,351 @@
 
 ## constexpr 变量
 
-**constexpr 变量声明**
-`constexpr <type> <var> = <constant_expr>;`
+**基本写法：定义编译期常量**
+`constexpr <type> <var_name> = <value>;`
 ```cpp
-// 编译期常量
-constexpr int MAX_SIZE = 1024;
-constexpr double PI = 3.14159265358979;
-constexpr const char* VERSION = "1.0.0";
-// 用于数组大小
-int buffer[MAX_SIZE];
-// 用于模板参数
-template <int N> struct Array { int data[N]; };
-Array<MAX_SIZE> arr;
+// 定义编译期常量
+constexpr int SIZE = 10;
+```
+
+---
+
+**表达式写法：使用常量表达式**
+`constexpr <type> <var> = <constexpr_expr>;`
+```cpp
+// 使用常量表达式
+constexpr int AREA = 5 * 5;
+```
+
+---
+
+**函数调用写法：使用 constexpr 函数初始化**
+`constexpr <type> <var> = <constexpr_func>(<args>);`
+```cpp
+// 使用 constexpr 函数初始化
+constexpr int result = square(5);
 ```
 
 ---
 
 ## constexpr 函数
 
-**constexpr 函数定义**
+**基本写法：定义 constexpr 函数**
 `constexpr <return_type> <func>(<params>) { ... }`
 ```cpp
-// C++11：constexpr 函数只能有 return 语句
-constexpr int factorial(int n) {
-    return n <= 1 ? 1 : n * factorial(n - 1);
+// 定义编译期可计算的函数
+constexpr int square(int x) {
+    return x * x;
 }
-// C++14：允许更多语句
-constexpr int sum(int n) {
-    int result = 0;
-    for (int i = 1; i <= n; ++i) {
-        result += i;
-    }
-    return result;
-}
-// 使用
-constexpr int fact5 = factorial(5);    // 120，编译期计算
-constexpr int sum10 = sum(10);         // 55，编译期计算
-int n = 5;
-int result = factorial(n);             // 运行期计算
 ```
 
 ---
 
-**constexpr 递归函数**
-`constexpr <return_type> <func>(<params>) { return <base_case> ? <val> : <recursive_call>; }`
+**递归写法：constexpr 递归函数**
+`constexpr <return_type> <func>(<params>) { if (<base>) return ...; return <recursive>; }`
 ```cpp
-// 编译期递归计算斐波那契
-constexpr int fibonacci(int n) {
-    if (n <= 1) return n;
-    return fibonacci(n - 1) + fibonacci(n - 2);
+// 编译期递归计算阶乘
+constexpr int factorial(int n) {
+    return n <= 1 ? 1 : n * factorial(n - 1);
 }
-// 使用
-constexpr int fib10 = fibonacci(10);    // 55
+```
+
+---
+
+**条件写法：constexpr 函数中使用 if**
+`constexpr <return_type> <func>(<params>) { if (<cond>) { ... } else { ... } }`
+```cpp
+// C++14 constexpr 函数可以使用 if
+constexpr int abs_val(int x) {
+    if (x >= 0) {
+        return x;
+    } else {
+        return -x;
+    }
+}
+```
+
+---
+
+**循环写法：constexpr 函数中使用循环**
+`constexpr <return_type> <func>(<params>) { for (...) { ... } }`
+```cpp
+// C++14 constexpr 函数可以使用循环
+constexpr int sum(int n) {
+    int total = 0;
+    for (int i = 1; i <= n; i++) {
+        total += i;
+    }
+    return total;
+}
 ```
 
 ---
 
 ## constexpr 与 const
 
-**constexpr 与 const 对比**
-`constexpr <type> <var> = <expr>; // 编译期 | const <type> <var> = <expr>; // 运行期或编译期`
+**const 写法：运行期常量**
+`const <type> <var> = <value>;`
 ```cpp
-// constexpr：一定是编译期常量
-constexpr int x = 10;
-// const：可能是编译期或运行期常量
-const int y = 20;           // 编译期
-int n = 30;
-const int z = n;            // 运行期
-// constexpr 可以隐式转换为 const
-const int a = x;            // 正确
-// const 不能隐式转换为 constexpr
-// constexpr int b = z;    // 错误
+// 运行期常量
+const int runtime_val = 10;
+```
+
+---
+
+**constexpr 写法：编译期常量**
+`constexpr <type> <var> = <value>;`
+```cpp
+// 编译期常量
+constexpr int compiletime_val = 10;
+```
+
+---
+
+**const + constexpr 写法：两者结合**
+`const constexpr <type> <var> = <value>;`
+```cpp
+// const 和 constexpr 结合
+const constexpr int VALUE = 100;
+```
+
+---
+
+## if constexpr
+
+**基本写法：编译期条件判断**
+`if constexpr (<condition>) { ... } else { ... }`
+```cpp
+// 编译期条件判断
+template<typename T>
+void process(T value) {
+    if constexpr (std::is_integral_v<T>) {
+        std::cout << "Integer: " << value << std::endl;
+    } else {
+        std::cout << "Other: " << value << std::endl;
+    }
+}
+```
+
+---
+
+**无 else 写法：仅 if constexpr**
+`if constexpr (<condition>) { ... }`
+```cpp
+// 仅 if constexpr
+template<typename T>
+void process(T value) {
+    if constexpr (std::is_integral_v<T>) {
+        std::cout << "Integer" << std::endl;
+    }
+}
 ```
 
 ---
 
 ## constexpr 类
 
-**constexpr 构造函数**
-`constexpr <ClassName>(<params>) : <member>(<value>), ... {}`
+**基本写法：constexpr 构造函数**
+`constexpr <ClassName>(<params>) : <members> { ... }`
 ```cpp
+// constexpr 构造函数
 class Point {
-    double x_, y_;
+    int x, y;
 public:
-    // constexpr 构造函数
-    constexpr Point(double x = 0, double y = 0) : x_(x), y_(y) {}
-    // constexpr 成员函数
-    constexpr double x() const { return x_; }
-    constexpr double y() const { return y_; }
-    constexpr double distance_to(const Point& other) const {
-        double dx = x_ - other.x_;
-        double dy = y_ - other.y_;
-        return dx * dx + dy * dy;    // 返回距离平方
-    }
+    constexpr Point(int x, int y) : x(x), y(y) {}
 };
-// 编译期构造
-constexpr Point p1(0, 0);
-constexpr Point p2(3, 4);
-constexpr double dist_sq = p1.distance_to(p2);    // 25
 ```
 
 ---
 
-**constexpr 成员函数**
+**constexpr 成员函数写法**
 `constexpr <return_type> <func>() const { ... }`
 ```cpp
-class Vector {
-    double x_, y_, z_;
+// constexpr 成员函数
+class Point {
+    int x, y;
 public:
-    constexpr Vector(double x, double y, double z) : x_(x), y_(y), z_(z) {}
-    constexpr double dot(const Vector& other) const {
-        return x_ * other.x_ + y_ * other.y_ + z_ * other.z_;
-    }
-    constexpr Vector cross(const Vector& other) const {
-        return Vector(
-            y_ * other.z_ - z_ * other.y_,
-            z_ * other.x_ - x_ * other.z_,
-            x_ * other.y_ - y_ * other.x_
-        );
-    }
+    constexpr int get_x() const { return x; }
 };
 ```
 
 ---
 
-## constexpr if（C++17）
-
-**编译期条件判断**
-`if constexpr (<condition>) { ... } else { ... }`
+**constexpr 对象写法**
+`constexpr <ClassName> <var>(<args>);`
 ```cpp
-template <typename T>
-void process(T value) {
-    if constexpr (std::is_integral_v<T>) {
-        std::cout << "Integral: " << value << std::endl;
-    } else if constexpr (std::is_floating_point_v<T>) {
-        std::cout << "Floating: " << value << std::endl;
-    } else {
-        std::cout << "Other type" << std::endl;
-    }
+// 创建 constexpr 对象
+constexpr Point p(10, 20);
+```
+
+---
+
+## constexpr 与模板
+
+**模板写法：constexpr 模板函数**
+`template<typename T> constexpr <return_type> <func>(T <param>) { ... }`
+```cpp
+// constexpr 模板函数
+template<typename T>
+constexpr T max_val(T a, T b) {
+    return a > b ? a : b;
 }
-// 使用
-process(42);        // 输出 Integral: 42
-process(3.14);      // 输出 Floating: 3.14
-process("hello");   // 输出 Other type
+```
+
+---
+
+## 编译期计算
+
+**递归写法：模板递归编译期计算**
+`template<int N> struct <Factorial> { static constexpr int value = N * <Factorial><N-1>::value; };`
+```cpp
+// 模板递归计算阶乘
+template<int N>
+struct Factorial {
+    static constexpr int value = N * Factorial<N - 1>::value;
+};
+
+template<>
+struct Factorial<0> {
+    static constexpr int value = 1;
+};
+```
+
+---
+
+**使用写法：访问编译期计算的值**
+`<Factorial><N>::value`
+```cpp
+// 访问编译期计算的值
+constexpr int result = Factorial<5>::value;
+```
+
+---
+
+## constexpr 与数组
+
+**数组大小写法：使用 constexpr 作为数组大小**
+`<type> <array>[<constexpr_var>];`
+```cpp
+// 使用 constexpr 作为数组大小
+constexpr int SIZE = 10;
+int arr[SIZE];
+```
+
+---
+
+**std::array 写法：使用 constexpr 作为 std::array 大小**
+`std::array<<type>, <constexpr_var>> <arr>;`
+```cpp
+#include <array>
+// 使用 constexpr 作为 std::array 大小
+constexpr int SIZE = 10;
+std::array<int, SIZE> arr;
+```
+
+---
+
+## constexpr 与 std::array
+
+**基本写法：constexpr std::array**
+`constexpr std::array<<type>, <size>> <arr> = {<values>};`
+```cpp
+#include <array>
+// constexpr std::array
+constexpr std::array<int, 5> arr = {1, 2, 3, 4, 5};
+```
+
+---
+
+## constexpr lambda（C++17）
+
+**基本写法：constexpr lambda**
+`auto <lambda> = []() constexpr { ... }`
+```cpp
+// C++17 constexpr lambda
+auto square = [](int x) constexpr {
+    return x * x;
+};
+```
+
+---
+
+**调用写法：在编译期调用 constexpr lambda**
+`constexpr <type> <var> = <lambda>(<args>);`
+```cpp
+// 在编译期调用 constexpr lambda
+constexpr int result = square(5);
 ```
 
 ---
 
 ## consteval（C++20）
 
-**consteval 函数**
+**基本写法：定义 consteval 函数**
 `consteval <return_type> <func>(<params>) { ... }`
 ```cpp
-// C++20：consteval 强制编译期执行
-consteval int compile_time_square(int x) {
+// C++20 consteval 函数，必须在编译期执行
+consteval int square(int x) {
     return x * x;
 }
-// 必须在编译期调用
-constexpr int result = compile_time_square(5);    // 25
-// int n = 5;
-// int r = compile_time_square(n);    // 错误：n 不是编译期常量
+```
+
+---
+
+**调用写法：调用 consteval 函数**
+`constexpr <type> <var> = <func>(<args>);`
+```cpp
+// 调用 consteval 函数
+constexpr int result = square(5);
 ```
 
 ---
 
 ## constinit（C++20）
 
-**constinit 变量**
-`constinit <type> <var> = <constant_expr>;`
+**基本写法：constinit 变量**
+`constinit <type> <var> = <value>;`
 ```cpp
-// C++20：constinit 确保编译期初始化
-constinit int global_var = 42;
-// 与 constexpr 的区别
-// constexpr：既是编译期常量，又是只读
-// constinit：编译期初始化，但可修改
-global_var = 100;    // 正确：可以修改
+// C++20 constinit 变量，必须编译期初始化
+constinit int global_var = 10;
 ```
 
 ---
 
-## 编译期计算示例
+## 类型检查
 
-**编译期字符串操作**
-`constexpr <type> <func>(const char* <str>) { ... }`
-```cpp
-// 编译期计算字符串长度
-constexpr size_t str_len(const char* str) {
-    size_t len = 0;
-    while (str[len] != '\0') {
-        ++len;
-    }
-    return len;
-}
-// 使用
-constexpr const char* msg = "Hello";
-constexpr size_t len = str_len(msg);    // 5
-static_assert(len == 5, "Length must be 5");
-```
-
----
-
-**编译期数组求和**
-`constexpr <type> <func>(const std::array<<Type>, <Size>>& <arr>) { ... }`
-```cpp
-#include <array>
-template <typename T, size_t N>
-constexpr T array_sum(const std::array<T, N>& arr) {
-    T sum = T();
-    for (size_t i = 0; i < N; ++i) {
-        sum += arr[i];
-    }
-    return sum;
-}
-// 使用
-constexpr std::array<int, 5> arr = {1, 2, 3, 4, 5};
-constexpr int sum = array_sum(arr);    // 15
-```
-
----
-
-## static_assert
-
-**编译期断言**
-`static_assert(<constant_expr>, "<message>");`
-```cpp
-// 编译期检查
-static_assert(sizeof(int) == 4, "int must be 4 bytes");
-static_assert(sizeof(void*) == 8, "64-bit system required");
-// 模板参数检查
-template <int N>
-struct Buffer {
-    static_assert(N > 0, "Buffer size must be positive");
-    int data[N];
-};
-// 使用 constexpr 变量
-constexpr int SIZE = 10;
-static_assert(SIZE > 0, "SIZE must be positive");
-```
-
----
-
-## 类型 traits（编译期）
-
-**类型检查**
-`std::is_integral_v<T> | std::is_floating_point_v<T> | std::is_pointer_v<T>`
+**is_constant_evaluated 写法：检查是否在编译期求值**
+`if (std::is_constant_evaluated()) { ... }`
 ```cpp
 #include <type_traits>
-// 类型检查
-static_assert(std::is_integral_v<int>, "int is integral");
-static_assert(std::is_floating_point_v<double>, "double is floating point");
-static_assert(std::is_pointer_v<int*>, "int* is pointer");
-// 条件编译
-template <typename T>
-void process(T value) {
-    if constexpr (std::is_integral_v<T>) {
-        std::cout << "Integer: " << value << std::endl;
+// 检查是否在编译期求值
+constexpr int compute(int x) {
+    if (std::is_constant_evaluated()) {
+        return x * 2;
+    } else {
+        return x * 3;
     }
 }
 ```
 
 ---
 
-**类型转换**
-`std::remove_const_t<T> | std::add_const_t<T> | std::remove_reference_t<T>`
+## constexpr 与标准库
+
+**基本写法：constexpr 标准库函数**
+`constexpr <type> <var> = std::<func>(<args>);`
 ```cpp
-#include <type_traits>
-// 移除 const
-using NonConst = std::remove_const_t<const int>;    // int
-// 添加 const
-using Const = std::add_const_t<int>;                // const int
-// 移除引用
-using NoRef = std::remove_reference_t<int&>;        // int
-// 获取底层类型
-using Decay = std::decay_t<int[5>;                 // int*
+#include <cmath>
+// 使用 constexpr 标准库函数
+constexpr double result = std::abs(-3.14);
+```
+
+---
+
+**constexpr 容器写法：C++20 constexpr 容器**
+`constexpr std::vector<<type>> <vec>;`
+```cpp
+#include <vector>
+// C++20 constexpr vector
+constexpr std::vector<int> vec = {1, 2, 3};
 ```

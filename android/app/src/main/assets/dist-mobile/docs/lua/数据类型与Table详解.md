@@ -1,440 +1,561 @@
-# Lua 数据类型与 Table 速查
+# Lua 数据类型与 Table 详解速查
 
 > **符号约定**：`< >` 必填参数 | `[ ]` 可选参数
 
 ---
 
-## 基础数据类型
+## 基本数据类型
 
-**8 种基础数据类型**
-`nil | boolean | number | string | function | table | thread | userdata`
+**基本写法：nil 空值**
+`local <name> = nil`
 ```lua
--- nil：无效值
-local x = nil;
--- boolean：布尔值
-local flag = true;
--- number：数值（双精度浮点数）
-local num = 10;
-local int = 42;
-local float = 3.14;
--- string：字符串
-local str = "Hello";
--- function：函数
-local add = function(a, b) return a + b end;
--- table：表
-local t = {1, 2, 3};
--- thread：协程
-local co = coroutine.create(function() end);
+-- nil 表示空值
+local x = nil
 ```
 
-**类型判断**
-`type(<value>)`
+**基本写法：boolean 布尔值**
+`local <name> = <bool>`
 ```lua
-print(type(nil));                          -- nil
-print(type(true));                         -- boolean
-print(type(10));                           -- number
-print(type("hello"));                      -- string
-print(type(function() end));               -- function
-print(type({}));                           -- table
-print(type(coroutine.create(function() end)));  -- thread
+-- 布尔值
+local isActive = true
+local isDone = false
 ```
 
----
-
-## 类型转换
-
-**数值与字符串转换**
-`tostring(<value>) | tonumber(<str>)`
+**基本写法：number 数字**
+`local <name> = <number>`
 ```lua
--- 数值转字符串
-local num = 10;
-local str = tostring(num);  -- "10"
--- 字符串转数值
-local str = "123";
-local num1 = tonumber(str);     -- 123
-local num2 = tonumber("3.14");  -- 3.14
-local num3 = tonumber("abc");   -- nil
--- 算术运算自动转换
-print("10" + 5);  -- 15
-print(10 .. "5"); -- "105"
+-- 数字类型（整数和浮点数）
+local intVal = 42
+local floatVal = 3.14
+local sciVal = 1e10
+local hexVal = 0xFF
+```
+
+**基本写法：string 字符串**
+`local <name> = "<text>"`
+```lua
+-- 字符串
+local name = "Lua"
+local path = 'C:\\Users'
+```
+
+**基本写法：多行字符串**
+`local <name> = [[<content>]]`
+```lua
+-- 多行字符串
+local text = [[
+第一行
+第二行
+]]
+```
+
+**基本写法：function 函数**
+`local <name> = function(<params>) <body> end`
+```lua
+-- 函数类型
+local greet = function(name)
+    return "Hello, " .. name
+end
+```
+
+**基本写法：table 表**
+`local <name> = {}`
+```lua
+-- 表类型
+local emptyTable = {}
+local arr = {1, 2, 3}
+local map = {key = "value"}
 ```
 
 ---
 
 ## Table 创建
 
-**空表与初始化**
-`local <name> = {} | {<items>} | {<key> = <value>}`
+**基本写法：空表**
+`local <name> = {}`
 ```lua
--- 空表
-local t1 = {};
--- 数组初始化
-local t2 = {1, 2, 3, 4, 5};
--- 字典初始化
-local t3 = {name = "Lua", version = 5.4};
--- 混合初始化
-local t4 = {
-    "apple",
-    "banana",
-    name = "fruit",
-    count = 2
-};
--- 显式键
-local t5 = {
-    ["name"] = "Lua",
-    [10] = "ten",
-    [{}] = "table"
-};
+-- 创建空表
+local t = {}
+```
+
+**单行写法：数组式表**
+`local <name> = {<val1>, <val2>, <val3>}`
+```lua
+-- 创建数组式表
+local arr = {10, 20, 30, 40, 50}
+```
+
+**单行写法：字典式表**
+`local <name> = {<key1> = <val1>, <key2> = <val2>}`
+```lua
+-- 创建字典式表
+local person = {name = "Alice", age = 25}
+```
+
+**换行写法：多字段字典式表**
+`local <name> = { <key1> = <val1>, <key2> = <val2>, <key3> = <val3> }`
+```lua
+-- 换行声明多字段表
+local config = {
+    host = "localhost",
+    port = 8080,
+    timeout = 5000,
+    debug = true
+}
+```
+
+**单行写法：混合式表**
+`local <name> = {<val1>, <key> = <val2>}`
+```lua
+-- 混合数组与字典
+local mixed = {10, 20, name = "Alice", age = 25}
+```
+
+**基本写法：嵌套表**
+`local <name> = {<key> = {<subkey> = <val>}}`
+```lua
+-- 嵌套表
+local user = {
+    profile = {
+        name = "Alice",
+        age = 25
+    }
+}
 ```
 
 ---
 
-## Table 作为数组
+## Table 访问
 
-**数组操作**
-`<arr>[<index>] = <value> | #<arr>`
+**基本写法：点号访问**
+`<table>.<key>`
 ```lua
--- 注意：Lua 数组索引从 1 开始
-local arr = {10, 20, 30, 40, 50};
--- 访问元素
-print(arr[1]);  -- 10
-print(arr[3]);  -- 30
--- 修改元素
-arr[2] = 25;
-print(arr[2]);  -- 25
--- 添加元素
-arr[6] = 60;
-print(arr[6]);  -- 60
--- 获取长度
-print(#arr);    -- 6
+-- 点号访问表字段
+local person = {name = "Alice", age = 25}
+print(person.name)
+print(person.age)
+```
+
+**基本写法：方括号访问**
+`<table>["<key>"]`
+```lua
+-- 方括号访问表字段
+print(person["name"])
+```
+
+**基本写法：数组索引访问**
+`<table>[<index>]`
+```lua
+-- 数组索引访问（从 1 开始）
+local arr = {10, 20, 30}
+print(arr[1])
+print(arr[2])
+```
+
+**基本写法：动态键访问**
+`<table>[<variable>]`
+```lua
+-- 动态键访问
+local key = "name"
+print(person[key])
+```
+
+**基本写法：嵌套表访问**
+`<table>.<key1>.<key2>`
+```lua
+-- 嵌套表访问
+local user = {profile = {name = "Alice"}}
+print(user.profile.name)
 ```
 
 ---
 
-## Table 作为字典
+## Table 修改
 
-**字典操作**
-`<dict>.<key> | <dict>["<key>"] | <dict>[<key>] = nil`
+**基本写法：添加字段**
+`<table>.<newKey> = <value>`
 ```lua
-local dict = {
-    name = "John",
-    age = 30,
-    city = "New York"
-};
--- 点语法访问
-print(dict.name);  -- John
--- 方括号访问
-print(dict["age"]);  -- 30
--- 变量键访问
-local key = "city";
-print(dict[key]);  -- New York
--- 添加字段
-dict.email = "john@example.com";
-print(dict.email);  -- john@example.com
--- 删除字段（设为 nil）
-dict.age = nil;
-print(dict.age);  -- nil
+-- 添加新字段
+local person = {}
+person.name = "Alice"
+person.age = 25
+```
+
+**基本写法：修改字段**
+`<table>.<key> = <newValue>`
+```lua
+-- 修改字段值
+person.name = "Bob"
+```
+
+**基本写法：删除字段**
+`<table>.<key> = nil`
+```lua
+-- 删除字段
+person.age = nil
+```
+
+**基本写法：数组添加元素**
+`<table>[#<table> + 1] = <value>`
+```lua
+-- 数组末尾添加元素
+local arr = {1, 2, 3}
+arr[#arr + 1] = 4
 ```
 
 ---
 
 ## Table 遍历
 
-**ipairs 遍历数组**
-`for <i>, <v> in ipairs(<arr>) do <body> end`
+**基本写法：ipairs 遍历数组**
+`for <i>, <v> in ipairs(<table>) do <body> end`
 ```lua
--- ipairs：遍历连续整数键
-local arr = {1, 2, 3, 4, 5};
-for i = 1, #arr do
-    print(i, arr[i]);
-end;
-for index, value in ipairs(arr) do
-    print(index, value);
-end;
+-- ipairs 遍历数组部分
+local arr = {"a", "b", "c"}
+for i, v in ipairs(arr) do
+    print(i, v)
+end
 ```
 
-**pairs 遍历字典**
-`for <k>, <v> in pairs(<dict>) do <body> end`
+**基本写法：pairs 遍历表**
+`for <k>, <v> in pairs(<table>) do <body> end`
 ```lua
--- pairs：遍历所有键值对
-local dict = {name = "John", age = 30, city = "New York"};
-for key, value in pairs(dict) do
-    print(key, value);
-end;
+-- pairs 遍历所有键值对
+local t = {name = "Alice", age = 25}
+for k, v in pairs(t) do
+    print(k, v)
+end
+```
+
+**基本写法：数值遍历数组**
+`for <i> = 1, #<table> do <body> end`
+```lua
+-- 数值遍历数组
+local arr = {10, 20, 30}
+for i = 1, #arr do
+    print(arr[i])
+end
+```
+
+**基本写法：next 遍历表**
+`local <k>, <v> = next(<table>, <prevKey>)`
+```lua
+-- next 遍历表
+local t = {a = 1, b = 2}
+local k, v = next(t, nil)
+while k do
+    print(k, v)
+    k, v = next(t, k)
+end
+```
+
+---
+
+## Table 长度
+
+**基本写法：# 获取长度**
+`#<table>`
+```lua
+-- # 获取数组长度
+local arr = {1, 2, 3, 4, 5}
+print(#arr)
+```
+
+**基本写法：table.getn 获取长度**
+`table.getn(<table>)`
+```lua
+-- table.getn 获取长度（Lua 5.1）
+print(table.getn(arr))
+```
+
+**基本写法：计算表字段数量**
+`local <count> = 0; for _ in pairs(<table>) do <count> = <count> + 1 end`
+```lua
+-- 计算表字段数量
+local t = {a = 1, b = 2, c = 3}
+local count = 0
+for _ in pairs(t) do
+    count = count + 1
+end
+print(count)
 ```
 
 ---
 
 ## Table 操作函数
 
-**table.insert / table.remove / table.concat / table.sort / table.unpack**
-`table.<func>(<table>[, <args>])`
+**基本写法：table.insert 末尾插入**
+`table.insert(<table>, <value>)`
 ```lua
-local arr = {10, 30, 20, 50, 40};
--- 排序
-table.sort(arr);
-print(table.concat(arr, ", "));  -- 10, 20, 30, 40, 50
--- 插入元素到指定位置
-table.insert(arr, 3, 25);
-print(table.concat(arr, ", "));  -- 10, 20, 25, 30, 40, 50
--- 删除指定位置元素
-table.remove(arr, 3);
-print(table.concat(arr, ", "));  -- 10, 20, 30, 40, 50
--- 连接字符串
-local strs = {"Hello", "Lua", "World"};
-print(table.concat(strs, " "));  -- Hello Lua World
--- 解压表
-local values = {10, 20, 30};
-local a, b, c = table.unpack(values);
-print(a, b, c);  -- 10 20 30
+-- 末尾插入元素
+local arr = {1, 2, 3}
+table.insert(arr, 4)
+```
+
+**基本写法：table.insert 指定位置插入**
+`table.insert(<table>, <pos>, <value>)`
+```lua
+-- 指定位置插入元素
+table.insert(arr, 1, 0)
+```
+
+**基本写法：table.remove 末尾移除**
+`table.remove(<table>)`
+```lua
+-- 移除末尾元素
+local removed = table.remove(arr)
+```
+
+**基本写法：table.remove 指定位置移除**
+`table.remove(<table>, <pos>)`
+```lua
+-- 移除指定位置元素
+local removed = table.remove(arr, 1)
+```
+
+**基本写法：table.sort 排序**
+`table.sort(<table>)`
+```lua
+-- 升序排序
+local nums = {5, 3, 1, 4, 2}
+table.sort(nums)
+```
+
+**基本写法：table.sort 自定义排序**
+`table.sort(<table>, <comparator>)`
+```lua
+-- 自定义比较函数排序
+table.sort(nums, function(a, b)
+    return a > b
+end)
+```
+
+**基本写法：table.concat 连接**
+`table.concat(<table>, <separator>)`
+```lua
+-- 连接数组为字符串
+local arr = {"a", "b", "c"}
+local result = table.concat(arr, ", ")
+```
+
+**基本写法：table.concat 指定范围连接**
+`table.concat(<table>, <separator>, <start>, <end>)`
+```lua
+-- 指定范围连接
+local result = table.concat(arr, ", ", 2, 3)
+```
+
+**基本写法：table.unpack 解包**
+`table.unpack(<table>)`
+```lua
+-- 解包表为多个值
+local arr = {10, 20, 30}
+local a, b, c = table.unpack(arr)
+```
+
+**基本写法：table.unpack 部分解包**
+`table.unpack(<table>, <start>, <end>)`
+```lua
+-- 部分解包
+local a, b = table.unpack(arr, 1, 2)
 ```
 
 ---
 
-## 嵌套表
+## Table 复制
 
-**嵌套表结构**
-`<table>.<table>.<key>`
+**基本写法：浅拷贝**
+`local <newTable> = {}; for <k>, <v> in pairs(<table>) do <newTable>[<k>] = <v> end`
 ```lua
-local person = {
-    name = "John",
-    age = 30,
-    address = {
-        street = "Main St",
-        city = "New York",
-        zipcode = 10001
-    },
-    hobbies = {"reading", "coding", "gaming"}
-};
--- 访问嵌套字段
-print(person.address.city);    -- New York
-print(person.hobbies[2]);     -- coding
--- 修改嵌套字段
-person.address.street = "Broadway";
-print(person.address.street);  -- Broadway
-```
-
----
-
-## 表的引用与拷贝
-
-**浅拷贝**
-`local function shallow_copy(<table>)`
-```lua
--- 表是引用类型
-local t1 = {1, 2, 3};
-local t2 = t1;  -- t2 引用 t1
-t2[1] = 10;
-print(t1[1]);  -- 10
--- 浅拷贝
-local function shallow_copy(t)
-    local copy = {};
+-- 浅拷贝表
+local function shallowCopy(t)
+    local copy = {}
     for k, v in pairs(t) do
-        copy[k] = v;
-    end;
-    return copy;
-end;
-local t3 = shallow_copy(t1);
-t3[1] = 20;
-print(t1[1]);  -- 10（t1 不受影响）
-print(t3[1]);  -- 20
-```
-
-**深拷贝**
-`local function deep_copy(<table>)`
-```lua
--- 深拷贝（递归复制嵌套表）
-local function deep_copy(t)
-    if type(t) ~= "table" then
-        return t;
-    end;
-    local copy = {};
-    for k, v in pairs(t) do
-        copy[k] = deep_copy(v);
-    end;
-    return copy;
-end;
-```
-
----
-
-## 元表基础
-
-**setmetatable 设置元表**
-`setmetatable(<table>, <metatable>)`
-```lua
--- 元表允许修改表的行为
-local mt = {
-    -- __add 元方法：定义加法操作
-    __add = function(a, b)
-        local result = {};
-        for i, v in ipairs(a) do
-            result[i] = v;
-        end;
-        for i, v in ipairs(b) do
-            result[#result + 1] = v;
-        end;
-        return result;
-    end,
-    -- __tostring 元方法：定义字符串表示
-    __tostring = function(t)
-        return "[" .. table.concat(t, ", ") .. "]";
+        copy[k] = v
     end
-};
-local t1 = {1, 2, 3};
-local t2 = {4, 5, 6};
-setmetatable(t1, mt);
-setmetatable(t2, mt);
--- 使用 + 运算符
-local t3 = t1 + t2;
-print(t3);  -- [1, 2, 3, 4, 5, 6]
-print(t1);  -- [1, 2, 3]
+    return copy
+end
+```
+
+**换行写法：深拷贝**
+`local function <name>(<table>) <body with recursion> end`
+```lua
+-- 深拷贝表
+local function deepCopy(t)
+    local copy = {}
+    for k, v in pairs(t) do
+        if type(v) == "table" then
+            copy[k] = deepCopy(v)
+        else
+            copy[k] = v
+        end
+    end
+    return copy
+end
 ```
 
 ---
 
-## Table 实现面向对象
+## Table 合并
 
-**类定义**
-`local <Class> = {} <Class>.__index = <Class> function <Class>:new(<args>) ... end`
+**基本写法：合并两个表**
+`for <k>, <v> in pairs(<source>) do <target>[<k>] = <v> end`
 ```lua
--- 类定义
-local Person = {};
-Person.__index = Person;
--- 构造函数
-function Person:new(name, age)
-    local self = setmetatable({}, self);
-    self.name = name;
-    self.age = age;
-    return self;
-end;
--- 实例方法
-function Person:greet()
-    print("Hello, my name is " .. self.name);
-end;
-function Person:get_age()
-    return self.age;
-end;
--- 使用
-local john = Person:new("John", 30);
-john:greet();        -- Hello, my name is John
-print(john:get_age());  -- 30
+-- 合并两个表
+local function merge(target, source)
+    for k, v in pairs(source) do
+        target[k] = v
+    end
+    return target
+end
 ```
 
-**继承**
-`local <SubClass> = setmetatable({}, {__index = <BaseClass>})`
+**基本写法：数组合并**
+`for <i>, <v> in ipairs(<source>) do <target>[#<target> + 1] = <v> end`
 ```lua
--- 子类继承
-local Student = setmetatable({}, {__index = Person});
-Student.__index = Student;
-function Student:new(name, age, grade)
-    local self = Person:new(name, age);  -- 调用父类构造函数
-    setmetatable(self, Student);
-    self.grade = grade;
-    return self;
-end;
--- 重写方法
-function Student:greet()
-    print("Hello, my name is " .. self.name .. " and I'm in grade " .. self.grade);
-end;
--- 使用
-local alice = Student:new("Alice", 15, 9);
-alice:greet();  -- Hello, my name is Alice and I'm in grade 9
-print(alice:get_age());  -- 15（继承自 Person）
+-- 合并两个数组
+local function mergeArrays(target, source)
+    for i, v in ipairs(source) do
+        target[#target + 1] = v
+    end
+    return target
+end
 ```
 
 ---
 
-## 数据结构实现
+## Table 作为数组
 
-**栈**
-`local <Stack> = {} <Stack>.__index = <Stack>`
+**基本写法：创建数组**
+`local <name> = {<val1>, <val2>, <val3>}`
 ```lua
--- 栈数据结构
-local Stack = {};
-Stack.__index = Stack;
-function Stack:new()
-    return setmetatable({items = {}}, self);
-end;
-function Stack:push(item)
-    table.insert(self.items, item);
-end;
-function Stack:pop()
-    return table.remove(self.items);
-end;
-function Stack:peek()
-    return self.items[#self.items];
-end;
-function Stack:isEmpty()
-    return #self.items == 0;
-end;
--- 使用
-local stack = Stack:new();
-stack:push(1);
-stack:push(2);
-print(stack:pop());   -- 2
-print(stack:peek());  -- 1
+-- 创建数组
+local colors = {"red", "green", "blue"}
 ```
 
-**队列**
-`local <Queue> = {} <Queue>.__index = <Queue>`
+**基本写法：数组遍历**
+`for <i>, <v> in ipairs(<array>) do <body> end`
 ```lua
--- 队列数据结构
-local Queue = {};
-Queue.__index = Queue;
-function Queue:new()
-    return setmetatable({items = {}}, self);
-end;
-function Queue:enqueue(item)
-    table.insert(self.items, item);
-end;
-function Queue:dequeue()
-    return table.remove(self.items, 1);
-end;
-function Queue:front()
-    return self.items[1];
-end;
--- 使用
-local queue = Queue:new();
-queue:enqueue(1);
-queue:enqueue(2);
-print(queue:dequeue());  -- 1
+-- 遍历数组
+for i, color in ipairs(colors) do
+    print(i, color)
+end
 ```
 
-**集合**
-`local <Set> = {} <Set>.__index = <Set>`
+**基本写法：数组查找**
+`for <i>, <v> in ipairs(<array>) do if <v> == <target> then return <i> end end`
 ```lua
--- 集合数据结构
-local Set = {};
-Set.__index = Set;
-function Set:new(values)
-    local self = setmetatable({elements = {}}, self);
-    if values then
-        for _, v in ipairs(values) do
-            self:add(v);
-        end;
-    end;
-    return self;
-end;
-function Set:add(value)
-    self.elements[value] = true;
-end;
-function Set:remove(value)
-    self.elements[value] = nil;
-end;
-function Set:contains(value)
-    return self.elements[value] == true;
-end;
-function Set:size()
-    local count = 0;
-    for _ in pairs(self.elements) do
-        count = count + 1;
-    end;
-    return count;
-end;
--- 使用
-local set = Set:new({1, 2, 3});
-set:add(4);
-print(set:contains(3));  -- true
-print(set:contains(5));  -- false
+-- 查找元素索引
+local function indexOf(arr, target)
+    for i, v in ipairs(arr) do
+        if v == target then return i end
+    end
+    return nil
+end
+```
+
+**基本写法：数组过滤**
+`local <result> = {}; for <i>, <v> in ipairs(<array>) do if <cond> then <result>[#<result> + 1] = <v> end end`
+```lua
+-- 过滤数组元素
+local function filter(arr, predicate)
+    local result = {}
+    for i, v in ipairs(arr) do
+        if predicate(v) then
+            result[#result + 1] = v
+        end
+    end
+    return result
+end
+```
+
+**基本写法：数组映射**
+`local <result> = {}; for <i>, <v> in ipairs(<array>) do <result>[<i>] = <transform> end`
+```lua
+-- 映射数组元素
+local function map(arr, transform)
+    local result = {}
+    for i, v in ipairs(arr) do
+        result[i] = transform(v)
+    end
+    return result
+end
+```
+
+---
+
+## Table 作为集合
+
+**基本写法：创建集合**
+`local <set> = {<key1> = true, <key2> = true}`
+```lua
+-- 创建集合
+local fruits = {apple = true, banana = true, cherry = true}
+```
+
+**基本写法：集合添加元素**
+`<set>[<key>] = true`
+```lua
+-- 添加集合元素
+fruits.orange = true
+```
+
+**基本写法：集合移除元素**
+`<set>[<key>] = nil`
+```lua
+-- 移除集合元素
+fruits.banana = nil
+```
+
+**基本写法：集合包含检查**
+`if <set>[<key>] then <body> end`
+```lua
+-- 检查集合包含
+if fruits.apple then
+    print("包含 apple")
+end
+```
+
+---
+
+## Table 作为队列
+
+**基本写法：队列入队**
+`table.insert(<queue>, <value>)`
+```lua
+-- 队列入队
+local queue = {}
+table.insert(queue, "task1")
+```
+
+**基本写法：队列出队**
+`table.remove(<queue>, 1)`
+```lua
+-- 队列出队
+local task = table.remove(queue, 1)
+```
+
+---
+
+## 弱引用表
+
+**基本写法：弱引用键表**
+`setmetatable({}, {__mode = "k"})`
+```lua
+-- 弱引用键表
+local weakKeys = setmetatable({}, {__mode = "k"})
+```
+
+**基本写法：弱引用值表**
+`setmetatable({}, {__mode = "v"})`
+```lua
+-- 弱引用值表
+local weakValues = setmetatable({}, {__mode = "v"})
+```
+
+**基本写法：弱引用键值表**
+`setmetatable({}, {__mode = "kv"})`
+```lua
+-- 弱引用键值表
+local weakKV = setmetatable({}, {__mode = "kv"})
 ```

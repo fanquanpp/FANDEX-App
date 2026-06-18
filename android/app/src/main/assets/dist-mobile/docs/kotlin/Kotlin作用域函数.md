@@ -4,332 +4,396 @@
 
 ---
 
-## 作用域函数对比
+## let 函数
 
-**五个作用域函数**
-`<obj>.[let|run|apply|also] { <body> } | with(<obj>) { <body> }`
-```kotlin
-data class Person(var name: String, var age: Int);
-val person = Person("Alice", 25);
-// let：用 it 引用，返回 lambda 结果
-val greeting = person.let { "${it.name} is ${it.age}" };
-// run：用 this 引用，返回 lambda 结果
-val description = person.run { "$name is $age years old" };
-// with：不是扩展函数，用 this 引用
-val info = with(person) { "$name, age $age" };
-// apply：用 this 引用，返回对象本身
-val configured = person.apply {
-    name = "Bob";
-    age = 30;
-};
-// also：用 it 引用，返回对象本身
-val logged = person.also {
-    println("设置完成: $it");
-};
-```
-
----
-
-## let
-
-**let 空安全检查与转换**
-`<obj>?.let { <body with it> }`
-```kotlin
-// 不使用 let：需要先判空
-fun processName(name: String?) {
-    if (name != null) {
-        println(name.uppercase());
-        println(name.length);
-    };
-};
-// 使用 let：更简洁
-fun processNameWithLet(name: String?) {
-    name?.let {
-        println(it.uppercase());
-        println(it.length);
-        // 在这个 lambda 内，it 是非空的 String
-    };
-};
-```
-
-**let 用于转换**
+**基本写法：let 转换对象**
 `<obj>.let { <body with it> }`
 ```kotlin
-// let 用于转换
-val length = "Hello".let { it.length };
-println(length);  // 5
+// let 返回 Lambda 结果
+val length = "Kotlin".let { it.length };
 ```
 
-**let 用于链式调用**
-`<obj>.let { <body> }.let { <body> }`
+**基本写法：let 处理可空值**
+`<obj>?.let { <body with it> }`
 ```kotlin
-// let 用于链式调用
-val result = "  Hello World  "
-    .let { it.trim() }
-    .let { it.lowercase() }
-    .let { it.replace(" ", "_") };
-println(result);  // hello_world
+// let 安全调用非空值
+nickname?.let {
+    println("Length: ${it.length}");
+}
+```
+
+**基本写法：let 链式调用**
+`<obj>.let { <transform> }.let { <transform> }`
+```kotlin
+// let 链式转换
+val result = "Hello".let { it.uppercase() }.let { it + "!" };
+```
+
+**基本写法：let 与 Elvis 结合**
+`<obj>?.let { <transform> } ?: <default>`
+```kotlin
+// let 与 Elvis 结合提供默认值
+val length: Int = nickname?.let { it.length } ?: 0;
 ```
 
 ---
 
-## run
+## run 函数
 
-**run 执行计算并返回结果**
+**基本写法：run 执行代码块**
 `<obj>.run { <body with this> }`
 ```kotlin
-// 在对象上计算
-val person = Person("Alice", 25);
-val isAdult = person.run {
-    // this 指向 person，可以省略 this
-    age >= 18;
-};
-println(isAdult);  // true
+// run 返回 Lambda 结果，this 指向对象
+val length = "Kotlin".run { length };
 ```
 
-**run 不作为扩展函数使用**
+**基本写法：run 配置对象**
+`<obj>.run { <body with this> }`
+```kotlin
+// run 配置对象并返回结果
+val result = StringBuilder().run {
+    append("Hello");
+    append(", Kotlin");
+    toString();
+}
+```
+
+**基本写法：run 作为顶层函数**
 `run { <body> }`
 ```kotlin
-// run 也可以不作为扩展函数使用
-val result = run {
-    // 执行一段代码，返回最后一个表达式
-    val x = 10;
-    val y = 20;
-    x + y;
-};
-println(result);  // 30
-```
-
-**run 用于初始化和计算**
-`val <name> = run { <body> }`
-```kotlin
-// run 用于初始化和计算
-val config = run {
-    val env = System.getenv("ENV") ?: "development";
-    val port = System.getenv("PORT")?.toInt() ?: 8080;
-    Config(env, port);
-};
+// run 作为顶层函数执行代码块
+val value = run {
+    val a = 10;
+    val b = 20;
+    a + b;
+}
 ```
 
 ---
 
-## with
+## with 函数
 
-**with 对对象执行多个操作**
+**基本写法：with 执行多个操作**
 `with(<obj>) { <body with this> }`
 ```kotlin
-val person = Person("Alice", 25);
-// 使用 with 对对象执行多个操作
-val description = with(person) {
-    // this 指向 person
-    println("处理 $name 的数据");
-    name.uppercase();
-    // 返回最后一个表达式的值
-};
-println(description);  // ALICE
+// with 非扩展版本，对同一对象执行多个操作
+val greeting = with(StringBuilder()) {
+    append("Hello");
+    append(", Kotlin");
+    toString();
+}
 ```
 
-**with 常用于构建字符串**
-`with(<builder>) { <body> }.toString()`
+**基本写法：with 配置对象**
+`with(<obj>) { <body with this> }`
 ```kotlin
-// with 常用于构建字符串或其他对象
-val output = with(StringBuilder()) {
-    append("姓名: ");
-    append(person.name);
-    append("\n年龄: ");
-    append(person.age);
-    toString();
-};
-println(output);
+// with 配置对象
+val person = Person();
+with(person) {
+    name = "Alice";
+    age = 25;
+}
+```
+
+**基本写法：with 返回结果**
+`val <name> = with(<obj>) { <body with this> }`
+```kotlin
+// with 返回结果
+val description = with(person) {
+    "$name, $age years old";
+}
 ```
 
 ---
 
-## apply
+## apply 函数
 
-**apply 配置对象**
+**基本写法：apply 配置对象**
 `<obj>.apply { <body with this> }`
 ```kotlin
-// 配置对象
-val person = Person("Alice", 25).apply {
-    // this 指向 person，可以省略 this
-    name = "Bob";
-    age = 30;
-};
-println(person);  // Person(name=Bob, age=30)
+// apply 返回原对象，this 指向对象
+val person = Person().apply {
+    name = "Alice";
+    age = 25;
+}
 ```
 
-**apply 配置复杂对象**
-`<builder>.apply { <body> }.build()`
+**基本写法：apply 配置 Builder**
+`<obj>.apply { <body with this> }`
 ```kotlin
-// 配置复杂对象
-val request = HttpRequest.Builder().apply {
-    url = "https://api.example.com";
-    method = "POST";
-    headers["Content-Type"] = "application/json";
-    body = """{"name":"Alice"}""";
-    timeout = 5000;
-}.build();
+// apply 配置 Builder 对象
+val builder = AlertDialog.Builder(context).apply {
+    setTitle("Title");
+    setMessage("Message");
+    setPositiveButton("OK") { _, _ -> };
+}
 ```
 
-**apply 在 Android 中**
-`<view>.apply { <body> }`
+**基本写法：apply 链式调用**
+`<obj>.apply { <body> }.apply { <body> }`
 ```kotlin
-// apply 在 Android 中特别常用
-val textView = TextView(context).apply {
-    text = "Hello";
-    textSize = 16f;
-    setTextColor(Color.BLACK);
-};
+// apply 链式配置
+val list = mutableListOf<String>().apply {
+    add("a");
+    add("b");
+}.apply {
+    add("c");
+}
 ```
 
 ---
 
-## also
+## also 函数
 
-**also 用于日志**
+**基本写法：also 执行附加操作**
 `<obj>.also { <body with it> }`
 ```kotlin
-// also 用于日志
-val numbers = mutableListOf(1, 2, 3)
-    .also { println("原始列表: $it") }
-    .apply { add(4) }
-    .also { println("添加后: $it") }
-    .apply { removeAt(0) }
-    .also { println("删除后: $it") };
+// also 返回原对象，it 指向对象
+val person = Person("Alice", 25).also {
+    println("Created: $it");
+}
 ```
 
-**also 用于验证**
+**基本写法：also 日志记录**
 `<obj>.also { <body with it> }`
 ```kotlin
-// also 用于验证
-val user = User("Alice", 25)
-    .also {
-        require(it.name.isNotEmpty()) { "名字不能为空" };
-        require(it.age >= 0) { "年龄不能为负数" };
-    };
+// also 用于日志记录
+val result = compute().also {
+    println("Computed: $it");
+}
 ```
 
-**also 用于调试**
-`<obj>.also { <body with it> }.let { <body> }`
+**基本写法：also 链式调用**
+`<obj>.also { <body> }.also { <body> }`
 ```kotlin
-// also 用于调试
-val result = computeValue()
-    .also { println("计算结果: $it") }
-    .let { it * 2 }
-    .also { println("翻倍后: $it") };
-```
-
----
-
-## 链式处理
-
-**读取输入、处理、输出**
-`<input>?.let { <body> }?.takeIf { <cond> }?.let { <body> } ?: <default>`
-```kotlin
-// 读取输入、处理、输出
-fun processInput(input: String?): String {
-    return input
-        ?.let { it.trim() }                    // 去除空白
-        ?.takeIf { it.isNotEmpty() }           // 检查非空
-        ?.let { it.uppercase() }               // 转大写
-        ?: "DEFAULT";                           // 默认值
-};
+// also 链式附加操作
+val list = mutableListOf(1, 2, 3).also {
+    println("Initial: $it");
+}.also {
+    it.add(4);
+    println("After add: $it");
+}
 ```
 
 ---
 
-## 构建对象
+## 作用域函数对比
 
-**使用 apply 构建配置对象**
-`fun <name>(): <Type> = <Type>().apply { <body> }`
+**基本写法：let 与 also 对比**
+`<obj>.let { <transform> } // vs <obj>.also { <body> }`
 ```kotlin
-// 使用 apply 构建配置对象
-data class ServerConfig(
-    var host: String = "localhost",
-    var port: Int = 8080,
-    var debug: Boolean = false,
-    var maxConnections: Int = 100
-);
-fun createConfig(): ServerConfig = ServerConfig().apply {
-    host = System.getenv("HOST") ?: "0.0.0.0";
-    port = System.getenv("PORT")?.toInt() ?: 9090;
-    debug = System.getenv("DEBUG") == "true";
-    maxConnections = 200;
-};
+// let 返回 Lambda 结果，also 返回原对象
+val length = "Kotlin".let { it.length };  // 返回 Int
+val str = "Kotlin".also { println(it); };  // 返回 String
+```
+
+**基本写法：apply 与 run 对比**
+`<obj>.apply { <body> } // vs <obj>.run { <body> }`
+```kotlin
+// apply 返回原对象，run 返回 Lambda 结果
+val builder = StringBuilder().apply { append("a"); };  // 返回 StringBuilder
+val text = StringBuilder().run { append("a"); toString(); };  // 返回 String
+```
+
+**基本写法：with 与 run 对比**
+`with(<obj>) { <body> } // vs <obj>.run { <body> }`
+```kotlin
+// with 是非扩展函数，run 是扩展函数
+val result1 = with(StringBuilder()) { toString(); };
+val result2 = StringBuilder().run { toString(); };
 ```
 
 ---
 
-## 空安全链式调用
+## 作用域函数选择
 
-**安全地获取嵌套属性**
-`<obj>?.let { it.<prop>?.<prop2> }`
+**基本写法：let 用于转换**
+`<obj>?.let { <transform> }`
 ```kotlin
-// 安全地获取嵌套属性
-class Company(val address: Address?);
-class Address(val city: String?);
-val company: Company? = getCompany();
-// 不使用 let：多层判空
-val city1: String? = if (company != null && company.address != null) {
-    company.address.city;
-} else null;
-// 使用 let：更简洁
-val city2: String? = company?.let { it.address?.city };
+// let 典型场景：转换可空值
+val length: Int? = nickname?.let { it.length };
+```
+
+**基本写法：run 用于计算**
+`<obj>.run { <body with this> }`
+```kotlin
+// run 典型场景：对象上执行计算
+val isValid = userInput.run {
+    trim().isNotEmpty() && length >= 3;
+}
+```
+
+**基本写法：with 用于多操作**
+`with(<obj>) { <body with this> }`
+```kotlin
+// with 典型场景：对同一对象执行多个操作
+with(person) {
+    name = "Alice";
+    age = 25;
+    email = "alice@example.com";
+}
+```
+
+**基本写法：apply 用于配置**
+`<obj>.apply { <body with this> }`
+```kotlin
+// apply 典型场景：配置对象
+val intent = Intent().apply {
+    action = "ACTION_VIEW";
+    data = Uri.parse("https://example.com");
+}
+```
+
+**基本写法：also 用于附加操作**
+`<obj>.also { <body with it> }`
+```kotlin
+// also 典型场景：附加操作（日志、调试）
+val list = mutableListOf(1, 2, 3).also {
+    println("List created: $it");
+}
 ```
 
 ---
 
-## 自定义作用域函数
+## 作用域函数实战
 
-**类似 let 但可以提供默认值**
-`inline fun <T : Any, R> T?.letOrDefault(<default>, <block>): R`
+**基本写法：let 处理可空值**
+`<obj>?.let { <body with it> } ?: <default>`
 ```kotlin
-// 类似 let 但可以提供默认值
-inline fun <T : Any, R> T?.letOrDefault(default: R, block: (T) -> R): R {
-    return if (this != null) block(this) else default;
-};
-// 使用
-val name: String? = null;
-val length = name.letOrDefault(0) { it.length };
-println(length);  // 0
+// let 处理可空值并提供默认值
+val name = nullableName?.let { it.trim() } ?: "Unknown";
 ```
 
-**类似 apply 但可以条件执行**
-`inline fun <T> T.applyIf(<condition>, <block>): T`
+**基本写法：apply 配置并返回**
+`<obj>.apply { <body with this> }`
 ```kotlin
-// 类似 apply 但可以条件执行
-inline fun <T> T.applyIf(condition: Boolean, block: T.() -> Unit): T {
-    if (condition) block();
-    return this;
-};
-// 使用
-val person = Person("Alice", 25).applyIf(age > 18) {
-    name = name.uppercase();
-};
+// apply 配置对象并返回
+val person = Person().apply {
+    name = "Alice";
+    age = 25;
+    email = "alice@example.com";
+}
+```
+
+**基本写法：also 链式调试**
+`<obj>.also { <body> }.<method>()`
+```kotlin
+// also 链式调试
+val result = listOf(1, 2, 3)
+    .also { println("Original: $it"); }
+    .map { it * 2 }
+    .also { println("Mapped: $it"); }
+    .filter { it > 2 };
+```
+
+**基本写法：run 计算并返回**
+`<obj>.run { <body with this> }`
+```kotlin
+// run 计算并返回结果
+val summary = data.run {
+    val total = sum();
+    val avg = average();
+    "Total: $total, Avg: $avg";
+}
+```
+
+**基本写法：with 多操作返回**
+`val <name> = with(<obj>) { <body with this> }`
+```kotlin
+// with 多操作并返回结果
+val report = with(database) {
+    val count = queryCount();
+    val max = queryMax();
+    "Count: $count, Max: $max";
+}
 ```
 
 ---
 
-## 作用域函数与协程
+## 作用域函数与可空类型
 
-**协程中使用作用域函数**
-`withContext(<dispatcher>) { <body> }.let { <body> }.also { <body> }`
+**基本写法：let 处理可空值**
+`<obj>?.let { <body with it> }`
 ```kotlin
-import kotlinx.coroutines.*;
-fun main() = runBlocking {
-    // 在协程中使用作用域函数
-    val result = withContext(Dispatchers.IO) {
-        // 模拟网络请求
-        delay(100);
-        "Hello";
-    }.let { response ->
-        // 处理响应
-        response.uppercase();
-    }.also {
-        // 记录日志
-        println("处理结果: $it");
-    };
-    println(result);  // HELLO
-};
+// let 安全调用非空值
+nullableValue?.let {
+    println(it);
+}
+```
+
+**基本写法：apply 配置可空对象**
+`<obj>?.apply { <body with this> }`
+```kotlin
+// apply 安全配置可空对象
+nullableBuilder?.apply {
+    append("Hello");
+    append(", Kotlin");
+}
+```
+
+**基本写法：run 处理可空对象**
+`<obj>?.run { <body with this> }`
+```kotlin
+// run 安全执行可空对象
+nullableString?.run {
+    println(length);
+}
+```
+
+**基本写法：also 处理可空对象**
+`<obj>?.also { <body with it> }`
+```kotlin
+// also 安全附加操作
+nullableValue?.also {
+    println("Value: $it");
+}
+```
+
+---
+
+## 作用域函数与集合
+
+**基本写法：let 转换集合**
+`<list>.let { <transform> }`
+```kotlin
+// let 转换集合
+val size = list.let { it.size };
+```
+
+**基本写法：apply 配置集合**
+`<list>.apply { <body with this> }`
+```kotlin
+// apply 配置可变集合
+val list = mutableListOf<Int>().apply {
+    add(1);
+    add(2);
+    add(3);
+}
+```
+
+**基本写法：also 调试集合**
+`<list>.also { <body with it> }`
+```kotlin
+// also 调试集合
+val filtered = list
+    .filter { it > 0 }
+    .also { println("Filtered: $it"); }
+```
+
+**基本写法：run 计算集合**
+`<list>.run { <body with this> }`
+```kotlin
+// run 计算集合
+val result = list.run {
+    filter { it > 0 }.sum();
+}
+```
+
+**基本写法：with 多操作集合**
+`with(<list>) { <body with this> }`
+```kotlin
+// with 对集合执行多个操作
+val info = with(list) {
+    "Size: $size, First: ${firstOrNull()}, Last: ${lastOrNull()}";
+}
 ```

@@ -4,403 +4,538 @@
 
 ---
 
-## 顺序容器
+## vector
 
-**vector：动态数组**
-`std::vector<<Type>> <vec>;`
+**基本写法：创建 vector**
+`std::vector<<type>> <vec>;`
 ```cpp
 #include <vector>
-std::vector<int> v1;                    // 空 vector
-std::vector<int> v2(10);                // 10 个元素，默认值 0
-std::vector<int> v3(10, 5);             // 10 个元素，值为 5
-std::vector<int> v4 = {1, 2, 3, 4, 5};  // 列表初始化
-// 添加元素
-v1.push_back(10);
-v1.emplace_back(20);
-// 访问元素
-std::cout << v4[0] << std::endl;        // 1
-std::cout << v4.at(1) << std::endl;     // 2（带边界检查）
-std::cout << v4.front() << std::endl;   // 1
-std::cout << v4.back() << std::endl;    // 5
-// 大小
-std::cout << v4.size() << std::endl;    // 5
+// 创建整型 vector
+std::vector<int> vec;
 ```
 
 ---
 
-**list：双向链表**
-`std::list<<Type>> <lst>;`
+**初始化写法：列表初始化**
+`std::vector<<type>> <vec> = {<values>};`
+```cpp
+#include <vector>
+// 列表初始化 vector
+std::vector<int> vec = {1, 2, 3, 4, 5};
+```
+
+---
+
+**大小写法：指定大小初始化**
+`std::vector<<type>> <vec>(<size>);`
+```cpp
+#include <vector>
+// 创建包含 10 个 0 的 vector
+std::vector<int> vec(10);
+```
+
+---
+
+**大小填充写法：指定大小和初始值**
+`std::vector<<type>> <vec>(<size>, <value>);`
+```cpp
+#include <vector>
+// 创建包含 10 个 5 的 vector
+std::vector<int> vec(10, 5);
+```
+
+---
+
+**添加写法：添加元素**
+`<vec>.push_back(<value>);`
+```cpp
+#include <vector>
+// 添加元素到末尾
+std::vector<int> vec;
+vec.push_back(10);
+```
+
+---
+
+**原地构造写法：原地构造元素**
+`<vec>.emplace_back(<args>);`
+```cpp
+#include <vector>
+// 原地构造元素
+std::vector<std::string> vec;
+vec.emplace_back("Hello");
+```
+
+---
+
+**访问写法：访问元素**
+`<vec>[<index>]`
+```cpp
+#include <vector>
+// 通过索引访问元素
+std::vector<int> vec = {1, 2, 3};
+std::cout << vec[0] << std::endl;
+```
+
+---
+
+**at 写法：安全访问元素**
+`<vec>.at(<index>)`
+```cpp
+#include <vector>
+// 使用 at 安全访问（会进行边界检查）
+std::vector<int> vec = {1, 2, 3};
+std::cout << vec.at(0) << std::endl;
+```
+
+---
+
+**大小写法：获取元素个数**
+`<vec>.size()`
+```cpp
+#include <vector>
+// 获取 vector 元素个数
+std::vector<int> vec = {1, 2, 3};
+std::cout << vec.size() << std::endl;
+```
+
+---
+
+**删除写法：删除末尾元素**
+`<vec>.pop_back();`
+```cpp
+#include <vector>
+// 删除末尾元素
+std::vector<int> vec = {1, 2, 3};
+vec.pop_back();
+```
+
+---
+
+**清空写法：清空 vector**
+`<vec>.clear();`
+```cpp
+#include <vector>
+// 清空 vector
+std::vector<int> vec = {1, 2, 3};
+vec.clear();
+```
+
+---
+
+## list
+
+**基本写法：创建 list**
+`std::list<<type>> <lst>;`
 ```cpp
 #include <list>
-std::list<int> lst = {1, 2, 3};
-// 头尾操作
-lst.push_front(0);
-lst.push_back(4);
-// 插入与删除
-auto it = lst.begin();
-std::advance(it, 2);
-lst.insert(it, 10);
-lst.remove(10);    // 删除所有值为 10 的元素
-// 大小
-std::cout << lst.size() << std::endl;
+// 创建整型 list
+std::list<int> lst;
 ```
 
 ---
 
-**deque：双端队列**
-`std::deque<<Type>> <dq>;`
+**初始化写法：列表初始化**
+`std::list<<type>> <lst> = {<values>};`
+```cpp
+#include <list>
+// 列表初始化 list
+std::list<int> lst = {1, 2, 3};
+```
+
+---
+
+**添加写法：添加元素到末尾**
+`<lst>.push_back(<value>);`
+```cpp
+#include <list>
+// 添加元素到末尾
+std::list<int> lst;
+lst.push_back(10);
+```
+
+---
+
+**添加写法：添加元素到开头**
+`<lst>.push_front(<value>);`
+```cpp
+#include <list>
+// 添加元素到开头
+std::list<int> lst;
+lst.push_front(10);
+```
+
+---
+
+## deque
+
+**基本写法：创建 deque**
+`std::deque<<type>> <dq>;`
 ```cpp
 #include <deque>
-std::deque<int> dq = {1, 2, 3};
-dq.push_front(0);
-dq.push_back(4);
-// dq: {0, 1, 2, 3, 4}
-dq.pop_front();
-dq.pop_back();
-// dq: {1, 2, 3}
+// 创建整型 deque
+std::deque<int> dq;
 ```
 
 ---
 
-**array：固定大小数组（C++11）**
-`std::array<<Type>, <Size>> <arr>;`
+**添加写法：添加元素到末尾**
+`<dq>.push_back(<value>);`
 ```cpp
-#include <array>
-std::array<int, 5> arr = {1, 2, 3, 4, 5};
-// 访问
-std::cout << arr[0] << std::endl;       // 1
-std::cout << arr.at(1) << std::endl;    // 2
-std::cout << arr.size() << std::endl;   // 5
-// 遍历
-for (const auto& elem : arr) {
-    std::cout << elem << " ";
-}
+#include <deque>
+// 添加元素到末尾
+std::deque<int> dq;
+dq.push_back(10);
 ```
 
 ---
 
-**forward_list：单向链表（C++11）**
-`std::forward_list<<Type>> <flst>;`
+**添加写法：添加元素到开头**
+`<dq>.push_front(<value>);`
 ```cpp
-#include <forward_list>
-std::forward_list<int> flst = {1, 2, 3};
-flst.push_front(0);
-flst.push_front(-1);
-// flst: {-1, 0, 1, 2, 3}
-flst.pop_front();
-// flst: {0, 1, 2, 3}
+#include <deque>
+// 添加元素到开头
+std::deque<int> dq;
+dq.push_front(10);
 ```
 
 ---
 
-## 关联容器
+## map
 
-**map：有序键值对**
-`std::map<<KeyType>, <ValueType>> <m>;`
+**基本写法：创建 map**
+`std::map<<key_type>, <value_type>> <m>;`
 ```cpp
 #include <map>
-std::map<std::string, int> ages;
-// 插入
-ages["Alice"] = 25;
-ages["Bob"] = 30;
-ages.insert({"Charlie", 35});
-// 访问
-std::cout << ages["Alice"] << std::endl;    // 25
-// 查找
-if (ages.find("Bob") != ages.end()) {
-    std::cout << "Found Bob" << std::endl;
-}
-// 遍历
-for (const auto& [name, age] : ages) {
-    std::cout << name << ": " << age << std::endl;
-}
+// 创建 string 到 int 的 map
+std::map<std::string, int> m;
 ```
 
 ---
 
-**set：有序集合**
-`std::set<<Type>> <s>;`
+**初始化写法：列表初始化**
+`std::map<<key_type>, <value_type>> <m> = { {<key>, <value>}, ... };`
 ```cpp
-#include <set>
-std::set<int> s = {3, 1, 4, 1, 5, 9, 2, 6};
-// 自动排序去重
-// s: {1, 2, 3, 4, 5, 6, 9}
-s.insert(7);
-s.erase(4);
-// 查找
-if (s.count(5)) {
-    std::cout << "5 exists" << std::endl;
-}
-// 遍历
-for (int n : s) {
-    std::cout << n << " ";
+#include <map>
+// 列表初始化 map
+std::map<std::string, int> m = {{"apple", 1}, {"banana", 2}};
+```
+
+---
+
+**插入写法：插入键值对**
+`<m>[<key>] = <value>;`
+```cpp
+#include <map>
+// 使用下标插入键值对
+std::map<std::string, int> m;
+m["apple"] = 1;
+```
+
+---
+
+**insert 写法：使用 insert 插入**
+`<m>.insert({<key>, <value>});`
+```cpp
+#include <map>
+// 使用 insert 插入键值对
+std::map<std::string, int> m;
+m.insert({"banana", 2});
+```
+
+---
+
+**访问写法：访问元素**
+`<m>[<key>]`
+```cpp
+#include <map>
+// 通过键访问值
+std::map<std::string, int> m = {{"apple", 1}};
+std::cout << m["apple"] << std::endl;
+```
+
+---
+
+**at 写法：安全访问元素**
+`<m>.at(<key>)`
+```cpp
+#include <map>
+// 使用 at 安全访问（会进行键检查）
+std::map<std::string, int> m = {{"apple", 1}};
+std::cout << m.at("apple") << std::endl;
+```
+
+---
+
+**查找写法：查找元素**
+`auto <it> = <m>.find(<key>);`
+```cpp
+#include <map>
+// 查找键
+std::map<std::string, int> m = {{"apple", 1}};
+auto it = m.find("apple");
+if (it != m.end()) {
+    std::cout << it->second << std::endl;
 }
 ```
 
 ---
 
-**unordered_map：哈希表（C++11）**
-`std::unordered_map<<KeyType>, <ValueType>> <m>;`
+**删除写法：删除元素**
+`<m>.erase(<key>);`
+```cpp
+#include <map>
+// 删除指定键的元素
+std::map<std::string, int> m = {{"apple", 1}};
+m.erase("apple");
+```
+
+---
+
+## unordered_map
+
+**基本写法：创建 unordered_map**
+`std::unordered_map<<key_type>, <value_type>> <m>;`
 ```cpp
 #include <unordered_map>
-std::unordered_map<std::string, int> hash_map;
-hash_map["one"] = 1;
-hash_map["two"] = 2;
-hash_map["three"] = 3;
-// 查找
-auto it = hash_map.find("two");
-if (it != hash_map.end()) {
-    std::cout << it->first << ": " << it->second << std::endl;
-}
+// 创建哈希表
+std::unordered_map<std::string, int> m;
 ```
 
 ---
 
-**unordered_set：哈希集合（C++11）**
-`std::unordered_set<<Type>> <s>;`
+**初始化写法：列表初始化**
+`std::unordered_map<<key_type>, <value_type>> <m> = { {<key>, <value>}, ... };`
 ```cpp
-#include <unordered_set>
-std::unordered_set<int> uset = {3, 1, 4, 1, 5, 9};
-// 自动去重
-// uset: {1, 3, 4, 5, 9}（无序）
-uset.insert(7);
-if (uset.count(4)) {
-    std::cout << "4 exists" << std::endl;
-}
+#include <unordered_map>
+// 列表初始化 unordered_map
+std::unordered_map<std::string, int> m = {{"apple", 1}, {"banana", 2}};
 ```
 
 ---
 
-**multimap 与 multiset：允许重复键**
-`std::multimap<<KeyType>, <ValueType>> <mm>;`
+## set
+
+**基本写法：创建 set**
+`std::set<<type>> <s>;`
 ```cpp
-#include <map>
 #include <set>
-std::multimap<std::string, int> mm;
-mm.insert({"Alice", 90});
-mm.insert({"Alice", 85});
-mm.insert({"Bob", 95});
-// 查找所有 Alice 的记录
-auto range = mm.equal_range("Alice");
-for (auto it = range.first; it != range.second; ++it) {
-    std::cout << it->first << ": " << it->second << std::endl;
+// 创建整型 set
+std::set<int> s;
+```
+
+---
+
+**插入写法：插入元素**
+`<s>.insert(<value>);`
+```cpp
+#include <set>
+// 插入元素
+std::set<int> s;
+s.insert(10);
+```
+
+---
+
+**查找写法：查找元素**
+`auto <it> = <s>.find(<value>);`
+```cpp
+#include <set>
+// 查找元素
+std::set<int> s = {1, 2, 3};
+auto it = s.find(2);
+if (it != s.end()) {
+    std::cout << "Found" << std::endl;
 }
-```
-
----
-
-## 容器适配器
-
-**stack：栈**
-`std::stack<<Type>> <stk>;`
-```cpp
-#include <stack>
-std::stack<int> stk;
-stk.push(1);
-stk.push(2);
-stk.push(3);
-std::cout << stk.top() << std::endl;    // 3
-stk.pop();
-std::cout << stk.top() << std::endl;    // 2
-std::cout << stk.size() << std::endl;   // 2
-```
-
----
-
-**queue：队列**
-`std::queue<<Type>> <q>;`
-```cpp
-#include <queue>
-std::queue<int> q;
-q.push(1);
-q.push(2);
-q.push(3);
-std::cout << q.front() << std::endl;    // 1
-std::cout << q.back() << std::endl;     // 3
-q.pop();
-std::cout << q.front() << std::endl;    // 2
-```
-
----
-
-**priority_queue：优先队列**
-`std::priority_queue<<Type>> <pq>;`
-```cpp
-#include <queue>
-// 默认最大堆
-std::priority_queue<int> pq;
-pq.push(3);
-pq.push(1);
-pq.push(4);
-pq.push(1);
-pq.push(5);
-std::cout << pq.top() << std::endl;    // 5（最大值）
-pq.pop();
-std::cout << pq.top() << std::endl;    // 4
-// 最小堆
-std::priority_queue<int, std::vector<int>, std::greater<int>> min_pq;
-min_pq.push(3);
-min_pq.push(1);
-min_pq.push(4);
-std::cout << min_pq.top() << std::endl;    // 1（最小值）
 ```
 
 ---
 
 ## 迭代器
 
-**迭代器类型**
-`<container>::iterator | <container>::const_iterator | <container>::reverse_iterator`
+**begin 写法：获取起始迭代器**
+`<container>.begin()`
 ```cpp
-std::vector<int> v = {1, 2, 3, 4, 5};
-// 正向迭代器
-for (std::vector<int>::iterator it = v.begin(); it != v.end(); ++it) {
-    std::cout << *it << " ";
+#include <vector>
+// 获取起始迭代器
+std::vector<int> vec = {1, 2, 3};
+auto it = vec.begin();
+```
+
+---
+
+**end 写法：获取结束迭代器**
+`<container>.end()`
+```cpp
+#include <vector>
+// 获取结束迭代器
+std::vector<int> vec = {1, 2, 3};
+auto it = vec.end();
+```
+
+---
+
+**迭代器遍历写法：使用迭代器遍历**
+`for (auto it = <container>.begin(); it != <container>.end(); ++it) { ... }`
+```cpp
+#include <vector>
+// 使用迭代器遍历
+std::vector<int> vec = {1, 2, 3};
+for (auto it = vec.begin(); it != vec.end(); ++it) {
+    std::cout << *it << std::endl;
 }
-// const 迭代器
-for (std::vector<int>::const_iterator it = v.cbegin(); it != v.cend(); ++it) {
-    std::cout << *it << " ";
+```
+
+---
+
+**范围 for 写法：使用范围 for 循环**
+`for (const auto& <item> : <container>) { ... }`
+```cpp
+#include <vector>
+// 使用范围 for 循环遍历
+std::vector<int> vec = {1, 2, 3};
+for (const auto& item : vec) {
+    std::cout << item << std::endl;
 }
-// 反向迭代器
-for (std::vector<int>::reverse_iterator it = v.rbegin(); it != v.rend(); ++it) {
-    std::cout << *it << " ";    // 5 4 3 2 1
+```
+
+---
+
+**反向迭代器写法：反向遍历**
+`for (auto it = <container>.rbegin(); it != <container>.rend(); ++it) { ... }`
+```cpp
+#include <vector>
+// 反向遍历
+std::vector<int> vec = {1, 2, 3};
+for (auto it = vec.rbegin(); it != vec.rend(); ++it) {
+    std::cout << *it << std::endl;
 }
-```
-
----
-
-**迭代器辅助函数**
-`std::advance(<it>, <n>) | std::distance(<first>, <last>) | std::next(<it>[, <n>]) | std::prev(<it>[, <n>])`
-```cpp
-#include <iterator>
-std::vector<int> v = {1, 2, 3, 4, 5};
-auto it = v.begin();
-// 前进
-std::advance(it, 2);
-std::cout << *it << std::endl;    // 3
-// 距离
-auto it2 = v.begin();
-std::cout << std::distance(it2, it) << std::endl;    // 2
-// next/prev
-auto next_it = std::next(it);    // 指向 4
-auto prev_it = std::prev(it);   // 指向 2
-```
-
----
-
-**插入迭代器**
-`std::back_inserter(<container>) | std::front_inserter(<container>) | std::inserter(<container>, <it>)`
-```cpp
-#include <iterator>
-std::vector<int> src = {1, 2, 3};
-std::vector<int> dest;
-// back_inserter：在末尾插入
-std::copy(src.begin(), src.end(), std::back_inserter(dest));
-// dest: {1, 2, 3}
-std::list<int> lst;
-// front_inserter：在开头插入
-std::copy(src.begin(), src.end(), std::front_inserter(lst));
-// lst: {3, 2, 1}
-```
-
----
-
-## 容器通用操作
-
-**大小与容量**
-`<c>.size() | <c>.empty() | <c>.clear()`
-```cpp
-std::vector<int> v = {1, 2, 3};
-std::cout << v.size() << std::endl;    // 3
-std::cout << v.empty() << std::endl;   // false
-v.clear();
-std::cout << v.empty() << std::endl;   // true
-```
-
----
-
-**交换**
-`<c1>.swap(<c2>)`
-```cpp
-std::vector<int> v1 = {1, 2, 3};
-std::vector<int> v2 = {4, 5, 6};
-v1.swap(v2);
-// v1: {4, 5, 6}, v2: {1, 2, 3}
 ```
 
 ---
 
 ## 算法
 
-**排序算法**
-`std::sort(<begin>, <end>[, <comp>])`
+**sort 写法：排序**
+`std::sort(<begin>, <end>);`
 ```cpp
 #include <algorithm>
-std::vector<int> v = {5, 2, 8, 1, 9, 3};
-// 升序
-std::sort(v.begin(), v.end());
-// 降序
-std::sort(v.begin(), v.end(), std::greater<int>());
-// 自定义比较
-std::sort(v.begin(), v.end(), [](int a, int b) {
-    return a % 10 < b % 10;    // 按个位数排序
-});
+#include <vector>
+// 对 vector 排序
+std::vector<int> vec = {3, 1, 4, 1, 5};
+std::sort(vec.begin(), vec.end());
 ```
 
 ---
 
-**查找算法**
-`std::find(<begin>, <end>, <value>) | std::find_if(<begin>, <end>, <pred>)`
+**find 写法：查找元素**
+`std::find(<begin>, <end>, <value>);`
 ```cpp
-std::vector<int> v = {1, 2, 3, 4, 5};
-// 查找值
-auto it = std::find(v.begin(), v.end(), 3);
-if (it != v.end()) {
-    std::cout << "Found at: " << std::distance(v.begin(), it) << std::endl;
-}
-// 条件查找
-auto it2 = std::find_if(v.begin(), v.end(), [](int n) { return n > 3; });
+#include <algorithm>
+#include <vector>
+// 查找元素
+std::vector<int> vec = {1, 2, 3};
+auto it = std::find(vec.begin(), vec.end(), 2);
 ```
 
 ---
 
-**计数与累加**
-`std::count(<begin>, <end>, <value>) | std::accumulate(<begin>, <end>, <init>)`
+**count 写法：统计元素个数**
+`std::count(<begin>, <end>, <value>);`
+```cpp
+#include <algorithm>
+#include <vector>
+// 统计元素个数
+std::vector<int> vec = {1, 2, 3, 2, 2};
+int count = std::count(vec.begin(), vec.end(), 2);
+```
+
+---
+
+**accumulate 写法：求和**
+`std::accumulate(<begin>, <end>, <init>);`
 ```cpp
 #include <numeric>
-std::vector<int> v = {1, 2, 3, 4, 5};
-// 计数
-int count = std::count(v.begin(), v.end(), 3);    // 1
-// 累加
-int sum = std::accumulate(v.begin(), v.end(), 0);    // 15
+#include <vector>
+// 计算元素总和
+std::vector<int> vec = {1, 2, 3, 4, 5};
+int sum = std::accumulate(vec.begin(), vec.end(), 0);
 ```
 
 ---
 
-**复制与转换**
-`std::copy(<begin>, <end>, <out>) | std::transform(<begin>, <end>, <out>, <func>)`
+**for_each 写法：遍历处理**
+`std::for_each(<begin>, <end>, <func>);`
 ```cpp
-std::vector<int> src = {1, 2, 3, 4, 5};
-std::vector<int> dest(src.size());
-// 复制
-std::copy(src.begin(), src.end(), dest.begin());
-// 转换
-std::transform(src.begin(), src.end(), dest.begin(), [](int n) {
-    return n * n;    // 平方
+#include <algorithm>
+#include <vector>
+// 遍历处理每个元素
+std::vector<int> vec = {1, 2, 3};
+std::for_each(vec.begin(), vec.end(), [](int x) {
+    std::cout << x << std::endl;
 });
-// dest: {1, 4, 9, 16, 25}
 ```
 
 ---
 
-**删除元素**
-`std::remove(<begin>, <end>, <value>) | std::remove_if(<begin>, <end>, <pred>)`
+**transform 写法：转换元素**
+`std::transform(<begin>, <end>, <dest>, <func>);`
 ```cpp
-std::vector<int> v = {1, 2, 3, 4, 5, 3};
-// 删除所有值为 3 的元素
-auto new_end = std::remove(v.begin(), v.end(), 3);
-v.erase(new_end, v.end());
-// v: {1, 2, 4, 5}
-// 条件删除
-v.erase(std::remove_if(v.begin(), v.end(), [](int n) { return n % 2 == 0; }), v.end());
+#include <algorithm>
+#include <vector>
+// 转换元素
+std::vector<int> src = {1, 2, 3};
+std::vector<int> dest(3);
+std::transform(src.begin(), src.end(), dest.begin(), [](int x) {
+    return x * 2;
+});
+```
+
+---
+
+**copy 写法：复制元素**
+`std::copy(<begin>, <end>, <dest>);`
+```cpp
+#include <algorithm>
+#include <vector>
+// 复制元素
+std::vector<int> src = {1, 2, 3};
+std::vector<int> dest(3);
+std::copy(src.begin(), src.end(), dest.begin());
+```
+
+---
+
+**remove 写法：删除元素**
+`<container>.erase(std::remove(<begin>, <end>, <value>), <end>);`
+```cpp
+#include <algorithm>
+#include <vector>
+// 删除所有值为 2 的元素
+std::vector<int> vec = {1, 2, 3, 2, 4};
+vec.erase(std::remove(vec.begin(), vec.end(), 2), vec.end());
+```
+
+---
+
+**lower_bound 写法：二分查找下界**
+`std::lower_bound(<begin>, <end>, <value>);`
+```cpp
+#include <algorithm>
+#include <vector>
+// 二分查找下界
+std::vector<int> vec = {1, 2, 3, 4, 5};
+auto it = std::lower_bound(vec.begin(), vec.end(), 3);
+```
+
+---
+
+**upper_bound 写法：二分查找上界**
+`std::upper_bound(<begin>, <end>, <value>);`
+```cpp
+#include <algorithm>
+#include <vector>
+// 二分查找上界
+std::vector<int> vec = {1, 2, 3, 4, 5};
+auto it = std::upper_bound(vec.begin(), vec.end(), 3);
 ```

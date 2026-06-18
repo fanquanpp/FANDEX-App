@@ -6,89 +6,153 @@
 
 ## 文件流基础
 
-**文件写入**
-`std::ofstream <out>("<filename>"); <out> << <data>;`
+**包含头文件写法**
+`#include <fstream>`
+```cpp
+// 包含文件流头文件
+#include <fstream>
+```
+
+---
+
+## 文件打开与关闭
+
+**输出流写法：打开输出文件流**
+`std::ofstream <ofs>("<filename>");`
 ```cpp
 #include <fstream>
-std::ofstream outfile("example.txt");
-if (outfile.is_open()) {
-    outfile << "Hello, File!" << std::endl;
-    outfile << "Number: " << 42 << std::endl;
-    outfile.close();
-}
+// 打开输出文件流
+std::ofstream ofs("output.txt");
 ```
 
 ---
 
-**文件读取**
-`std::ifstream <in>("<filename>"); while (std::getline(<in>, <line>)) { ... }`
-```cpp
-std::ifstream infile("example.txt");
-if (infile.is_open()) {
-    std::string line;
-    while (std::getline(infile, line)) {
-        std::cout << line << std::endl;
-    }
-    infile.close();
-}
-```
-
----
-
-**文件读写**
-`std::fstream <fs>("<filename>", <mode>);`
+**输入流写法：打开输入文件流**
+`std::ifstream <ifs>("<filename>");`
 ```cpp
 #include <fstream>
-std::fstream file("data.txt", std::ios::in | std::ios::out | std::ios::app);
-if (file.is_open()) {
-    file << "Append this line" << std::endl;
-    file.seekg(0);    // 移动到文件开头
-    std::string line;
-    while (std::getline(file, line)) {
-        std::cout << line << std::endl;
-    }
-    file.close();
-}
+// 打开输入文件流
+std::ifstream ifs("input.txt");
 ```
 
 ---
 
-## 文件打开模式
-
-**打开模式标志**
-`std::ios::<in|out|app|ate|trunc|binary>`
+**打开模式写法：指定打开模式**
+`std::ofstream <ofs>("<filename>", <mode>);`
 ```cpp
-std::ios::in       // 读模式
-std::ios::out      // 写模式
-std::ios::app      // 追加模式
-std::ios::ate      // 打开后定位到末尾
-std::ios::trunc    // 截断文件
-std::ios::binary   // 二进制模式
-// 组合使用
-std::ofstream f1("file.txt", std::ios::out | std::ios::app);
-std::ifstream f2("file.bin", std::ios::in | std::ios::binary);
+#include <fstream>
+// 以追加模式打开文件
+std::ofstream ofs("log.txt", std::ios::app);
 ```
 
 ---
 
-## 文件状态检查
-
-**状态检查函数**
-`<fs>.is_open() | <fs>.good() | <fs>.eof() | <fs>.fail() | <fs>.bad()`
+**检查写法：检查文件是否打开成功**
+`if (!<stream>) { ... }` 或 `if (<stream>.is_open()) { ... }`
 ```cpp
-std::ifstream file("data.txt");
-if (!file.is_open()) {
+// 检查文件是否成功打开
+std::ifstream ifs("data.txt");
+if (!ifs) {
     std::cerr << "Failed to open file" << std::endl;
-    return;
 }
-while (!file.eof()) {
-    std::string line;
-    if (std::getline(file, line)) {
-        std::cout << line << std::endl;
-    }
+```
+
+---
+
+**关闭写法：关闭文件流**
+`<stream>.close();`
+```cpp
+// 关闭文件流
+ofs.close();
+```
+
+---
+
+## 写入文件
+
+**基本写法：使用 << 写入**
+`<ofs> << <value>;`
+```cpp
+// 使用 << 写入数据
+std::ofstream ofs("output.txt");
+ofs << "Hello World" << std::endl;
+ofs << 42 << std::endl;
+```
+
+---
+
+**write 写法：二进制写入**
+`<ofs>.write(<buffer>, <size>);`
+```cpp
+// 二进制写入
+std::ofstream ofs("data.bin", std::ios::binary);
+int data = 42;
+ofs.write(reinterpret_cast<const char*>(&data), sizeof(data));
+```
+
+---
+
+## 读取文件
+
+**基本写法：使用 >> 读取**
+`<ifs> >> <var>;`
+```cpp
+// 使用 >> 读取数据
+std::ifstream ifs("input.txt");
+int value;
+ifs >> value;
+```
+
+---
+
+**getline 写法：读取一行**
+`std::getline(<ifs>, <line>);`
+```cpp
+#include <string>
+// 读取一行
+std::ifstream ifs("input.txt");
+std::string line;
+std::getline(ifs, line);
+```
+
+---
+
+**read 写法：二进制读取**
+`<ifs>.read(<buffer>, <size>);`
+```cpp
+// 二进制读取
+std::ifstream ifs("data.bin", std::ios::binary);
+int data;
+ifs.read(reinterpret_cast<char*>(&data), sizeof(data));
+```
+
+---
+
+## 遍历文件
+
+**按行遍历写法：逐行读取文件**
+`while (std::getline(<ifs>, <line>)) { ... }`
+```cpp
+#include <fstream>
+#include <string>
+// 逐行读取文件
+std::ifstream ifs("input.txt");
+std::string line;
+while (std::getline(ifs, line)) {
+    std::cout << line << std::endl;
 }
-if (file.fail() && !file.eof()) {
-    std::cerr << "Read error occurred" << std::endl;
+```
+
+---
+
+**按字符遍历写法：逐字符读取**
+`while (<ifs>.get(<ch>)) { ... }`
+```cpp
+// 逐字符读取文件
+std::ifstream ifs("input.txt");
+char ch;
+while (ifs.get(ch)) {
+    std::cout << ch;
 }
 ```
 
@@ -96,150 +160,277 @@ if (file.fail() && !file.eof()) {
 
 ## 文件定位
 
-**seekg 与 seekp**
-`<fs>.seekg(<pos>, <origin>) | <fs>.seekp(<pos>, <origin>)`
+**seekg 写法：设置读取位置**
+`<ifs>.seekg(<offset>, <origin>);`
 ```cpp
-std::fstream file("data.txt", std::ios::in | std::ios::out);
-// seekg：设置读取位置
-file.seekg(0, std::ios::beg);    // 文件开头
-file.seekg(0, std::ios::end);    // 文件末尾
-file.seekg(10, std::ios::cur);   // 当前位置 +10
-// seekp：设置写入位置
-file.seekp(0, std::ios::beg);    // 文件开头
-// tellg：获取读取位置
-std::streampos pos = file.tellg();
-// tellp：获取写入位置
-std::streampos wpos = file.tellp();
+// 设置读取位置到文件开头
+ifs.seekg(0, std::ios::beg);
 ```
 
 ---
 
-## 二进制文件读写
-
-**二进制写入**
-`<out>.write(reinterpret_cast<const char*>(<ptr>), <size>)`
+**tellg 写法：获取读取位置**
+`std::streampos <pos> = <ifs>.tellg();`
 ```cpp
-struct Record {
-    int id;
-    char name[20];
-    double score;
-};
-std::ofstream out("records.bin", std::ios::binary);
-Record r = {1, "Alice", 95.5};
-out.write(reinterpret_cast<const char*>(&r), sizeof(Record));
-out.close();
+// 获取当前读取位置
+std::streampos pos = ifs.tellg();
 ```
 
 ---
 
-**二进制读取**
-`<in>.read(reinterpret_cast<char*>(<ptr>), <size>)`
+**seekp 写法：设置写入位置**
+`<ofs>.seekp(<offset>, <origin>);`
 ```cpp
-std::ifstream in("records.bin", std::ios::binary);
-Record r;
-in.read(reinterpret_cast<char*>(&r), sizeof(Record));
-std::cout << r.id << " " << r.name << " " << r.score << std::endl;
-in.close();
+// 设置写入位置到文件末尾
+ofs.seekp(0, std::ios::end);
 ```
 
 ---
 
-## 文件系统（C++17）
+## 文件状态检查
 
-**路径操作**
-`std::filesystem::path <p> = "<path>";`
+**eof 写法：检查文件结束**
+`<ifs>.eof()`
 ```cpp
-#include <filesystem>
-namespace fs = std::filesystem;
-// 创建路径对象
-fs::path p = "dir/subdir/file.txt";
-// 路径组件
-std::cout << p.parent_path() << std::endl;    // "dir/subdir"
-std::cout << p.filename() << std::endl;        // "file.txt"
-std::cout << p.stem() << std::endl;            // "file"
-std::cout << p.extension() << std::endl;       // ".txt"
-// 路径拼接
-fs::path dir = "mydir";
-fs::path file = dir / "file.txt";    // "mydir/file.txt"
-```
-
----
-
-**目录操作**
-`fs::create_directory(<path>) | fs::remove(<path>) | fs::exists(<path>)`
-```cpp
-namespace fs = std::filesystem;
-// 创建目录
-fs::create_directory("mydir");
-fs::create_directories("a/b/c");    // 递归创建
-// 检查是否存在
-if (fs::exists("mydir")) {
-    std::cout << "Directory exists" << std::endl;
-}
-// 删除文件或空目录
-fs::remove("file.txt");
-fs::remove_all("mydir");    // 递归删除
-// 重命名
-fs::rename("old.txt", "new.txt");
-// 复制
-fs::copy("source.txt", "dest.txt");
-fs::copy("src_dir", "dest_dir", fs::copy_options::recursive);
-```
-
----
-
-**遍历目录**
-`for (const auto& entry : fs::directory_iterator(<path>)) { ... }`
-```cpp
-namespace fs = std::filesystem;
-// 遍历目录
-for (const auto& entry : fs::directory_iterator(".")) {
-    std::cout << entry.path() << std::endl;
-}
-// 递归遍历
-for (const auto& entry : fs::recursive_directory_iterator(".")) {
-    if (fs::is_regular_file(entry)) {
-        std::cout << entry.path() << " (" << fs::file_size(entry) << " bytes)" << std::endl;
-    }
+// 检查是否到达文件末尾
+if (ifs.eof()) {
+    std::cout << "End of file" << std::endl;
 }
 ```
 
 ---
 
-**文件信息**
-`fs::file_size(<path>) | fs::is_regular_file(<path>) | fs::is_directory(<path>)`
+**fail 写法：检查文件错误**
+`<ifs>.fail()`
 ```cpp
-namespace fs = std::filesystem;
-fs::path p = "example.txt";
-if (fs::exists(p)) {
-    std::cout << "Size: " << fs::file_size(p) << " bytes" << std::endl;
-    std::cout << "Is file: " << fs::is_regular_file(p) << std::endl;
-    std::cout << "Is dir: " << fs::is_directory(p) << std::endl;
-    // 获取最后修改时间
-    auto ftime = fs::last_write_time(p);
-    auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
-        ftime - fs::file_time_type::clock::now() + std::chrono::system_clock::now());
-    std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
-    std::cout << "Modified: " << std::ctime(&cftime);
+// 检查文件操作是否失败
+if (ifs.fail()) {
+    std::cerr << "File operation failed" << std::endl;
 }
+```
+
+---
+
+**clear 写法：清除错误状态**
+`<ifs>.clear();`
+```cpp
+// 清除文件错误状态
+ifs.clear();
 ```
 
 ---
 
 ## 字符串流
 
-**字符串流操作**
-`std::stringstream <ss>; <ss> << <data>; std::string <str> = <ss>.str();`
+**istringstream 写法：字符串输入流**
+`std::istringstream <iss>(<str>);`
 ```cpp
 #include <sstream>
-// 输出字符串流
+// 从字符串读取
+std::string str = "10 20 30";
+std::istringstream iss(str);
+int a, b, c;
+iss >> a >> b >> c;
+```
+
+---
+
+**ostringstream 写法：字符串输出流**
+`std::ostringstream <oss>;`
+```cpp
+#include <sstream>
+// 写入到字符串
 std::ostringstream oss;
-oss << "Name: " << "Alice" << ", Age: " << 25;
+oss << "Value: " << 42;
 std::string result = oss.str();
-// 输入字符串流
-std::istringstream iss("10 3.14 hello");
-int i;
-double d;
-std::string s;
-iss >> i >> d >> s;
+```
+
+---
+
+**stringstream 写法：双向字符串流**
+`std::stringstream <ss>;`
+```cpp
+#include <sstream>
+// 双向字符串流
+std::stringstream ss;
+ss << "Hello";
+std::string result;
+ss >> result;
+```
+
+---
+
+## 文件系统（C++17）
+
+**包含头文件写法**
+`#include <filesystem>`
+```cpp
+// 包含文件系统头文件
+#include <filesystem>
+namespace fs = std::filesystem;
+```
+
+---
+
+**创建目录写法**
+`fs::create_directory(<path>);`
+```cpp
+#include <filesystem>
+// 创建目录
+fs::create_directory("mydir");
+```
+
+---
+
+**创建多级目录写法**
+`fs::create_directories(<path>);`
+```cpp
+#include <filesystem>
+// 创建多级目录
+fs::create_directories("a/b/c");
+```
+
+---
+
+**删除文件写法**
+`fs::remove(<path>);`
+```cpp
+#include <filesystem>
+// 删除文件
+fs::remove("file.txt");
+```
+
+---
+
+**删除目录写法**
+`fs::remove_all(<path>);`
+```cpp
+#include <filesystem>
+// 递归删除目录
+fs::remove_all("mydir");
+```
+
+---
+
+**检查文件存在写法**
+`fs::exists(<path>)`
+```cpp
+#include <filesystem>
+// 检查文件是否存在
+if (fs::exists("file.txt")) {
+    std::cout << "File exists" << std::endl;
+}
+```
+
+---
+
+**复制文件写法**
+`fs::copy(<src>, <dest>);`
+```cpp
+#include <filesystem>
+// 复制文件
+fs::copy("src.txt", "dest.txt");
+```
+
+---
+
+**重命名文件写法**
+`fs::rename(<old>, <new>);`
+```cpp
+#include <filesystem>
+// 重命名文件
+fs::rename("old.txt", "new.txt");
+```
+
+---
+
+**获取文件大小写法**
+`fs::file_size(<path>)`
+```cpp
+#include <filesystem>
+// 获取文件大小
+std::uintmax_t size = fs::file_size("file.txt");
+```
+
+---
+
+## 目录遍历
+
+**基本写法：遍历目录**
+`for (const auto& <entry> : fs::directory_iterator(<path>)) { ... }`
+```cpp
+#include <filesystem>
+// 遍历目录
+for (const auto& entry : fs::directory_iterator(".")) {
+    std::cout << entry.path() << std::endl;
+}
+```
+
+---
+
+**递归遍历写法：递归遍历目录**
+`for (const auto& <entry> : fs::recursive_directory_iterator(<path>)) { ... }`
+```cpp
+#include <filesystem>
+// 递归遍历目录
+for (const auto& entry : fs::recursive_directory_iterator(".")) {
+    std::cout << entry.path() << std::endl;
+}
+```
+
+---
+
+## 路径操作
+
+**基本写法：创建路径对象**
+`fs::path <p>("<path>");`
+```cpp
+#include <filesystem>
+// 创建路径对象
+fs::path p("dir/file.txt");
+```
+
+---
+
+**拼接写法：路径拼接**
+`<p> / "<subpath>"`
+```cpp
+#include <filesystem>
+// 使用 / 运算符拼接路径
+fs::path p = "dir";
+p /= "subdir";
+p /= "file.txt";
+```
+
+---
+
+**获取文件名写法**
+`<path>.filename()`
+```cpp
+#include <filesystem>
+// 获取文件名
+fs::path p("dir/file.txt");
+std::cout << p.filename() << std::endl;
+```
+
+---
+
+**获取扩展名写法**
+`<path>.extension()`
+```cpp
+#include <filesystem>
+// 获取文件扩展名
+fs::path p("file.txt");
+std::cout << p.extension() << std::endl;
+```
+
+---
+
+**获取父路径写法**
+`<path>.parent_path()`
+```cpp
+#include <filesystem>
+// 获取父路径
+fs::path p("dir/file.txt");
+std::cout << p.parent_path() << std::endl;
 ```

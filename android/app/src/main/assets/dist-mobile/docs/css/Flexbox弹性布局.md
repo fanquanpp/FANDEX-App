@@ -4,399 +4,585 @@
 
 ---
 
-## 弹性容器创建
+## 容器属性
 
-**块级弹性容器**：创建块级 flex 容器
+**基本写法：flex 容器**
 `display: flex;`
 ```css
-/* 块级弹性容器 */
-.flex-container {
+/* 设置为弹性容器 */
+.container {
   display: flex;
 }
 ```
 
 ---
 
-**内联弹性容器**：创建内联 flex 容器
+**基本写法：inline-flex 行内容器**
 `display: inline-flex;`
 ```css
-/* 内联弹性容器 */
-.inline-flex-container {
+/* 设置为行内弹性容器 */
+.badge {
   display: inline-flex;
 }
 ```
 
 ---
 
-## 容器属性
-
-**flex-direction**：定义主轴方向
-`flex-direction: row | row-reverse | column | column-reverse;`
+**基本写法：flex-direction 行方向**
+`flex-direction: row;`
 ```css
-/* 水平方向（默认） */
-.container { display: flex; flex-direction: row; }
-
-/* 垂直方向 */
-.container { display: flex; flex-direction: column; }
-
-/* 水平反向 */
-.container { display: flex; flex-direction: row-reverse; }
-
-/* 垂直反向 */
-.container { display: flex; flex-direction: column-reverse; }
+/* 主轴为水平方向 */
+.container {
+  flex-direction: row;
+}
 ```
 
 ---
 
-**justify-content**：主轴对齐方式
-`justify-content: flex-start | flex-end | center | space-between | space-around | space-evenly;`
+**基本写法：flex-direction 列方向**
+`flex-direction: column;`
+```css
+/* 主轴为垂直方向 */
+.container {
+  flex-direction: column;
+}
+```
+
+---
+
+**基本写法：flex-direction 反向行**
+`flex-direction: row-reverse;`
+```css
+/* 主轴为水平反向 */
+.container {
+  flex-direction: row-reverse;
+}
+```
+
+---
+
+**基本写法：flex-direction 反向列**
+`flex-direction: column-reverse;`
+```css
+/* 主轴为垂直反向 */
+.container {
+  flex-direction: column-reverse;
+}
+```
+
+---
+
+**基本写法：flex-wrap 不换行**
+`flex-wrap: nowrap;`
+```css
+/* 子元素不换行 */
+.container {
+  flex-wrap: nowrap;
+}
+```
+
+---
+
+**基本写法：flex-wrap 换行**
+`flex-wrap: wrap;`
+```css
+/* 子元素自动换行 */
+.container {
+  flex-wrap: wrap;
+}
+```
+
+---
+
+**基本写法：flex-wrap 反向换行**
+`flex-wrap: wrap-reverse;`
+```css
+/* 子元素反向换行 */
+.container {
+  flex-wrap: wrap-reverse;
+}
+```
+
+---
+
+**基本写法：flex-flow 简写**
+`flex-flow: <方向> <换行>;`
+```css
+/* 同时设置方向和换行 */
+.container {
+  flex-flow: row wrap;
+}
+```
+
+---
+
+**基本写法：justify-content 主轴起始**
+`justify-content: flex-start;`
 ```css
 /* 主轴起始对齐 */
-.container { display: flex; justify-content: flex-start; }
-
-/* 主轴居中对齐 */
-.container { display: flex; justify-content: center; }
-
-/* 项目均匀分布，两端对齐 */
-.container { display: flex; justify-content: space-between; }
-
-/* 项目均匀分布，两端有间距 */
-.container { display: flex; justify-content: space-around; }
-
-/* 项目均匀分布，两端和中间间距相等 */
-.container { display: flex; justify-content: space-evenly; }
-```
-
----
-
-**align-items**：侧轴对齐方式
-`align-items: stretch | flex-start | flex-end | center | baseline;`
-```css
-/* 侧轴拉伸对齐（默认） */
-.container { display: flex; align-items: stretch; }
-
-/* 侧轴起始对齐 */
-.container { display: flex; align-items: flex-start; }
-
-/* 侧轴居中对齐 */
-.container { display: flex; align-items: center; }
-
-/* 侧轴结束对齐 */
-.container { display: flex; align-items: flex-end; }
-
-/* 基线对齐 */
-.container { display: flex; align-items: baseline; }
-```
-
----
-
-**flex-wrap**：是否换行
-`flex-wrap: nowrap | wrap | wrap-reverse;`
-```css
-/* 不换行（默认） */
-.container { display: flex; flex-wrap: nowrap; }
-
-/* 换行 */
-.container { display: flex; flex-wrap: wrap; }
-
-/* 反向换行 */
-.container { display: flex; flex-wrap: wrap-reverse; }
-```
-
----
-
-**flex-flow**：flex-direction 和 flex-wrap 的复合属性
-`flex-flow: <direction> <wrap>;`
-```css
-/* 水平方向，不换行（默认） */
-.container { display: flex; flex-flow: row nowrap; }
-
-/* 垂直方向，换行 */
-.container { display: flex; flex-flow: column wrap; }
-```
-
----
-
-**align-content**：多行侧轴对齐方式
-`align-content: stretch | flex-start | flex-end | center | space-between | space-around;`
-```css
-/* 多行拉伸对齐（默认） */
-.container { display: flex; flex-wrap: wrap; align-content: stretch; }
-
-/* 多行居中对齐 */
-.container { display: flex; flex-wrap: wrap; align-content: center; }
-
-/* 多行均匀分布 */
-.container { display: flex; flex-wrap: wrap; align-content: space-between; }
-```
-
----
-
-**gap**：项目间距
-`gap: <行间距> <列间距>;`
-```css
-/* 统一间距 */
 .container {
+  justify-content: flex-start;
+}
+```
+
+---
+
+**基本写法：justify-content 主轴居中**
+`justify-content: center;`
+```css
+/* 主轴居中对齐 */
+.container {
+  justify-content: center;
+}
+```
+
+---
+
+**基本写法：justify-content 主轴末尾**
+`justify-content: flex-end;`
+```css
+/* 主轴末尾对齐 */
+.container {
+  justify-content: flex-end;
+}
+```
+
+---
+
+**基本写法：justify-content 两端对齐**
+`justify-content: space-between;`
+```css
+/* 两端对齐，间距相等 */
+.container {
+  justify-content: space-between;
+}
+```
+
+---
+
+**基本写法：justify-content 均匀分布**
+`justify-content: space-evenly;`
+```css
+/* 均匀分布，间距相同 */
+.container {
+  justify-content: space-evenly;
+}
+```
+
+---
+
+**基本写法：justify-content 环绕分布**
+`justify-content: space-around;`
+```css
+/* 环绕分布，两端间距为中间一半 */
+.container {
+  justify-content: space-around;
+}
+```
+
+---
+
+**基本写法：align-items 交叉轴起始**
+`align-items: flex-start;`
+```css
+/* 交叉轴起始对齐 */
+.container {
+  align-items: flex-start;
+}
+```
+
+---
+
+**基本写法：align-items 交叉轴居中**
+`align-items: center;`
+```css
+/* 交叉轴居中对齐 */
+.container {
+  align-items: center;
+}
+```
+
+---
+
+**基本写法：align-items 交叉轴末尾**
+`align-items: flex-end;`
+```css
+/* 交叉轴末尾对齐 */
+.container {
+  align-items: flex-end;
+}
+```
+
+---
+
+**基本写法：align-items 拉伸**
+`align-items: stretch;`
+```css
+/* 子元素拉伸填满交叉轴 */
+.container {
+  align-items: stretch;
+}
+```
+
+---
+
+**基本写法：align-items 基线对齐**
+`align-items: baseline;`
+```css
+/* 基线对齐 */
+.container {
+  align-items: baseline;
+}
+```
+
+---
+
+**基本写法：align-content 多行起始**
+`align-content: flex-start;`
+```css
+/* 多行时交叉轴起始对齐 */
+.container {
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+```
+
+---
+
+**基本写法：align-content 多行居中**
+`align-content: center;`
+```css
+/* 多行时交叉轴居中对齐 */
+.container {
+  flex-wrap: wrap;
+  align-content: center;
+}
+```
+
+---
+
+**基本写法：align-content 多行两端对齐**
+`align-content: space-between;`
+```css
+/* 多行时两端对齐 */
+.container {
+  flex-wrap: wrap;
+  align-content: space-between;
+}
+```
+
+---
+
+**基本写法：gap 间距**
+`gap: <值>;`
+```css
+/* 设置子元素间距 */
+.grid {
   display: flex;
   gap: 20px;
 }
+```
 
-/* 不同行列间距 */
-.container {
-  display: flex;
-  gap: 10px 20px;
+---
+
+**基本写法：gap 双值**
+`gap: <行间距> <列间距>;`
+```css
+/* 分别设置行列间距 */
+.grid {
+  gap: 20px 10px;
 }
 ```
 
 ---
 
-## 项目属性
+**基本写法：row-gap 行间距**
+`row-gap: <值>;`
+```css
+/* 仅设置行间距 */
+.grid {
+  row-gap: 20px;
+}
+```
 
-**flex-grow**：放大比例
+---
+
+**基本写法：column-gap 列间距**
+`column-gap: <值>;`
+```css
+/* 仅设置列间距 */
+.grid {
+  column-gap: 10px;
+}
+```
+
+---
+
+## 子元素属性
+
+**基本写法：flex-grow 放大**
 `flex-grow: <数值>;`
 ```css
-/* 项目不放大（默认） */
-.item { flex-grow: 0; }
-
-/* 项目放大比例为 1 */
-.item { flex-grow: 1; }
-
-/* 不同项目的放大比例 */
-.item-1 { flex-grow: 1; }
-.item-2 { flex-grow: 2; }
-.item-3 { flex-grow: 1; }
+/* 子元素放大比例 */
+.item {
+  flex-grow: 1;
+}
 ```
 
 ---
 
-**flex-shrink**：缩小比例
+**基本写法：flex-shrink 缩小**
 `flex-shrink: <数值>;`
 ```css
-/* 项目可以缩小（默认） */
-.item { flex-shrink: 1; }
-
-/* 项目不可缩小 */
-.item { flex-shrink: 0; }
+/* 子元素缩小比例 */
+.item {
+  flex-shrink: 0;
+}
 ```
 
 ---
 
-**flex-basis**：初始大小
-`flex-basis: auto | <长度> | <百分比>;`
+**基本写法：flex-basis 基础尺寸**
+`flex-basis: <长度>;`
 ```css
-/* 初始大小为 auto（默认） */
-.item { flex-basis: auto; }
-
-/* 初始大小为 200px */
-.item { flex-basis: 200px; }
-
-/* 初始大小为 50% */
-.item { flex-basis: 50%; }
+/* 子元素基础尺寸 */
+.item {
+  flex-basis: 200px;
+}
 ```
 
 ---
 
-**flex 复合属性**：grow、shrink、basis 的简写
+**基本写法：flex-basis 百分比**
+`flex-basis: <百分比>;`
+```css
+/* 基础尺寸为百分比 */
+.item {
+  flex-basis: 50%;
+}
+```
+
+---
+
+**基本写法：flex 简写**
 `flex: <grow> <shrink> <basis>;`
 ```css
-/* 默认值：0 1 auto */
-.item { flex: 0 1 auto; }
-
-/* 等比分配空间 */
-.item { flex: 1; }
-
-/* 不缩小，初始大小为 200px */
-.item { flex: 0 0 200px; }
-
-/* 放大比例为 2，缩小比例为 1，初始大小为 100px */
-.item { flex: 2 1 100px; }
+/* 同时设置三个属性 */
+.item {
+  flex: 1 1 0%;
+}
 ```
 
 ---
 
-**align-self**：单个项目侧轴对齐
-`align-self: auto | stretch | flex-start | flex-end | center | baseline;`
+**基本写法：flex auto**
+`flex: auto;`
 ```css
-/* 继承容器的 align-items（默认） */
-.item { align-self: auto; }
-
-/* 单个项目居中对齐 */
-.item { align-self: center; }
-
-/* 单个项目起始对齐 */
-.item { align-self: flex-start; }
-
-/* 单个项目结束对齐 */
-.item { align-self: flex-end; }
+/* 等价于 flex: 1 1 auto */
+.item {
+  flex: auto;
+}
 ```
 
 ---
 
-**order**：排列顺序
+**基本写法：flex none**
+`flex: none;`
+```css
+/* 等价于 flex: 0 0 auto */
+.item {
+  flex: none;
+}
+```
+
+---
+
+**基本写法：order 排序**
 `order: <数值>;`
 ```css
-/* 默认顺序 */
-.item { order: 0; }
-
-/* 不同项目的顺序 */
-.item-1 { order: 3; }
-.item-2 { order: 1; }
-.item-3 { order: 2; }
+/* 设置子元素排序 */
+.item {
+  order: -1;
+}
 ```
 
 ---
 
-## 常见布局
+**基本写法：align-self 单独对齐**
+`align-self: <对齐方式>;`
+```css
+/* 单独设置交叉轴对齐 */
+.item {
+  align-self: center;
+}
+```
 
-**垂直水平居中**：使用 flex 实现居中
+---
+
+**基本写法：align-self 拉伸**
+`align-self: stretch;`
+```css
+/* 单独拉伸 */
+.item {
+  align-self: stretch;
+}
+```
+
+---
+
+## 常见布局模式
+
+**基本写法：水平垂直居中**
 `display: flex; justify-content: center; align-items: center;`
 ```css
-/* 垂直水平居中 */
-.container {
+/* Flex 实现水平垂直居中 */
+.center {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 300px;
-}
-.item {
-  width: 100px;
-  height: 100px;
 }
 ```
 
 ---
 
-**等高布局**：项目等高
+**基本写法：两栏布局**
 `display: flex;`
 ```css
-/* 等高布局 */
-.container {
+/* 左侧固定，右侧自适应 */
+.layout {
   display: flex;
 }
-.item {
-  flex: 1;
-  padding: 20px;
-  border: 1px solid #ddd;
+.sidebar {
+  width: 250px;
+  flex-shrink: 0;
+}
+.main {
+  flex-grow: 1;
 }
 ```
 
 ---
 
-**导航菜单**：两端对齐的导航
+**基本写法：三栏布局**
+`display: flex;`
+```css
+/* 两侧固定，中间自适应 */
+.layout {
+  display: flex;
+}
+.left {
+  width: 200px;
+  flex-shrink: 0;
+}
+.center {
+  flex-grow: 1;
+}
+.right {
+  width: 200px;
+  flex-shrink: 0;
+}
+```
+
+---
+
+**基本写法：等宽分布**
+`display: flex;`
+```css
+/* 子元素等宽分布 */
+.equal {
+  display: flex;
+}
+.equal > * {
+  flex: 1;
+}
+```
+
+---
+
+**基本写法：底部固定**
+`display: flex; flex-direction: column; min-height: 100vh;`
+```css
+/* 页脚固定在底部 */
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.content {
+  flex: 1;
+}
+```
+
+---
+
+**基本写法：导航栏布局**
 `display: flex; justify-content: space-between;`
 ```css
+/* 导航栏两端对齐 */
 .nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #333;
-  padding: 10px 20px;
-}
-.nav__menu {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 20px;
 }
 ```
 
 ---
 
-**卡片布局**：响应式卡片网格
-`display: flex; flex-wrap: wrap; gap: <间距>;`
+**基本写法：卡片网格**
+`display: flex; flex-wrap: wrap; gap: <值>;`
 ```css
-.card-container {
+/* 自适应卡片网格 */
+.cards {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  padding: 20px;
 }
 .card {
   flex: 1 1 300px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 20px;
 }
 ```
 
 ---
 
-**表单布局**：垂直排列的表单
-`display: flex; flex-direction: column; gap: <间距>;`
+## 响应式 Flex
+
+**基本写法：嵌套媒体查询**
+`@media (max-width: <值>) { flex-direction: column; }`
 ```css
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  max-width: 500px;
-  margin: 0 auto;
-}
-.form__group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-```
-
----
-
-## 响应式 Flexbox
-
-**媒体查询调整**：响应式布局
-`@media (max-width: <宽度>) { <选择器> { <样式> } }`
-```css
-/* 基础布局 */
+/* 小屏幕切换为列方向 */
 .container {
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  flex-direction: row;
 }
-.item {
-  flex: 1 1 300px;
-}
-
-/* 响应式调整 */
 @media (max-width: 768px) {
-  .item {
-    flex: 1 1 100%;
-  }
-}
-
-@media (max-width: 480px) {
   .container {
     flex-direction: column;
   }
-  .item {
-    flex: 1 1 auto;
+}
+```
+
+---
+
+**基本写法：嵌套媒体查询**
+`.container { display: flex; @media (max-width: <值>) { flex-direction: column; } }`
+```css
+/* CSS 原生嵌套媒体查询 */
+.container {
+  display: flex;
+  @media (max-width: 768px) {
+    flex-direction: column;
   }
 }
 ```
 
 ---
 
-## 性能优化
-
-**使用 transform 代替 top/left**：避免重排
-`transition: transform <时间>;`
+**基本写法：响应式间距**
+`gap: clamp(<最小>, <理想>, <最大>);`
 ```css
-/* 优化前 */
-.item {
-  position: relative;
-  left: 0;
-  transition: left 0.3s ease;
-}
-.item:hover {
-  left: 10px;
-}
-
-/* 优化后 */
-.item {
-  will-change: transform;
-  transition: transform 0.3s ease;
-}
-.item:hover {
-  transform: translateX(10px);
+/* 响应式间距 */
+.grid {
+  display: flex;
+  gap: clamp(10px, 2vw, 30px);
 }
 ```

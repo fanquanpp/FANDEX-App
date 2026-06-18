@@ -4,536 +4,479 @@
 
 ---
 
+## let 与 const
+
+**基本写法：let 声明**
+`let <变量名> = <值>;`
+```javascript
+// 声明块级作用域变量
+let count = 0;
+```
+
+---
+
+**基本写法：const 声明**
+`const <常量名> = <值>;`
+```javascript
+// 声明不可重新赋值的常量
+const PI = 3.14159;
+```
+
+---
+
+## 箭头函数
+
+**基本写法：箭头函数**
+`(<参数>) => <表达式>`
+```javascript
+// 箭头函数直接返回表达式
+let square = x => x * x;
+```
+
+---
+
+**基本写法：箭头函数带函数体**
+`(<参数>) => { return <值>; }`
+```javascript
+// 箭头函数带函数体
+let greet = (name) => {
+    return "Hello, " + name;
+};
+```
+
+---
+
+## 模板字符串
+
+**基本写法：模板字符串**
+`` ` <文本> ` ``
+```javascript
+// 使用反引号创建字符串
+let str = `Hello World`;
+```
+
+---
+
+**基本写法：变量插值**
+`` ` <文本> ${<变量>} ` ``
+```javascript
+// 在模板字符串中嵌入变量
+let greeting = `Hello, ${name}!`;
+```
+
+---
+
+**基本写法：多行字符串**
+`` ` <行1> <行2> ` ``
+```javascript
+// 模板字符串支持多行
+let text = `Line 1
+Line 2`;
+```
+
+---
+
+**基本写法：表达式插值**
+`` ` <文本> ${<表达式>} ` ``
+```javascript
+// 在模板字符串中嵌入表达式
+let result = `Sum: ${a + b}`;
+```
+
+---
+
 ## 解构赋值
 
-**数组解构**：从数组提取值
-`const [<变量1>, <变量2>] = <数组>;`
+**基本写法：数组解构**
+`let [ <变量1>, <变量2> ] = <数组>;`
 ```javascript
-const [a, b, c] = [1, 2, 3];
-console.log(a, b, c);  // 1 2 3
-
-// 跳过元素
-const [first, , third] = [1, 2, 3];
-console.log(first, third);  // 1 3
-
-// 默认值
-const [x, y, z = 10] = [1, 2];
-console.log(x, y, z);  // 1 2 10
-
-// 交换变量
-let m = 1, n = 2;
-[m, n] = [n, m];
-console.log(m, n);  // 2 1
-
-// 剩余元素
-const [head, ...tail] = [1, 2, 3, 4, 5];
-console.log(head, tail);  // 1 [2, 3, 4, 5]
+// 解构数组元素
+let [a, b] = [1, 2];
 ```
 
 ---
 
-**对象解构**：从对象提取属性
-`const { <属性1>, <属性2> } = <对象>;`
+**基本写法：对象解构**
+`let { <属性1>, <属性2> } = <对象>;`
 ```javascript
-const { name, age } = { name: 'Alice', age: 25 };
-console.log(name, age);  // Alice 25
-
-// 重命名
-const { name: userName, age: userAge } = { name: 'Alice', age: 25 };
-console.log(userName, userAge);  // Alice 25
-
-// 默认值
-const { x = 1, y = 2 } = { x: 10 };
-console.log(x, y);  // 10 2
-
-// 嵌套解构
-const user = {
-  profile: { name: 'Alice', address: { city: 'Beijing' } },
-};
-const { profile: { name, address: { city } } } = user;
-console.log(name, city);  // Alice Beijing
-
-// 剩余属性
-const { a: pa, ...rest } = { a: 1, b: 2, c: 3 };
-console.log(pa, rest);  // 1 { b: 2, c: 3 }
+// 解构对象属性
+let { name, age } = user;
 ```
 
 ---
 
-**函数参数解构**：解构函数参数
-`function <函数名>({ <属性1>, <属性2> = <默认值> }) { ... }`
+**基本写法：默认值解构**
+`let { <属性> = <默认值> } = <对象>;`
 ```javascript
-function greet({ name, age = 0, greeting = 'Hello' }) {
-  console.log(`${greeting}, ${name}! You are ${age} years old.`);
-}
-greet({ name: 'Alice', age: 25 });  // Hello, Alice! You are 25 years old.
+// 解构时设置默认值
+let { name = "Unknown" } = user;
+```
+
+---
+
+**基本写法：重命名解构**
+`let { <属性>: <新名> } = <对象>;`
+```javascript
+// 解构时重命名变量
+let { name: userName } = user;
+```
+
+---
+
+**基本写法：剩余元素解构**
+`let [ <变量1>, ...<剩余> ] = <数组>;`
+```javascript
+// 解构剩余元素到数组
+let [first, ...rest] = numbers;
 ```
 
 ---
 
 ## 展开运算符
 
-**数组展开**：展开数组元素
+**基本写法：数组展开**
 `[...<数组1>, ...<数组2>]`
 ```javascript
 // 合并数组
-const merged = [...[1, 2, 3], ...[4, 5, 6]];
-console.log(merged);  // [1, 2, 3, 4, 5, 6]
-
-// 复制数组
-const original = [1, 2, 3];
-const copy = [...original];
-
-// 数组插入
-const result = [1, 2, ...[3, 4], 5, 6];
-console.log(result);  // [1, 2, 3, 4, 5, 6]
-
-// Math 方法
-console.log(Math.max(...[5, 2, 8, 1, 9]));  // 9
+let combined = [...arr1, ...arr2];
 ```
 
 ---
 
-**对象展开**：展开对象属性
+**基本写法：对象展开**
 `{ ...<对象1>, ...<对象2> }`
 ```javascript
-// 合并对象（后者覆盖前者）
-const defaults = { theme: 'light', fontSize: 14, lang: 'zh' };
-const userPrefs = { theme: 'dark', fontSize: 16 };
-const config = { ...defaults, ...userPrefs };
-console.log(config);  // { theme: 'dark', fontSize: 16, lang: 'zh' }
+// 合并对象
+let merged = { ...obj1, ...obj2 };
+```
 
-// 添加/覆盖属性
-const user = { name: 'Alice', age: 25 };
-const updated = { ...user, age: 26, email: 'alice@example.com' };
+---
 
-// 移除属性
-const { removed, ...withoutRemoved } = { a: 1, removed: 2, b: 3 };
-console.log(withoutRemoved);  // { a: 1, b: 3 }
+**基本写法：函数参数展开**
+`<函数>(...<数组>)`
+```javascript
+// 将数组展开为函数参数
+Math.max(...numbers);
+```
+
+---
+
+## 默认参数
+
+**基本写法：默认参数**
+`function <函数>(<参数> = <默认值>) { }`
+```javascript
+// 参数默认值
+function greet(name = "Guest") {
+}
+```
+
+---
+
+## 剩余参数
+
+**基本写法：剩余参数**
+`function <函数>(...<参数名>) { }`
+```javascript
+// 收集剩余参数为数组
+function sum(...numbers) {
+}
+```
+
+---
+
+## for-of 循环
+
+**基本写法：for-of 遍历**
+`for (let <元素> of <可迭代对象>) { }`
+```javascript
+// 遍历可迭代对象
+for (let item of array) {
+}
 ```
 
 ---
 
 ## Symbol
 
-**Symbol 创建**：创建唯一标识符
-`const <变量名> = Symbol([<描述>]);`
+**基本写法：创建 Symbol**
+`let <变量> = Symbol("<描述>");`
 ```javascript
-const sym1 = Symbol();
-const sym2 = Symbol('description');
-console.log(Symbol('foo') === Symbol('foo'));  // false，每个 Symbol 唯一
-
-// 作为对象属性键
-const id = Symbol('id');
-const user = { name: 'Alice', [id]: 12345 };
-console.log(user[id]);  // 12345
-
-// Symbol 属性不出现在常规遍历中
-console.log(Object.keys(user));  // ['name']
-console.log(Object.getOwnPropertySymbols(user));  // [Symbol(id)]
+// 创建唯一符号
+let id = Symbol("id");
 ```
 
 ---
 
-**全局 Symbol**：使用 Symbol.for
-`Symbol.for(<键>)` | `Symbol.keyFor(<symbol>)`
+**基本写法：Symbol 作为属性键**
+`{ [<Symbol>]: <值> }`
 ```javascript
-const globalSym1 = Symbol.for('app.id');
-const globalSym2 = Symbol.for('app.id');
-console.log(globalSym1 === globalSym2);  // true
-console.log(Symbol.keyFor(globalSym1));  // "app.id"
+// 使用 Symbol 作为对象属性键
+let obj = { [id]: 123 };
 ```
 
 ---
 
-**内置 Symbol**：自定义迭代行为
-`[Symbol.iterator]() { ... }`
+## 类
+
+**基本写法：类定义**
+`class <类名> { }`
 ```javascript
-const range = {
-  from: 1,
-  to: 5,
-  [Symbol.iterator]() {
-    let current = this.from;
-    const last = this.to;
-    return {
-      next() {
-        return current <= last
-          ? { value: current++, done: false }
-          : { done: true };
-      },
-    };
-  },
-};
-for (const num of range) {
-  console.log(num);  // 1, 2, 3, 4, 5
+// 定义类
+class Person {
 }
 ```
 
 ---
 
-**Symbol.toPrimitive**：自定义类型转换
-`[Symbol.toPrimitive](<hint>) { ... }`
+**基本写法：构造方法**
+`constructor(<参数>) { }`
 ```javascript
-const temperature = {
-  celsius: 25,
-  [Symbol.toPrimitive](hint) {
-    if (hint === 'number') return this.celsius;
-    if (hint === 'string') return `${this.celsius}°C`;
-    return this.celsius;
-  },
-};
-console.log(+temperature);    // 25（number hint）
-console.log(`${temperature}`);  // "25°C"（string hint）
-console.log(temperature + 5);  // 30（default hint）
-```
-
----
-
-## Proxy 代理
-
-**基本代理**：拦截对象操作
-`new Proxy(<目标对象>, <处理器>)`
-```javascript
-const target = { name: 'Alice', age: 25 };
-const handler = {
-  get(obj, prop) {
-    console.log(`读取属性: ${prop}`);
-    return prop in obj ? obj[prop] : '属性不存在';
-  },
-  set(obj, prop, value) {
-    console.log(`设置属性: ${prop} = ${value}`);
-    if (prop === 'age' && (typeof value !== 'number' || value < 0)) {
-      throw new TypeError('年龄必须是非负数');
+// 类的构造方法
+class Person {
+    constructor(name) {
+        this.name = name;
     }
-    obj[prop] = value;
-    return true;
-  },
-};
-const proxy = new Proxy(target, handler);
-console.log(proxy.name);  // 读取属性: name → "Alice"
-proxy.age = 30;           // 设置属性: age = 30
+}
 ```
 
 ---
 
-**验证代理**：属性验证
-`new Proxy({}, { set(obj, prop, value) { ... } })`
+**基本写法：类方法**
+`<方法名>() { }`
 ```javascript
-function validatedObject(schema) {
-  return new Proxy({}, {
-    set(obj, prop, value) {
-      if (schema[prop]) {
-        const { type, validator } = schema[prop];
-        if (type && typeof value !== type) {
-          throw new TypeError(`${prop} must be ${type}`);
-        }
-        if (validator && !validator(value)) {
-          throw new TypeError(`${prop} validation failed`);
-        }
-      }
-      obj[prop] = value;
-      return true;
-    },
-  });
+// 定义类方法
+class Person {
+    greet() {
+    }
 }
-const user = validatedObject({
-  name: { type: 'string' },
-  age: { type: 'number', validator: (v) => v >= 0 && v <= 150 },
+```
+
+---
+
+**基本写法：类继承**
+`class <子类> extends <父类> { }`
+```javascript
+// 类继承
+class Student extends Person {
+}
+```
+
+---
+
+**基本写法：super 调用**
+`super.<方法>()`
+```javascript
+// 调用父类方法
+class Student extends Person {
+    greet() {
+        super.greet();
+    }
+}
+```
+
+---
+
+**基本写法：静态方法**
+`static <方法名>() { }`
+```javascript
+// 定义静态方法
+class Person {
+    static create() {
+    }
+}
+```
+
+---
+
+## Promise
+
+**基本写法：创建 Promise**
+`new Promise((<resolve>, <reject>) => { })`
+```javascript
+// 创建 Promise 对象
+let p = new Promise((resolve, reject) => {
 });
-user.name = 'Alice';
-user.age = 25;
 ```
 
 ---
 
-**只读代理**：禁止修改
-`new Proxy(<对象>, { set() { throw new Error(...); } })`
+**基本写法：async-await**
+`async function <函数>() { await <Promise>; }`
 ```javascript
-function readOnly(obj) {
-  return new Proxy(obj, {
-    set() { throw new Error('只读对象，不可修改'); },
-    deleteProperty() { throw new Error('只读对象，不可删除'); },
-  });
+// 使用 async-await 处理异步
+async function fetchData() {
+    let data = await promise;
 }
-const config = readOnly({ version: '1.0', debug: false });
-// config.version = '2.0';  // Error: 只读对象
 ```
 
 ---
 
-**缓存代理**：缓存函数结果
-`new Proxy(<函数>, { apply(target, thisArg, args) { ... } })`
+## Map 与 Set
+
+**基本写法：创建 Map**
+`let <变量> = new Map();`
 ```javascript
-function createCache(fn) {
-  const cache = new Map();
-  return new Proxy(fn, {
-    apply(target, thisArg, args) {
-      const key = JSON.stringify(args);
-      if (cache.has(key)) {
-        console.log('缓存命中');
-        return cache.get(key);
-      }
-      const result = Reflect.apply(target, thisArg, args);
-      cache.set(key, result);
-      return result;
-    },
-  });
+// 创建 Map 对象
+let map = new Map();
+```
+
+---
+
+**基本写法：Map 设置**
+`<map>.set(<键>, <值>);`
+```javascript
+// 设置 Map 键值对
+map.set("name", "Alice");
+```
+
+---
+
+**基本写法：Map 获取**
+`<map>.get(<键>);`
+```javascript
+// 获取 Map 值
+let name = map.get("name");
+```
+
+---
+
+**基本写法：创建 Set**
+`let <变量> = new Set();`
+```javascript
+// 创建 Set 对象
+let set = new Set();
+```
+
+---
+
+**基本写法：Set 添加**
+`<set>.add(<值>);`
+```javascript
+// 向 Set 添加值
+set.add(1);
+```
+
+---
+
+## 模块化
+
+**基本写法：命名导出**
+`export <声明>`
+```javascript
+// 导出变量
+export let name = "Alice";
+```
+
+---
+
+**基本写法：默认导出**
+`export default <表达式>`
+```javascript
+// 默认导出
+export default function() {
 }
-const expensiveCalc = createCache((n) => n * n);
-expensiveCalc(5);  // 计算中... → 25
-expensiveCalc(5);  // 缓存命中 → 25
+```
+
+---
+
+**基本写法：导入**
+`import { <标识符> } from "<模块>";`
+```javascript
+// 导入模块
+import { name } from "./module.js";
 ```
 
 ---
 
 ## 可选链与空值合并
 
-**可选链操作符**：安全访问嵌套属性
+**基本写法：可选链**
 `<对象>?.<属性>`
 ```javascript
-const user = { profile: { address: { city: 'Beijing' } } };
-
-// 传统写法
-const city1 = user && user.profile && user.profile.address && user.profile.address.city;
-
-// 可选链
-const city2 = user?.profile?.address?.city;  // "Beijing"
-const zip = user?.profile?.address?.zip;      // undefined（不会报错）
-
-// 函数调用
-const obj = { method: () => 'result' };
-console.log(obj.method?.());    // "result"
-console.log(obj.nonExist?.());  // undefined
-
-// 数组访问
-const arr = null;
-console.log(arr?.[0]);  // undefined
+// 安全访问嵌套属性
+let name = user?.name;
 ```
 
 ---
 
-**空值合并操作符**：仅在 null/undefined 时使用默认值
+**基本写法：可选链方法**
+`<对象>?.<方法>()`
+```javascript
+// 安全调用方法
+let result = obj?.method();
+```
+
+---
+
+**基本写法：空值合并**
 `<值1> ?? <值2>`
 ```javascript
-const value1 = null ?? 'default';       // "default"
-const value2 = undefined ?? 'default'; // "default"
-const value3 = 0 ?? 'default';          // 0（不是 null/undefined）
-const value4 = '' ?? 'default';        // ""（不是 null/undefined）
-const value5 = false ?? 'default';     // false
-
-// 对比 ||
-const value6 = 0 || 'default';    // "default"（0 是 falsy）
-const value7 = '' || 'default';   // "default"（空字符串是 falsy）
-
-// 配置合并
-function createConfig(options) {
-  return {
-    timeout: options.timeout ?? 5000,  // 0 是有效值
-    retries: options.retries ?? 3,
-    debug: options.debug ?? false,      // false 是有效值
-    prefix: options.prefix ?? 'app',    // '' 是有效值
-  };
-}
+// 左侧为 null 或 undefined 时返回右侧
+let value = a ?? b;
 ```
 
 ---
 
-## 逻辑赋值运算符
+## 其他特性
 
-**逻辑赋值**：ES2021+，运算并赋值
-`<变量> <&&=|| ||=|??=> <值>`
+**基本写法：BigInt**
+`<数字>n`
 ```javascript
-let a = null;
-a ??= 'default';  // a = a ?? 'default' → "default"
-
-let b = 0;
-b ||= 10;  // b = b || 10 → 10
-
-let c = { x: 1 };
-c &&= c.x;  // c = c && c.x → 1
+// 创建大整数
+let big = 9007199254740991n;
 ```
 
 ---
 
-## Object 新方法
-
-**Object.keys/values/entries**：获取对象键值
-`Object.keys(<对象>)` | `Object.values(<对象>)` | `Object.entries(<对象>)`
+**基本写法：globalThis**
+`globalThis`
 ```javascript
-const obj = { a: 1, b: 2, c: 3 };
-console.log(Object.keys(obj));     // ['a', 'b', 'c']
-console.log(Object.values(obj)); // [1, 2, 3]
-console.log(Object.entries(obj)); // [['a',1], ['b',2], ['c',3]]
+// 访问全局对象
+globalThis.variable = 10;
 ```
 
 ---
 
-**Object.fromEntries**：从键值对数组创建对象
+**基本写法：数值分隔符**
+`<数字>_<数字>`
+```javascript
+// 使用下划线分隔数字提高可读性
+let num = 1_000_000;
+```
+
+---
+
+**基本写法：Array.flat**
+`<数组>.flat(<深度>)`
+```javascript
+// 展平嵌套数组
+let flat = [1, [2, [3]]].flat(Infinity);
+```
+
+---
+
+**基本写法：Object.fromEntries**
 `Object.fromEntries(<键值对数组>)`
 ```javascript
-const entries = [['a', 1], ['b', 2]];
-const newObj = Object.fromEntries(entries);
-console.log(newObj);  // { a: 1, b: 2 }
-
-// 对象过滤
-const filtered = Object.fromEntries(
-  Object.entries(obj).filter(([key, value]) => value > 1)
-);
-console.log(filtered);  // { b: 2, c: 3 }
+// 将键值对数组转换为对象
+let obj = Object.fromEntries([["a", 1], ["b", 2]]);
 ```
 
 ---
 
-**Object.assign vs 展开运算符**：合并对象
-`Object.assign(<目标>, <源>)` | `{ ...<对象> }`
+**基本写法：String.trimStart**
+`<字符串>.trimStart()`
 ```javascript
-const target = { a: 1 };
-const source = { b: 2 };
-Object.assign(target, source);  // 修改 target
-const merged = { ...target, ...source };  // 创建新对象
+// 去除字符串开头空白
+let trimmed = " hello".trimStart();
 ```
 
 ---
 
-## Array 新方法
-
-**Array.from**：从可迭代对象创建数组
-`Array.from(<可迭代对象>[, <映射函数>])`
+**基本写法：String.trimEnd**
+`<字符串>.trimEnd()`
 ```javascript
-const set = new Set([1, 2, 3]);
-const arr = Array.from(set);
-console.log(arr);  // [1, 2, 3]
-
-// 带映射函数
-const doubled = Array.from([1, 2, 3], (x) => x * 2);
-console.log(doubled);  // [2, 4, 6]
-```
-
----
-
-**Array.of**：创建数组
-`Array.of(<元素1>, <元素2>, ...)`
-```javascript
-const arr = Array.of(1, 2, 3);
-console.log(arr);  // [1, 2, 3]
-
-// 对比 Array 构造函数
-console.log(Array(3));     // [empty x 3]
-console.log(Array.of(3));  // [3]
-```
-
----
-
-**flat / flatMap**：扁平化数组
-`<数组>.flat([<深度>])` | `<数组>.flatMap(<回调>)`
-```javascript
-const nested = [1, [2, [3, [4]]]];
-console.log(nested.flat());          // [1, 2, [3, [4]]]
-console.log(nested.flat(2));        // [1, 2, 3, [4]]
-console.log(nested.flat(Infinity)); // [1, 2, 3, 4]
-
-// flatMap
-const sentences = ['Hello World', 'Good Morning'];
-const words = sentences.flatMap((s) => s.split(' '));
-console.log(words);  // ['Hello', 'World', 'Good', 'Morning']
-```
-
----
-
-**at**：支持负索引访问
-`<数组>.at(<索引>)`
-```javascript
-const arr = [1, 2, 3, 4, 5];
-console.log(arr.at(-1));  // 5（最后一个元素）
-console.log(arr.at(-2));  // 4
-```
-
----
-
-**findLast / findLastIndex**：从末尾查找
-`<数组>.findLast(<回调>)` | `<数组>.findLastIndex(<回调>)`
-```javascript
-const nums = [1, 2, 3, 4, 3, 5];
-console.log(nums.findLast((n) => n === 3));        // 3
-console.log(nums.findLastIndex((n) => n === 3));  // 4
-```
-
----
-
-**toSorted / toReversed / toSpliced**：不修改原数组
-`<数组>.toSorted()` | `<数组>.toReversed()`
-```javascript
-const original = [3, 1, 4, 1, 5];
-const sorted = original.toSorted();
-console.log(sorted);    // [1, 1, 3, 4, 5]
-console.log(original);  // [3, 1, 4, 1, 5]（不变）
-```
-
----
-
-## String 新方法
-
-**trimStart / trimEnd**：去除首尾空白
-`<字符串>.trimStart()` | `<字符串>.trimEnd()`
-```javascript
-const str = '  hello  ';
-console.log(str.trimStart());  // "hello  "
-console.log(str.trimEnd());    // "  hello"
-```
-
----
-
-**replaceAll**：替换所有匹配
-`<字符串>.replaceAll(<模式>, <替换>)`
-```javascript
-const text = 'aaa';
-console.log(text.replaceAll('a', 'b'));  // "bbb"
-```
-
----
-
-**at**：支持负索引访问
-`<字符串>.at(<索引>)`
-```javascript
-const str = 'Hello';
-console.log(str.at(-1));  // 'o'
-```
-
----
-
-**includes / startsWith / endsWith**：字符串包含检查
-`<字符串>.includes(<子串>)` | `<字符串>.startsWith(<前缀>)` | `<字符串>.endsWith(<后缀>)`
-```javascript
-console.log('Hello World'.includes('World'));    // true
-console.log('Hello World'.startsWith('Hello'));   // true
-console.log('Hello World'.endsWith('World'));    // true
-```
-
----
-
-## 深拷贝
-
-**structuredClone**：ES2022+，深拷贝
-`structuredClone(<对象>)`
-```javascript
-const original = { a: 1, b: { c: 2 } };
-const deepCopy = structuredClone(original);
-deepCopy.b.c = 99;
-console.log(original.b.c);  // 2（原对象不受影响）
-
-// 对比展开运算符（浅拷贝）
-const shallowCopy = { ...original };
-shallowCopy.b.c = 99;
-console.log(original.b.c);  // 99（原对象受影响）
-```
-
----
-
-**逐层展开**：手动深拷贝
-`{ ...<对象>, <嵌套属性>: { ...<对象>.<嵌套属性> } }`
-```javascript
-const obj = { a: 1, b: { c: 2 } };
-const deepSpread = { ...obj, b: { ...obj.b } };
-deepSpread.b.c = 99;
-console.log(obj.b.c);  // 2（原对象不受影响）
+// 去除字符串结尾空白
+let trimmed = "hello ".trimEnd();
 ```

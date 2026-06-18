@@ -4,147 +4,105 @@
 
 ---
 
-## 指针类型
+## unsafe.Pointer
 
-**指针声明**：获取变量地址
-`var <变量> *<类型>` / `&<变量>`
-
+**基本写法：获取指针**
+`unsafe.Pointer(&<变量>)`
 ```go
-// 指针声明和取地址
-var x int = 42;
-var p *int = &x;
-fmt.Println(*p); // 42
+// 获取变量的 unsafe.Pointer
+x := 42;
+p := unsafe.Pointer(&x);
 ```
 
-**空指针**：nil 指针
-`var <变量> *<类型>`
-
+**基本写法：指针转换回普通指针**
+`(*<类型>)(unsafe.Pointer(&<变量>))`
 ```go
-// nil 指针
-var p *int;
-if p == nil {
-    fmt.Println("nil pointer");
-}
-```
-
-**new 返回指针**：分配零值内存
-`new(<类型>)`
-
-```go
-// new 分配并返回指针
-p := new(int);
-*p = 100;
+// 转换回 *int
+pInt := (*int)(p);
 ```
 
 ---
 
-## unsafe.Pointer
+## 指针类型转换
 
-**Pointer 类型**：通用指针类型
-`unsafe.Pointer(&<变量>)`
-
+**基本写法：int 转 float64**
+`*(*<目标类型>)(unsafe.Pointer(&<变量>))`
 ```go
-// 转换为 unsafe.Pointer
-var x int = 42;
-p := unsafe.Pointer(&x);
+// 将 int 的位模式解释为 float64
+var i int64 = 0x400921FB54442D18;
+f := *(*float64)(unsafe.Pointer(&i));
+fmt.Println(f); // 3.141592653589793
 ```
 
-**三种指针转换**：普通指针、uintptr、unsafe.Pointer
-`(*<类型>)(unsafe.Pointer(<指针>))`
-
+**基本写法：float64 转 int**
+`*(*<目标类型>)(unsafe.Pointer(&<变量>))`
 ```go
-// 指针类型转换
-var x int64 = 42;
-var y float64 = *(*float64)(unsafe.Pointer(&x));
+// 将 float64 的位模式解释为 int64
+var f = 3.14;
+i := *(*int64)(unsafe.Pointer(&f));
 ```
 
-**Pointer 与 uintptr 转换**：uintptr 可进行算术运算
-`uintptr(unsafe.Pointer(&<变量>))`
-
+**基本写法：[]byte 转 string**
+`*(*string)(unsafe.Pointer(&<切片>))`
 ```go
-// 转换为 uintptr 进行地址运算
-var x int = 42;
-addr := uintptr(unsafe.Pointer(&x));
+// 零拷贝将 []byte 转为 string
+b := []byte("hello");
+s := *(*string)(unsafe.Pointer(&b));
 ```
 
 ---
 
 ## unsafe.Sizeof
 
-**获取大小**：变量占用的字节数
+**基本写法：获取变量大小**
 `unsafe.Sizeof(<变量>)`
-
 ```go
-// 获取类型大小
-fmt.Println(unsafe.Sizeof(int(0)));     // 8
-fmt.Println(unsafe.Sizeof("hello"));    // 16
-fmt.Println(unsafe.Sizeof(true));       // 1
+// 获取 int 类型大小
+fmt.Println(unsafe.Sizeof(int(0))); // 8
 ```
 
-**结构体大小**：包含 padding
+**基本写法：获取结构体大小**
 `unsafe.Sizeof(<结构体>{})`
-
 ```go
-// 结构体大小（含 padding）
-type User struct {
-    Age  int8;   // 1 + 7 padding
-    Name string; // 16
-}
-fmt.Println(unsafe.Sizeof(User{})); // 24
+// 获取结构体大小
+type Point struct{ X, Y int };
+fmt.Println(unsafe.Sizeof(Point{})); // 16
 ```
 
 ---
 
 ## unsafe.Offsetof
 
-**字段偏移量**：字段在结构体中的偏移
+**基本写法：获取字段偏移量**
 `unsafe.Offsetof(<结构体>.<字段>)`
-
 ```go
-// 获取字段偏移量
+// 获取字段在结构体中的偏移量
 type User struct {
     ID   int;
     Name string;
-    Age  int;
 }
 fmt.Println(unsafe.Offsetof(User{}.ID));   // 0
 fmt.Println(unsafe.Offsetof(User{}.Name)); // 8
-fmt.Println(unsafe.Offsetof(User{}.Age));  // 24
-```
-
-**通过偏移访问字段**：指针运算
-`(*<类型>)(unsafe.Pointer(<基址> + <偏移>))`
-
-```go
-// 通过偏移量访问字段
-u := User{ID: 1, Name: "Alice", Age: 30};
-base := unsafe.Pointer(&u);
-idPtr := (*int)(unsafe.Pointer(base));
-fmt.Println(*idPtr); // 1
 ```
 
 ---
 
 ## unsafe.Alignof
 
-**对齐系数**：类型的对齐要求
+**基本写法：获取对齐边界**
 `unsafe.Alignof(<变量>)`
-
 ```go
-// 获取类型对齐系数
-fmt.Println(unsafe.Alignof(int(0)));    // 8
-fmt.Println(unsafe.Alignof(int8(0)));   // 1
-fmt.Println(unsafe.Alignof(int32(0))); // 4
+// 获取类型的对齐边界
+fmt.Println(unsafe.Alignof(int64(0))); // 8
 ```
 
-**结构体对齐**：最大字段的对齐系数
+**基本写法：获取结构体对齐**
 `unsafe.Alignof(<结构体>{})`
-
 ```go
-// 结构体对齐系数
+// 获取结构体的对齐边界
 type S struct {
-    A int8;   // align 1
-    B int64;  // align 8
+    A bool;
+    B int64;
 }
 fmt.Println(unsafe.Alignof(S{})); // 8
 ```
@@ -153,162 +111,119 @@ fmt.Println(unsafe.Alignof(S{})); // 8
 
 ## 指针运算
 
-**uintptr 加法**：地址偏移
-`uintptr + unsafe.Sizeof(<类型>) * <索引>`
-
+**基本写法：指针加法**
+`unsafe.Pointer(uintptr(<指针>) + <偏移>)`
 ```go
-// 指针算术运算
-arr := [5]int{10, 20, 30, 40, 50};
-base := uintptr(unsafe.Pointer(&arr[0]));
-elem := (*int)(unsafe.Pointer(base + unsafe.Sizeof(int(0))*2));
-fmt.Println(*elem); // 30
+// 指针偏移访问数组元素
+arr := [3]int{10, 20, 30};
+p := unsafe.Pointer(&arr[0]);
+p2 := unsafe.Pointer(uintptr(p) + unsafe.Sizeof(arr[0]));
+fmt.Println(*(*int)(p2)); // 20
 ```
 
-**Add 函数**：Go 1.17+ 指针加法
-`unsafe.Add(<指针>, <偏移>)`
-
-```go
-// Go 1.17+ 使用 unsafe.Add
-arr := [5]int{10, 20, 30, 40, 50};
-ptr := unsafe.Pointer(&arr[0]);
-elem := (*int)(unsafe.Add(ptr, unsafe.Sizeof(int(0))*2));
-fmt.Println(*elem); // 30
-```
-
----
-
-## Slice 操作
-
-**SliceHeader 结构**：切片的内部表示
-`reflect.SliceHeader`
-
-```go
-// 切片内部结构
-type SliceHeader struct {
-    Data uintptr;  // 指向底层数组
-    Len  int;      // 长度
-    Cap  int;      // 容量
-}
-```
-
-**通过 unsafe 修改切片**：直接操作底层
-`(*reflect.SliceHeader)(unsafe.Pointer(&<切片>))`
-
-```go
-// 通过 unsafe 修改切片长度
-s := make([]int, 0, 10);
-hdr := (*reflect.SliceHeader)(unsafe.Pointer(&s));
-hdr.Len = 5; // 直接修改长度
-```
-
----
-
-## String 操作
-
-**StringHeader 结构**：字符串的内部表示
-`reflect.StringHeader`
-
-```go
-// 字符串内部结构
-type StringHeader struct {
-    Data uintptr;  // 指向字节数组
-    Len  int;      // 长度
-}
-```
-
-**String 与 []byte 零拷贝**：共享底层数据
-`*(*string)(unsafe.Pointer(&<字节切片>))`
-
-```go
-// []byte 转 string 零拷贝（不安全）
-b := []byte{'h', 'e', 'l', 'l', 'o'};
-s := *(*string)(unsafe.Pointer(&b));
-fmt.Println(s); // hello
-```
-
-**StringHeader 转换**：直接构造字符串
-`reflect.StringHeader{ Data: <地址>, Len: <长度> }`
-
-```go
-// 通过 StringHeader 构造字符串
-data := [...]byte{'h', 'i'};
-hdr := reflect.StringHeader{
-    Data: uintptr(unsafe.Pointer(&data[0])),
-    Len:  2,
-};
-s := *(*string)(unsafe.Pointer(&hdr));
-```
-
----
-
-## unsafe.Pointer 转换规则
-
-**安全转换**：*T1 -> *T2（相同大小）
-`(*<T2>)(unsafe.Pointer(<*T1>))`
-
-```go
-// int32 与 float32 互转（相同大小）
-var i int32 = 42;
-f := *(*float32)(unsafe.Pointer(&i));
-```
-
-**uintptr 转换**：用于地址运算
+**基本写法：uintptr 转换**
 `uintptr(unsafe.Pointer(&<变量>))`
-
 ```go
-// 转换为 uintptr 进行地址运算
+// 转换为 uintptr 用于指针运算
 addr := uintptr(unsafe.Pointer(&x));
 ```
 
-**unsafe.Pointer 转回**：还原为具体类型指针
-`(*<类型>)(unsafe.Pointer(<uintptr>))`
+---
 
+## SliceHeader
+
+**基本写法：获取 SliceHeader**
+`(*reflect.SliceHeader)(unsafe.Pointer(&<切片>))`
 ```go
-// uintptr 转回 Pointer
-ptr := unsafe.Pointer(addr);
-p := (*int)(ptr);
+// 获取切片的底层结构
+s := []int{1, 2, 3};
+header := (*reflect.SliceHeader)(unsafe.Pointer(&s));
+fmt.Println(header.Len);    // 3
+fmt.Println(header.Cap);    // 3
 ```
 
 ---
 
-## Slice 转换
+## StringHeader
 
-**[]T1 转 []T2**：不同类型切片转换
-`*[]<T2>(unsafe.Pointer(&<切片>))`
-
+**基本写法：获取 StringHeader**
+`(*reflect.StringHeader)(unsafe.Pointer(&<字符串>))`
 ```go
-// []int 转 []int64（不安全）
-src := []int{1, 2, 3, 4};
-dst := *(*[]int64)(unsafe.Pointer(&src));
+// 获取字符串的底层结构
+s := "hello";
+header := (*reflect.StringHeader)(unsafe.Pointer(&s));
+fmt.Println(header.Len); // 5
 ```
 
 ---
 
-## 实际应用
+## 零拷贝转换
 
-**高性能字符串拼接**：避免拷贝
-`strings.Builder + unsafe`
-
+**基本写法：string 转 []byte**
+`*(*[]byte)(unsafe.Pointer(&<字符串变量>))`
 ```go
-// 使用 unsafe 优化字符串操作
-func concat(a, b string) string {
-    var builder strings.Builder;
-    builder.Grow(len(a) + len(b));
-    builder.WriteString(a);
-    builder.WriteString(b);
-    return builder.String();
-}
+// 零拷贝 string 转 []byte
+s := "hello";
+b := *(*[]byte)(unsafe.Pointer(&s));
 ```
 
-**直接内存访问**：绕过类型系统
-`(*[<大小>]<类型>)(unsafe.Pointer(&<变量>))`
-
+**基本写法：[]byte 转 string**
+`*(*string)(unsafe.Pointer(&<切片变量>))`
 ```go
-// 将结构体转为字节数组
-type Data struct {
-    A int32;
-    B int32;
-}
-d := Data{A: 1, B: 2};
-bytes := *(*[8]byte)(unsafe.Pointer(&d));
+// 零拷贝 []byte 转 string
+b := []byte("hello");
+s := *(*string)(unsafe.Pointer(&b));
+```
+
+---
+
+## 内存操作
+
+**基本写法：内存拷贝**
+`unsafe.Pointer(<目标>)`
+```go
+// 指针内存拷贝
+src := [4]byte{1, 2, 3, 4};
+var dst [4]byte;
+copy(dst[:], src[:]);
+```
+
+---
+
+## unsafe.Add
+
+**基本写法：指针加法（Go 1.17+）**
+`unsafe.Add(<指针>, <偏移>)`
+```go
+// Go 1.17+ 指针加法
+arr := [3]int{10, 20, 30};
+p := unsafe.Pointer(&arr[0]);
+p2 := unsafe.Add(p, unsafe.Sizeof(arr[0]));
+fmt.Println(*(*int)(p2)); // 20
+```
+
+---
+
+## unsafe.Slice
+
+**基本写法：从指针创建切片（Go 1.17+）**
+`unsafe.Slice(<指针>, <长度>)`
+```go
+// Go 1.17+ 从指针创建切片
+arr := [3]int{10, 20, 30};
+p := &arr[0];
+s := unsafe.Slice(p, 3);
+fmt.Println(s); // [10 20 30]
+```
+
+---
+
+## 注意事项
+
+**基本写法：uintptr 不能作为指针存储**
+`uintptr(unsafe.Pointer(&<变量>))`
+```go
+// uintptr 只是一个数值，GC 不视为指针
+// 仅用于临时指针运算
+addr := uintptr(unsafe.Pointer(&x));
 ```

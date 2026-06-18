@@ -6,70 +6,102 @@
 
 ## 基本类型注解
 
-**变量类型注解**
+**基本写法：变量类型注解**
 `<变量>: <类型> = <值>`
 
 ```python
-# 基本类型注解
-age: int = 30
+# 变量类型注解
 name: str = "Alice"
-height: float = 5.9
+age: int = 30
+height: float = 1.75
 is_active: bool = True
-
-# 容器类型注解（Python 3.9+）
-numbers: list[int] = [1, 2, 3]
-person: dict[str, int] = {"Alice": 30, "Bob": 25}
-unique_numbers: set[int] = {1, 2, 3}
-coordinates: tuple[int, int] = (10, 20)
-
-# 旧版本兼容（Python 3.8 及以下）
-from typing import List, Dict, Set, Tuple
-numbers: List[int] = [1, 2, 3]
-person: Dict[str, int] = {"Alice": 30}
-unique_numbers: Set[int] = {1, 2, 3}
-coordinates: Tuple[int, int] = (10, 20)
 ```
 
 ---
 
-## 函数类型注解
-
-**函数参数和返回值注解**
-`def <函数>(<参数>: <类型>) -> <返回类型>: ...`
+**基本写法：函数参数类型注解**
+`def <函数名>(<参数>: <类型>): <语句>`
 
 ```python
-# 基本函数注解
+# 函数参数类型注解
 def greet(name: str) -> str:
     return f"Hello, {name}!"
+```
 
+---
+
+**基本写法：函数返回值类型注解**
+`def <函数名>(<参数>) -> <返回类型>: <语句>`
+
+```python
+# 函数返回值类型注解
 def add(a: int, b: int) -> int:
     return a + b
+```
 
-def divide(a: float, b: float) -> float:
-    return a / b
+---
 
-# 带默认值
-def greet(name: str, greeting: str = "Hello") -> str:
-    return f"{greeting}, {name}!"
+## 复合类型注解
 
-# 可变参数
-def sum_all(*args: int) -> int:
-    return sum(args)
+**基本写法：列表类型注解**
+`from typing import List`
+`<变量>: List[<元素类型>] = <值>`
 
-def print_info(**kwargs: str) -> None:
-    for key, value in kwargs.items():
-        print(f"{key}: {value}")
+```python
+# 列表类型注解
+from typing import List
+numbers: List[int] = [1, 2, 3]
+names: List[str] = ["Alice", "Bob"]
+```
 
-# 多种返回类型
-from typing import Union, Optional
+---
 
-def find_user(user_id: int) -> Union[dict, None]:
-    if user_id == 1:
-        return {"name": "Alice"}
-    return None
+**基本写法：字典类型注解**
+`from typing import Dict`
+`<变量>: Dict[<键类型>, <值类型>] = <值>`
 
-# Optional 简写
-def get_user(user_id: int) -> Optional[dict]:
+```python
+# 字典类型注解
+from typing import Dict
+user: Dict[str, int] = {"age": 30, "score": 95}
+```
+
+---
+
+**基本写法：元组类型注解**
+`from typing import Tuple`
+`<变量>: Tuple[<类型1>, <类型2>] = <值>`
+
+```python
+# 元组类型注解
+from typing import Tuple
+point: Tuple[int, int] = (3, 4)
+```
+
+---
+
+**基本写法：集合类型注解**
+`from typing import Set`
+`<变量>: Set[<元素类型>] = <值>`
+
+```python
+# 集合类型注解
+from typing import Set
+unique_numbers: Set[int] = {1, 2, 3}
+```
+
+---
+
+## Optional 类型
+
+**基本写法：使用 Optional 类型**
+`from typing import Optional`
+`<变量>: Optional[<类型>] = <值>`
+
+```python
+# Optional 类型注解（表示值可以为 None）
+from typing import Optional
+def find_user(user_id: int) -> Optional[dict]:
     if user_id == 1:
         return {"name": "Alice"}
     return None
@@ -77,454 +109,594 @@ def get_user(user_id: int) -> Optional[dict]:
 
 ---
 
-## typing 模块
+## Union 类型
 
-**常用类型**
-`from typing import <类型>`
+**基本写法：使用 Union 类型**
+`from typing import Union`
+`<变量>: Union[<类型1>, <类型2>] = <值>`
 
 ```python
-from typing import (
-    List, Dict, Set, Tuple,  # 容器类型
-    Union, Optional,  # 联合类型
-    Any,  # 任意类型
-    Callable,  # 可调用类型
-    Iterable, Iterator,  # 迭代器
-    Generator,  # 生成器
-    TypeVar, Generic,  # 泛型
-    Protocol,  # 协议
-    Literal,  # 字面量类型
-    Type,  # 类型本身
-    ClassVar,  # 类变量
-    Final,  # 常量
-)
-
-# Any 类型
-def process(data: Any) -> Any:
+# Union 类型注解（表示值可以是多种类型之一）
+from typing import Union
+def process(data: Union[str, bytes]) -> str:
+    if isinstance(data, bytes):
+        return data.decode()
     return data
-
-# Union 类型
-def process_value(value: Union[int, str, float]) -> str:
-    return str(value)
-
-# Optional 类型（等价于 Union[T, None]）
-def find(value: int) -> Optional[int]:
-    if value > 0:
-        return value
-    return None
-
-# Callable 类型
-def apply(func: Callable[[int, int], int], a: int, b: int) -> int:
-    return func(a, b)
-
-# Iterable 和 Iterator
-def process_items(items: Iterable[int]) -> list[int]:
-    return [item * 2 for item in items]
-
-# Generator 类型
-def counter() -> Generator[int, None, None]:
-    count = 0
-    while True:
-        yield count
-        count += 1
-
-# Literal 类型
-def set_mode(mode: Literal["read", "write", "append"]) -> None:
-    print(f"Mode: {mode}")
-
-# Type 类型
-def create_instance(cls: Type[int]) -> int:
-    return cls()
 ```
 
 ---
 
-## 泛型
-
-**TypeVar：类型变量**
-`from typing import TypeVar`
-`<T> = TypeVar("<T>")`
+**基本写法：使用管道符（Python 3.10+）**
+`<变量>: <类型1> | <类型2> = <值>`
 
 ```python
-from typing import TypeVar, List, Generic
+# 使用管道符表示联合类型
+def process(data: str | bytes) -> str:
+    if isinstance(data, bytes):
+        return data.decode()
+    return data
+```
 
-# 基本泛型
+---
+
+## Any 类型
+
+**基本写法：使用 Any 类型**
+`from typing import Any`
+`<变量>: Any = <值>`
+
+```python
+# Any 类型注解（表示任意类型）
+from typing import Any
+data: Any = "hello"
+data = 123
+```
+
+---
+
+## Callable 类型
+
+**基本写法：使用 Callable 类型**
+`from typing import Callable`
+`<变量>: Callable[[<参数类型>], <返回类型>] = <函数>`
+
+```python
+# Callable 类型注解（表示可调用对象）
+from typing import Callable
+def apply(func: Callable[[int], int], value: int) -> int:
+    return func(value)
+```
+
+---
+
+**基本写法：Callable 无参数**
+`<变量>: Callable[[], <返回类型>] = <函数>`
+
+```python
+# Callable 无参数类型注解
+from typing import Callable
+callback: Callable[[], None] = lambda: print("Hello")
+```
+
+---
+
+## 泛型类型
+
+**换行写法：定义泛型类**
+`from typing import TypeVar, Generic`
+`T = TypeVar("T")`
+`class <类名>(Generic[T]):`
+`    def <方法>(self, <参数>: T) -> T: <语句>`
+
+```python
+# 定义泛型类
+from typing import TypeVar, Generic
+
 T = TypeVar("T")
 
-def first(items: List[T]) -> T:
-    return items[0]
-
-# 使用泛型函数
-print(first([1, 2, 3]))        # 返回 int
-print(first(["a", "b", "c"]))  # 返回 str
-
-# 泛型类
 class Stack(Generic[T]):
-    def __init__(self) -> None:
-        self.items: List[T] = []
-    
+    def __init__(self):
+        self.items: list[T] = []
+
     def push(self, item: T) -> None:
         self.items.append(item)
-    
+
     def pop(self) -> T:
         return self.items.pop()
-    
-    def is_empty(self) -> bool:
-        return len(self.items) == 0
+```
 
-# 使用泛型类
-int_stack: Stack[int] = Stack()
-int_stack.push(1)
-int_stack.push(2)
-print(int_stack.pop())  # 2
+---
 
-str_stack: Stack[str] = Stack()
-str_stack.push("hello")
-print(str_stack.pop())  # hello
+**换行写法：定义泛型函数**
+`from typing import TypeVar`
+`T = TypeVar("T")`
+`def <函数名>(<参数>: T) -> T: <语句>`
 
-# 受限泛型
+```python
+# 定义泛型函数
+from typing import TypeVar
+
+T = TypeVar("T")
+
+def first(items: list[T]) -> T:
+    return items[0]
+```
+
+---
+
+## TypeVar 约束
+
+**基本写法：带约束的 TypeVar**
+`T = TypeVar("T", <类型1>, <类型2>)`
+
+```python
+# 带约束的 TypeVar（限制为指定类型之一）
+from typing import TypeVar
+
 T = TypeVar("T", int, float)
 
 def add(a: T, b: T) -> T:
     return a + b
-
-print(add(1, 2))        # 3
-print(add(1.5, 2.5))    # 4.0
-# add("a", "b")  # 类型错误
 ```
 
 ---
 
-## Protocol（协议）
-
-**Protocol：结构子类型**
-`from typing import Protocol`
-`class <协议>(Protocol): def <方法>(self) -> ...: ...`
+**基本写法：带边界的 TypeVar**
+`T = TypeVar("T", bound=<类型>)`
 
 ```python
-from typing import Protocol
+# 带边界的 TypeVar（限制为指定类型及其子类）
+from typing import TypeVar
 
-class Drawable(Protocol):
-    def draw(self) -> None:
-        ...
+class Animal:
+    def speak(self) -> str:
+        return "sound"
 
-class Movable(Protocol):
-    def move(self, x: int, y: int) -> None:
-        ...
+T = TypeVar("T", bound=Animal)
 
-# 实现协议（隐式）
-class Circle:
-    def draw(self) -> None:
-        print("Drawing circle")
-    
-    def move(self, x: int, y: int) -> None:
-        print(f"Moving circle to ({x}, {y})")
-
-class Square:
-    def draw(self) -> None:
-        print("Drawing square")
-
-def render(obj: Drawable) -> None:
-    obj.draw()
-
-def animate(obj: Movable) -> None:
-    obj.move(10, 20)
-
-circle = Circle()
-square = Square()
-
-render(circle)  # Drawing circle
-render(square)  # Drawing square
-animate(circle)  # Moving circle to (10, 20)
-# animate(square)  # 类型错误：Square 没有 move 方法
+def make_speak(animal: T) -> str:
+    return animal.speak()
 ```
 
 ---
 
 ## TypedDict
 
-**TypedDict：类型化字典**
+**换行写法：定义 TypedDict**
 `from typing import TypedDict`
-`class <类型>(TypedDict): <字段>: <类型>`
+`class <TypedDict类>(TypedDict):`
+`    <字段1>: <类型>`
+`    <字段2>: <类型>`
 
 ```python
+# 定义 TypedDict（类型安全的字典）
 from typing import TypedDict
-
-class Person(TypedDict):
-    name: str
-    age: int
-    city: str
-
-# 使用
-person: Person = {
-    "name": "Alice",
-    "age": 30,
-    "city": "New York"
-}
-
-# 函数参数
-def print_person(p: Person) -> None:
-    print(f"{p['name']}, {p['age']}, {p['city']}")
-
-print_person(person)
-
-# 必需和可选字段
-from typing import TypedDict, NotRequired
 
 class User(TypedDict):
     name: str
     age: int
-    email: NotRequired[str]
-
-user1: User = {"name": "Alice", "age": 30}
-user2: User = {"name": "Bob", "age": 25, "email": "bob@example.com"}
+    email: str
 ```
 
 ---
 
-## Final 和 ClassVar
+**基本写法：使用 TypedDict**
+`<变量>: <TypedDict类> = {<字段>: <值>}`
 
-**Final：常量声明**
+```python
+# 使用 TypedDict
+user: User = {"name": "Alice", "age": 30, "email": "alice@example.com"}
+```
+
+---
+
+## Literal 类型
+
+**基本写法：使用 Literal 类型**
+`from typing import Literal`
+`<变量>: Literal[<值1>, <值2>] = <值>`
+
+```python
+# Literal 类型注解（限制为特定字面量值）
+from typing import Literal
+
+def set_mode(mode: Literal["read", "write", "append"]) -> None:
+    print(f"模式: {mode}")
+```
+
+---
+
+## Final 类型
+
+**基本写法：使用 Final 类型**
 `from typing import Final`
 `<变量>: Final[<类型>] = <值>`
 
 ```python
-from typing import Final, ClassVar
-
-# Final 常量
+# Final 类型注解（表示常量，不可重新赋值）
+from typing import Final
 MAX_SIZE: Final[int] = 100
-PI: Final[float] = 3.14159265359
-APP_NAME: Final[str] = "MyApp"
-
-# MAX_SIZE = 200  # 类型错误：不能修改 Final 变量
-
-# ClassVar 类变量
-class Config:
-    DATABASE_URL: ClassVar[str] = "postgresql://localhost/db"
-    DEBUG: ClassVar[bool] = False
-    MAX_CONNECTIONS: ClassVar[int] = 10
-    
-    def __init__(self, name: str) -> None:
-        self.name = name  # 实例变量
-
-print(Config.DATABASE_URL)
-print(Config.DEBUG)
 ```
 
 ---
 
-## mypy 类型检查
+## ClassVar 类型
 
-**安装和基本使用**
-`pip install mypy`
-`mypy <文件>`
+**基本写法：使用 ClassVar 类型**
+`from typing import ClassVar`
+`<属性>: ClassVar[<类型>] = <值>`
 
 ```python
-# example.py
-def add(a: int, b: int) -> int:
-    return a + b
+# ClassVar 类型注解（表示类变量而非实例变量）
+from typing import ClassVar
 
-def greet(name: str) -> str:
-    return f"Hello, {name}!"
-
-# 正确调用
-result = add(1, 2)
-message = greet("Alice")
-
-# 类型错误（mypy 会报错）
-# result = add("1", "2")  # error: Argument 1 to "add" has incompatible type "str"
-# message = greet(123)    # error: Argument 1 to "greet" has incompatible type "int"
+class MyClass:
+    count: ClassVar[int] = 0
+    name: str = "default"
 ```
 
 ---
 
-**mypy 配置文件**
-`mypy.ini` / `setup.cfg` / `pyproject.toml`
+## Protocol 类型
 
-```ini
-# mypy.ini
-[mypy]
-python_version = 3.11
-warn_return_any = True
-warn_unused_configs = True
-disallow_untyped_defs = True
-disallow_incomplete_defs = True
-check_untyped_defs = True
-disallow_untyped_decorators = True
-no_implicit_optional = True
-warn_redundant_casts = True
-warn_unused_ignores = True
-warn_no_return = True
-warn_return_any = True
-no_implicit_reexport = True
-strict_equality = True
-
-# 针对特定模块的配置
-[mypy-my_module.*]
-disallow_untyped_defs = False
-
-# 忽略特定模块
-[mypy-some_module.*]
-ignore_missing_imports = True
-```
-
----
-
-**mypy 严格模式**
-`mypy --strict <文件>`
+**换行写法：定义 Protocol**
+`from typing import Protocol`
+`class <Protocol名>(Protocol):`
+`    def <方法>(self, <参数>) -> <返回类型>: ...`
 
 ```python
-# 严格模式要求所有函数都有类型注解
-# 不允许 Any 类型
-# 不允许未类型化的装饰器
+# 定义 Protocol（结构化子类型）
+from typing import Protocol
 
-# 严格模式示例
-from typing import List
+class Drawable(Protocol):
+    def draw(self) -> None:
+        ...
 
-def process(items: List[int]) -> List[int]:
-    result: List[int] = []
-    for item in items:
-        result.append(item * 2)
-    return result
-
-# 类型忽略注释
-def some_function() -> int:
-    value = "not an int"  # type: ignore
-    return value  # type: ignore
+def render(obj: Drawable) -> None:
+    obj.draw()
 ```
 
 ---
 
 ## 类型别名
 
-**类型别名**
+**基本写法：定义类型别名**
 `<别名> = <类型>`
 
 ```python
-from typing import Union, List, Tuple
+# 定义类型别名
+Vector = list[float]
+Matrix = list[Vector]
 
-# 简单类型别名
-Vector = List[float]
-Matrix = List[Vector]
-
-# 联合类型别名
-JSONValue = Union[str, int, float, bool, None, List["JSONValue"], dict[str, "JSONValue"]]
-
-# 使用类型别名
-def dot_product(a: Vector, b: Vector) -> float:
-    return sum(x * y for x, y in zip(a, b))
-
-def transpose(matrix: Matrix) -> Matrix:
-    return [list(row) for row in zip(*matrix)]
-
-# Python 3.12+ 类型别名语法
-# type Vector = List[float]
-# type Matrix = List[Vector]
+def create_vector() -> Vector:
+    return [1.0, 2.0, 3.0]
 ```
 
 ---
 
-## 函数重载
-
-**@overload：函数重载**
-`from typing import overload`
-`@overload def <函数>(...): ...`
+**基本写法：使用 TypeAlias**
+`from typing import TypeAlias`
+`<别名>: TypeAlias = <类型>`
 
 ```python
-from typing import overload, Union
-
-@overload
-def process(value: int) -> int: ...
-
-@overload
-def process(value: str) -> str: ...
-
-@overload
-def process(value: list) -> list: ...
-
-def process(value):
-    """实际实现"""
-    if isinstance(value, int):
-        return value * 2
-    elif isinstance(value, str):
-        return value.upper()
-    elif isinstance(value, list):
-        return [item * 2 for item in value]
-    raise TypeError("Unsupported type")
-
-# 使用
-print(process(5))        # 10
-print(process("hello"))  # HELLO
-print(process([1, 2, 3]))  # [2, 4, 6]
+# 使用 TypeAlias 显式声明类型别名
+from typing import TypeAlias
+UserId: TypeAlias = int
+UserName: TypeAlias = str
 ```
 
 ---
 
 ## NewType
 
-**NewType：创建新类型**
+**基本写法：使用 NewType 创建新类型**
 `from typing import NewType`
-`<类型> = NewType("<名称>", <基础类型>)`
+`<新类型> = NewType("<新类型名>", <基础类型>)`
 
 ```python
+# 使用 NewType 创建新类型
 from typing import NewType
-
-# 创建新类型
 UserId = NewType("UserId", int)
-Username = NewType("Username", str)
-Email = NewType("Email", str)
 
-# 使用
-def get_user(user_id: UserId) -> dict:
-    return {"id": user_id, "name": "Alice"}
-
-def send_email(to: Email, subject: str) -> None:
-    print(f"Sending email to {to}: {subject}")
-
-# 创建新类型实例
-user_id = UserId(123)
-email = Email("alice@example.com")
-
-get_user(user_id)
-send_email(email, "Hello")
-
-# get_user(123)  # 类型错误：需要 UserId 类型
-# get_user(email)  # 类型错误
+def get_user(user_id: UserId) -> str:
+    return f"User {user_id}"
 ```
 
 ---
 
-## 运行时类型检查
+## mypy 配置
 
-**typing.get_type_hints()：获取类型提示**
-`from typing import get_type_hints`
-`get_type_hints(<函数>)`
+**基本写法：创建 mypy.ini 配置文件**
+`[mypy]`
+`python_version = <版本>`
+`strict = <布尔值>`
 
 ```python
-from typing import get_type_hints
+# mypy.ini 配置文件
+# [mypy]
+# python_version = 3.11
+# strict = True
+# warn_return_any = True
+# warn_unused_configs = True
+```
 
-def greet(name: str, age: int) -> str:
-    return f"Hello, {name}! You are {age} years old."
+---
 
-# 获取类型提示
-hints = get_type_hints(greet)
-print(hints)  # {'name': <class 'str'>, 'age': <class 'int'>, 'return': <class 'str'>}
+**基本写法：使用 pyproject.toml 配置**
+`[tool.mypy]`
+`python_version = "<版本>"`
 
-# 运行时类型检查
-def validate_type(value, expected_type):
-    """运行时类型检查"""
-    if not isinstance(value, expected_type):
-        raise TypeError(f"Expected {expected_type}, got {type(value)}")
-    return value
+```python
+# pyproject.toml 中的 mypy 配置
+# [tool.mypy]
+# python_version = "3.11"
+# strict = true
+# disallow_untyped_defs = true
+```
 
-# 使用 pydantic 进行运行时类型检查
+---
+
+## 运行 mypy
+
+**基本写法：运行 mypy 检查**
+`mypy <文件或目录>`
+
+```python
+# 运行 mypy 检查 Python 文件
+# 命令行执行：mypy script.py
+```
+
+---
+
+**基本写法：运行 mypy 严格模式**
+`mypy --strict <文件>`
+
+```python
+# 运行 mypy 严格模式
+# 命令行执行：mypy --strict script.py
+```
+
+---
+
+**基本写法：忽略特定错误**
+`# type: ignore`
+
+```python
+# 忽略类型检查错误
+result = some_untyped_function()  # type: ignore
+```
+
+---
+
+**基本写法：忽略特定错误码**
+`# type: ignore[<错误码>]`
+
+```python
+# 忽略特定错误码
+result = some_function()  # type: ignore[no-untyped-call]
+```
+
+---
+
+## 类型注解进阶
+
+**基本写法：使用 Type 获取类型**
+`from typing import Type`
+`def <函数>(<参数>: Type[<类>]) -> <语句>`
+
+```python
+# 使用 Type 注解表示类本身
+from typing import Type
+
+class Animal:
+    @classmethod
+    def create(cls) -> "Animal":
+        return cls()
+
+def factory(cls: Type[Animal]) -> Animal:
+    return cls.create()
+```
+
+---
+
+**基本写法：使用 TypeGuard**
+`from typing import TypeGuard`
+`def <函数>(<参数>: <类型>) -> TypeGuard[<目标类型>]: <语句>`
+
+```python
+# 使用 TypeGuard 定义类型守卫
+from typing import TypeGuard
+
+def is_string_list(items: list) -> TypeGuard[list[str]]:
+    return all(isinstance(item, str) for item in items)
+```
+
+---
+
+**基本写法：使用 ParamSpec**
+`from typing import ParamSpec`
+`P = ParamSpec("P")`
+
+```python
+# 使用 ParamSpec 传递参数签名
+from typing import ParamSpec, TypeVar, Callable
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+def decorator(func: Callable[P, R]) -> Callable[P, R]:
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        return func(*args, **kwargs)
+    return wrapper
+```
+
+---
+
+**基本写法：使用 Concatenate**
+`from typing import Concatenate`
+`def <函数>(<参数>: Callable[Concatenate[<类型>, P], R]): <语句>`
+
+```python
+# 使用 Concatenate 在参数签名前添加参数
+from typing import Concatenate, ParamSpec, TypeVar, Callable
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+def with_context(func: Callable[Concatenate[str, P], R]) -> Callable[P, R]:
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        return func("context", *args, **kwargs)
+    return wrapper
+```
+
+---
+
+## 类型注解与 dataclass
+
+**换行写法：带类型注解的 dataclass**
+`from dataclasses import dataclass`
+`@dataclass`
+`class <类名>:`
+`    <字段1>: <类型>`
+`    <字段2>: <类型> = <默认值>`
+
+```python
+# 带类型注解的 dataclass
+from dataclasses import dataclass
+
+@dataclass
+class User:
+    name: str
+    age: int
+    email: str = ""
+    active: bool = True
+```
+
+---
+
+## 类型注解与 Pydantic
+
+**换行写法：使用 Pydantic 模型**
+`from pydantic import BaseModel`
+`class <模型名>(BaseModel):`
+`    <字段1>: <类型>`
+`    <字段2>: <类型>`
+
+```python
+# 使用 Pydantic 定义数据模型
 from pydantic import BaseModel
 
 class User(BaseModel):
     name: str
     age: int
     email: str
+```
 
-user = User(name="Alice", age=30, email="alice@example.com")
-print(user.name)  # Alice
-# user = User(name="Alice", age="thirty")  # ValidationError
+---
+
+**基本写法：使用 Pydantic 验证**
+`<模型>(**<字典>)`
+
+```python
+# 使用 Pydantic 进行数据验证
+data = {"name": "Alice", "age": 30, "email": "alice@example.com"}
+user = User(**data)
+```
+
+---
+
+## 异步类型注解
+
+**换行写法：异步函数类型注解**
+`from typing import Coroutine, Any`
+`async def <函数>(<参数>: <类型>) -> <返回类型>: <语句>`
+
+```python
+# 异步函数类型注解
+import asyncio
+
+async def fetch_data(url: str) -> str:
+    await asyncio.sleep(1)
+    return f"Data from {url}"
+```
+
+---
+
+**基本写法：Awaitable 类型注解**
+`from typing import Awaitable`
+`<变量>: Awaitable[<类型>] = <协程>`
+
+```python
+# Awaitable 类型注解
+from typing import Awaitable
+
+def get_fetcher() -> Awaitable[str]:
+    return fetch_data("https://example.com")
+```
+
+---
+
+**基本写法：AsyncIterator 类型注解**
+`from typing import AsyncIterator`
+`async def <函数>() -> AsyncIterator[<类型>]: <语句>`
+
+```python
+# AsyncIterator 类型注解
+from typing import AsyncIterator
+
+async def async_range(n: int) -> AsyncIterator[int]:
+    for i in range(n):
+        yield i
+        await asyncio.sleep(0.1)
+```
+
+---
+
+## 类型注解最佳实践
+
+**基本写法：为所有函数添加类型注解**
+`def <函数名>(<参数>: <类型>) -> <返回类型>: <语句>`
+
+```python
+# 为所有函数添加类型注解
+def calculate_total(prices: list[float], tax_rate: float) -> float:
+    subtotal = sum(prices)
+    return subtotal * (1 + tax_rate)
+```
+
+---
+
+**基本写法：使用 NoReturn 表示不返回**
+`from typing import NoReturn`
+`def <函数>(<参数>) -> NoReturn: <语句>`
+
+```python
+# 使用 NoReturn 表示函数不返回
+from typing import NoReturn
+
+def raise_error(message: str) -> NoReturn:
+    raise ValueError(message)
+```
+
+---
+
+**基本写法：使用 overload 重载**
+`from typing import overload`
+`@overload`
+`def <函数>(<参数>: <类型1>) -> <返回类型1>: ...`
+
+```python
+# 使用 overload 定义函数重载
+from typing import overload
+
+@overload
+def process(data: int) -> int: ...
+
+@overload
+def process(data: str) -> str: ...
+
+def process(data):
+    if isinstance(data, int):
+        return data * 2
+    return data.upper()
 ```

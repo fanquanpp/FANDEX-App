@@ -4,199 +4,192 @@
 
 ---
 
-## Promise.all
-
-**全部成功**：等待所有 Promise 完成
-`Promise.all([<promise1>, <promise2>, ...])`
-```javascript
-const [users, posts, comments] = await Promise.all([
-  fetchUsers(),
-  fetchPosts(),
-  fetchComments(),
-]);
-// 所有 Promise 成功 -> 返回结果数组
-// 任一 Promise 失败 -> 立即拒绝，返回第一个错误
-```
-
----
-
-**错误处理**：捕获第一个失败
-`try { await Promise.all([...]) } catch (<错误>) { <处理> }`
-```javascript
-try {
-  const results = await Promise.all([
-    fetch('/api/a'),
-    fetch('/api/b'),
-    fetch('/api/c'),
-  ]);
-} catch (error) {
-  // 只能捕获第一个失败，其他请求的结果丢失
-  console.error(error);
-}
-```
-
----
-
-## Promise.allSettled
-
-**全部完成**：等待所有 Promise 完成（无论成功或失败）
-`Promise.allSettled([<promise1>, <promise2>, ...])`
-```javascript
-const results = await Promise.allSettled([
-  fetch('/api/a'),
-  fetch('/api/b'),
-  fetch('/api/c'),
-]);
-results.forEach((result) => {
-  if (result.status === 'fulfilled') {
-    console.log('成功:', result.value);
-  } else {
-    console.log('失败:', result.reason);
-  }
-});
-```
-
----
-
-**结果格式**：成功和失败的对象结构
-`{ status: 'fulfilled', value: <值> }` | `{ status: 'rejected', reason: <原因> }`
-```javascript
-// 成功结果
-{ status: 'fulfilled', value: any }
-
-// 失败结果
-{ status: 'rejected', reason: any }
-```
-
----
-
-**分离成功和失败**：使用工具函数
-`function partitionResults(<结果数组>) { ... }`
-```javascript
-function partitionResults(results) {
-  const fulfilled = results.filter((r) => r.status === 'fulfilled').map((r) => r.value);
-  const rejected = results.filter((r) => r.status === 'rejected').map((r) => r.reason);
-  return { fulfilled, rejected };
-}
-
-// 批量操作，收集所有结果
-async function batchDelete(ids) {
-  const results = await Promise.allSettled(
-    ids.map((id) => fetch(`/api/items/${id}`, { method: 'DELETE' }))
-  );
-  const { fulfilled, rejected } = partitionResults(results);
-  console.log(`成功: ${fulfilled.length}, 失败: ${rejected.length}`);
-  return { fulfilled, rejected };
-}
-```
-
----
-
-## Promise.any
-
-**任一成功**：返回第一个成功的 Promise
-`Promise.any([<promise1>, <promise2>, ...])`
-```javascript
-// 多源竞速，取最快成功的
-const fastest = await Promise.any([
-  fetchFromCDN1('/api/data'),
-  fetchFromCDN2('/api/data'),
-  fetchFromCDN3('/api/data'),
-]);
-// 任一 Promise 成功 -> 立即返回该结果
-// 所有 Promise 失败 -> 抛出 AggregateError
-```
-
----
-
-**AggregateError**：所有 Promise 失败时抛出
-`catch (<aggregateError>) { <处理> }`
-```javascript
-try {
-  const result = await Promise.any([
-    Promise.reject(new Error('CDN1 failed')),
-    Promise.reject(new Error('CDN2 failed')),
-    Promise.reject(new Error('CDN3 failed')),
-  ]);
-} catch (aggregateError) {
-  console.log(aggregateError instanceof AggregateError);  // true
-  console.log(aggregateError.errors);  // [Error, Error, Error]
-  aggregateError.errors.forEach((err) => console.error(err.message));
-}
-```
-
----
-
-**与 Promise.race 的区别**：成功条件不同
-`Promise.race([...])` | `Promise.any([...])`
-```javascript
-// race: 第一个拒绝就拒绝
-const r1 = await Promise.race([
-  Promise.reject(new Error('fast fail')),
-  new Promise((resolve) => setTimeout(() => resolve('slow success'), 100)),
-]);
-// 抛出 Error: fast fail
-
-// any: 忽略拒绝，等第一个成功
-const r2 = await Promise.any([
-  Promise.reject(new Error('fast fail')),
-  new Promise((resolve) => setTimeout(() => resolve('slow success'), 100)),
-]);
-// 'slow success'
-```
-
----
-
-## Promise.race
-
-**第一个完成**：返回第一个完成的 Promise（无论成功或失败）
-`Promise.race([<promise1>, <promise2>, ...])`
-```javascript
-const promise1 = new Promise((resolve) => setTimeout(() => resolve('第一个'), 1000));
-const promise2 = new Promise((resolve) => setTimeout(() => resolve('第二个'), 500));
-Promise.race([promise1, promise2]).then((result) => {
-  console.log('第一个完成的 Promise:', result);  // '第二个'
-});
-```
-
----
-
 ## Promise.resolve
 
-**返回已解决的 Promise**：快速创建成功 Promise
+**基本写法：resolve 值**
 `Promise.resolve(<值>)`
 ```javascript
-const promise = Promise.resolve('成功');
-promise.then((result) => {
-  console.log(result);  // '成功'
-});
+// 创建已完成的 Promise
+let p = Promise.resolve(42);
 ```
 
 ---
 
-**resolve thenable**：转换 thenable 对象
+**基本写法：resolve 对象**
+`Promise.resolve(<对象>)`
+```javascript
+// 将对象包装为 Promise
+let p = Promise.resolve({ name: "Alice" });
+```
+
+---
+
+**基本写法：resolve 数组**
+`Promise.resolve(<数组>)`
+```javascript
+// 将数组包装为 Promise
+let p = Promise.resolve([1, 2, 3]);
+```
+
+---
+
+**基本写法：resolve thenable**
 `Promise.resolve(<thenable>)`
 ```javascript
-const thenable = {
-  then(resolve) {
-    resolve('thenable 结果');
-  },
-};
-Promise.resolve(thenable).then((result) => {
-  console.log(result);  // 'thenable 结果'
-});
+// 将 thenable 对象转换为 Promise
+let p = Promise.resolve({ then: (resolve) => resolve(42) });
+```
+
+---
+
+**基本写法：resolve Promise**
+`Promise.resolve(<promise>)`
+```javascript
+// 传入 Promise 原样返回
+let original = Promise.resolve(1);
+let p = Promise.resolve(original);
 ```
 
 ---
 
 ## Promise.reject
 
-**返回已拒绝的 Promise**：快速创建失败 Promise
-`Promise.reject(<原因>)`
+**基本写法：reject 错误**
+`Promise.reject(new Error("<消息>"))`
 ```javascript
-const promise = Promise.reject('失败');
-promise.catch((error) => {
-  console.log(error);  // '失败'
+// 创建已拒绝的 Promise
+let p = Promise.reject(new Error("failed"));
+```
+
+---
+
+**基本写法：reject 字符串**
+`Promise.reject("<消息>")`
+```javascript
+// 使用字符串作为拒绝原因
+let p = Promise.reject("error occurred");
+```
+
+---
+
+**基本写法：reject 对象**
+`Promise.reject({ <属性>: <值> })`
+```javascript
+// 使用对象作为拒绝原因
+let p = Promise.reject({ code: 500, message: "Server Error" });
+```
+
+---
+
+## Promise.all
+
+**基本写法：all 等待全部**
+`Promise.all([<promise1>, <promise2>])`
+```javascript
+// 等待所有 Promise 完成
+Promise.all([p1, p2]).then(results => {
+});
+```
+
+---
+
+**基本写法：all 结果顺序**
+`Promise.all([<promise1>, <promise2>]).then(([<结果1>, <结果2>]) => { })`
+```javascript
+// 结果顺序与传入顺序一致
+Promise.all([fetchA(), fetchB()]).then(([a, b]) => {
+});
+```
+
+---
+
+**基本写法：all 任一失败**
+`Promise.all([<promise1>, <promise2>]).catch(<回调>)`
+```javascript
+// 任一 Promise 失败则整体失败
+Promise.all([p1, p2]).catch(error => {
+});
+```
+
+---
+
+**基本写法：all 空数组**
+`Promise.all([])`
+```javascript
+// 空数组立即完成
+Promise.all([]).then(results => {
+});
+```
+
+---
+
+## Promise.allSettled
+
+**基本写法：allSettled 等待全部落定**
+`Promise.allSettled([<promise1>, <promise2>])`
+```javascript
+// 等待所有 Promise 落定无论成功失败
+Promise.allSettled([p1, p2]).then(results => {
+});
+```
+
+---
+
+**基本写法：allSettled 结果处理**
+`Promise.allSettled([<promise1>, <promise2>]).then(<回调>)`
+```javascript
+// 处理每个 Promise 的状态和值
+Promise.allSettled([p1, p2]).then(results => {
+    results.forEach(result => {
+        if (result.status === "fulfilled") {
+        }
+    });
+});
+```
+
+---
+
+## Promise.race
+
+**基本写法：race 竞速**
+`Promise.race([<promise1>, <promise2>])`
+```javascript
+// 返回第一个落定的 Promise
+Promise.race([p1, p2]).then(result => {
+});
+```
+
+---
+
+**基本写法：race 超时控制**
+`Promise.race([<promise>, <超时Promise>])`
+```javascript
+// 使用 race 实现超时控制
+Promise.race([
+    fetchData(),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 5000))
+]);
+```
+
+---
+
+## Promise.any
+
+**基本写法：any 第一个成功**
+`Promise.any([<promise1>, <promise2>])`
+```javascript
+// 返回第一个成功的 Promise
+Promise.any([p1, p2]).then(result => {
+});
+```
+
+---
+
+**基本写法：any 全部失败**
+`Promise.any([<promise1>, <promise2>]).catch(<回调>)`
+```javascript
+// 所有 Promise 失败则抛出 AggregateError
+Promise.any([p1, p2]).catch(error => {
 });
 ```
 
@@ -204,133 +197,107 @@ promise.catch((error) => {
 
 ## Promise.withResolvers
 
-**withResolvers 用法**：ES2024+，一步到位
-`const { promise, resolve, reject } = Promise.withResolvers();`
+**基本写法：withResolvers**
+`Promise.withResolvers()`
 ```javascript
+// 获取 Promise 和 resolve reject 函数
 const { promise, resolve, reject } = Promise.withResolvers();
-// resolve 和 reject 可以在 Promise 外部使用
-setTimeout(() => resolve('done'), 1000);
-const result = await promise;  // 'done'
 ```
 
 ---
 
-**缓存 Promise**：使用 withResolvers
-`const { promise, resolve, reject } = Promise.withResolvers();`
+## 实用模式
+
+**基本写法：并行执行**
+`Promise.all([<异步1>(), <异步2>(), <异步3>()])`
 ```javascript
-function createCachedFetcher() {
-  const cache = new Map();
-  return function fetchWithCache(url) {
-    if (cache.has(url)) {
-      return cache.get(url).promise;
-    }
-    const { promise, resolve, reject } = Promise.withResolvers();
-    cache.set(url, { promise });
-    fetch(url)
-      .then((res) => res.json())
-      .then(resolve)
-      .catch(reject);
-    return promise;
-  };
-}
+// 并行执行多个异步操作
+Promise.all([fetchUsers(), fetchPosts(), fetchComments()]);
 ```
 
 ---
 
-**事件转 Promise**：使用 withResolvers
-`const { promise, resolve } = Promise.withResolvers();`
+**基本写法：容错执行**
+`Promise.allSettled([<promise1>, <promise2>])`
 ```javascript
-function waitForEvent(emitter, eventName) {
-  const { promise, resolve } = Promise.withResolvers();
-  emitter.once(eventName, resolve);
-  setTimeout(() => resolve(null), 5000);  // 添加超时
-  return promise;
-}
-// 使用
-const data = await waitForEvent(socket, 'message');
+// 容错执行即使部分失败也继续
+Promise.allSettled([fetchA(), fetchB()]).then(results => {
+});
 ```
 
 ---
 
-**可取消的异步操作**：使用 withResolvers
-`function createCancellableTask(<异步函数>) { ... }`
+**基本写法：首个成功**
+`Promise.any([<promise1>, <promise2>])`
 ```javascript
-function createCancellableTask(asyncFn) {
-  const { promise, resolve, reject } = Promise.withResolvers();
-  let cancelled = false;
-  asyncFn()
-    .then((result) => {
-      if (!cancelled) resolve(result);
-    })
-    .catch((error) => {
-      if (!cancelled) reject(error);
+// 获取首个成功的响应
+Promise.any([fetchPrimary(), fetchBackup()]);
+```
+
+---
+
+**基本写法：超时控制**
+`Promise.race([<promise>, <超时Promise>])`
+```javascript
+// 限制 Promise 执行时间
+Promise.race([
+    fetch(),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 3000))
+]);
+```
+
+---
+
+## 错误处理
+
+**基本写法：all 错误处理**
+`Promise.all([<promise1>, <promise2>]).catch(<回调>)`
+```javascript
+// Promise.all 任一失败触发 catch
+Promise.all([p1, p2]).catch(error => {
+});
+```
+
+---
+
+**基本写法：any 错误处理**
+`Promise.any([<promise1>, <promise2>]).catch(<回调>)`
+```javascript
+// Promise.any 全部失败触发 AggregateError
+Promise.any([p1, p2]).catch(error => {
+});
+```
+
+---
+
+**基本写法：allSettled 错误处理**
+`Promise.allSettled([<promise1>, <promise2>]).then(<回调>)`
+```javascript
+// allSettled 不会触发 catch 需在 then 中处理
+Promise.allSettled([p1, p2]).then(results => {
+    results.forEach(r => {
+        if (r.status === "rejected") {
+        }
     });
-  return {
-    promise,
-    cancel() {
-      cancelled = true;
-      reject(new Error('Task cancelled'));
-    },
-  };
-}
+});
 ```
 
 ---
 
-## 组合使用
+## 数组映射为 Promise
 
-**带超时的请求**：使用 Promise.race
-`Promise.race([<promise>, <超时promise>])`
+**基本写法：数组映射 Promise**
+`Promise.all(<数组>.map(<异步函数>))`
 ```javascript
-function fetchWithTimeout(url, timeout = 5000) {
-  return Promise.race([
-    fetch(url),
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Timeout')), timeout)
-    ),
-  ]);
-}
+// 将数组元素映射为 Promise 并行执行
+Promise.all(urls.map(url => fetch(url)));
 ```
 
 ---
 
-**批量重试**：失败后重试
-`async function fetchWithRetry(<URL>, <重试次数>) { ... }`
+**基本写法：数组顺序执行**
+`<数组>.reduce(<链式回调>, Promise.resolve())`
 ```javascript
-async function fetchWithRetry(url, retries = 3) {
-  for (let i = 0; i < retries; i++) {
-    try {
-      return await fetch(url);
-    } catch (error) {
-      if (i === retries - 1) throw error;
-      await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, i)));
-    }
-  }
-}
-```
-
----
-
-## 方法对比
-
-**方法对比表**：不同静态方法的差异
-| 方法 | 成功条件 | 失败条件 | 返回值 |
-|------|----------|----------|--------|
-| `Promise.all` | 全部成功 | 任一失败 | 结果数组 |
-| `Promise.allSettled` | 永远成功 | 不会失败 | 状态对象数组 |
-| `Promise.race` | 第一个完成 | 第一个完成（可能拒绝） | 第一个结果 |
-| `Promise.any` | 第一个成功 | 全部失败 | 第一个成功值 |
-| `Promise.withResolvers` | 手动控制 | 手动控制 | { promise, resolve, reject } |
-```javascript
-// Promise.all - 全部成功才成功
-Promise.all([p1, p2, p3]).then(([r1, r2, r3]) => { ... });
-
-// Promise.allSettled - 等待全部完成
-Promise.allSettled([p1, p2, p3]).then((results) => { ... });
-
-// Promise.race - 第一个完成
-Promise.race([p1, p2, p3]).then((first) => { ... });
-
-// Promise.any - 第一个成功
-Promise.any([p1, p2, p3]).then((first) => { ... });
+// 顺序执行数组中的异步操作
+items.reduce((chain, item) => chain.then(() => process(item)), Promise.resolve());
 ```
