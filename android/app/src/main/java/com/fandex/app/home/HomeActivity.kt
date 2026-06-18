@@ -569,7 +569,10 @@ fun ArticleScreenContent(
     }
 
     /* 查找当前文档在模块中的位置，计算上一篇/下一篇 */
-    val documents = contentIndex?.documents?.filter { it.module == moduleId } ?: emptyList()
+    val module = contentIndex?.modules?.find { it.id == moduleId }
+    val documents = module?.documents?.map { docName ->
+        Document(slug = docName, title = docName, module = moduleId)
+    } ?: emptyList()
     val currentIndex = documents.indexOfFirst { it.slug == slug }
     val prevDoc: Document? = if (currentIndex > 0) documents[currentIndex - 1] else null
     val nextDoc: Document? = if (currentIndex >= 0 && currentIndex < documents.size - 1) documents[currentIndex + 1] else null
@@ -754,7 +757,7 @@ fun SidebarHomeContent(
                 ) {
                     StatItem(count = "${contentIndex.categories.size}", label = strings.category)
                     StatItem(count = "${contentIndex.modules.size}", label = strings.modules)
-                    StatItem(count = "${contentIndex.documents.size}", label = strings.documents)
+                    StatItem(count = "${contentIndex.modules.sumOf { it.documents.size }}", label = strings.documents)
                 }
             }
         }
@@ -842,7 +845,9 @@ fun SidebarModuleContent(
         contentIndex?.categories?.find { it.id == m.category }
     }
     val documents = module?.let { m ->
-        contentIndex?.documents?.filter { it.module == m.id }
+        m.documents.map { docName ->
+            Document(slug = docName, title = docName, module = m.id)
+        }
     } ?: emptyList()
 
     val accentColor = remember(category?.color) {
@@ -965,7 +970,9 @@ fun SidebarArticleContent(
         contentIndex?.categories?.find { it.id == m.category }
     }
     val documents = module?.let { m ->
-        contentIndex?.documents?.filter { it.module == m.id }
+        m.documents.map { docName ->
+            Document(slug = docName, title = docName, module = m.id)
+        }
     } ?: emptyList()
 
     val accentColor = remember(category?.color) {

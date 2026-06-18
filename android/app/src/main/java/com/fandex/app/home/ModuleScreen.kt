@@ -55,7 +55,9 @@ fun ModuleScreen(
         contentIndex.categories.find { it.id == m.category }
     }
     val documents = module?.let { m ->
-        contentIndex.documents.filter { it.module == m.id }
+        m.documents.map { docName ->
+            Document(slug = docName, title = docName, module = m.id)
+        }
     } ?: emptyList()
 
     /**

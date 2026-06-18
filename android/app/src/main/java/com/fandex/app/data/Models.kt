@@ -10,11 +10,11 @@ import com.google.gson.annotations.SerializedName
  * 输出：结构化的分类与模块数据
  */
 data class ContentIndex(
-    val version: String,
-    @SerializedName("generatedAt") val generatedAt: String,
-    val categories: List<Category>,
-    val modules: List<Module>,
-    val documents: List<Document>
+    val version: String = "",
+    @SerializedName("generatedAt") val generatedAt: String = "",
+    val categories: List<Category> = emptyList(),
+    val modules: List<Module> = emptyList(),
+    val documents: List<Document> = emptyList()
 )
 
 /**
@@ -38,9 +38,9 @@ data class Category(
 data class Module(
     val id: String,
     val title: String,
-    val category: String,
-    val description: String,
-    val documents: List<String>
+    val category: String = "",
+    val description: String = "",
+    val documents: List<String> = emptyList()
 )
 
 /**
@@ -51,9 +51,9 @@ data class Module(
  */
 data class Document(
     val slug: String,
-    val title: String,
-    val module: String,
-    val category: String,
-    val difficulty: String,
-    val description: String
+    val title: String = "",
+    val module: String = "",
+    val category: String = "",
+    val difficulty: String = "",
+    val description: String = ""
 )
