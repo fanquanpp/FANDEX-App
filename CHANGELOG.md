@@ -11,6 +11,11 @@
 - 保留 17 个编程语言模块：C、C++、C#、CSS、Git、Go、Java、JavaScript、Kotlin、Lua、Markdown、MySQL、PostgreSQL、Python、Redis、SQL、TypeScript
 - 共 641 篇纯语法速查文档
 - 重写 index.json 注册表，分类调整为：编程语言/前端技术/数据库/工具链/标记语言
+- 更新 README.md：标语改为"代码语法，离线速查"，新增定位章节
+- 更新项目说明文件：新增第四节"FANDEX-App 内容规则"
+- 更新文档格式模板：补充编写规则、符号约定、书写格式、文档结构说明
+- 更新下载页描述文本：与纯语法速查工具定位一致
+- 更新 process-content.ps1：模块映射从 49 个精简为 17 个，分类从 8 个调整为 5 个
 
 ## v1.5.1-beta
 

@@ -1,130 +1,61 @@
-# FANDEX Content Processor v2
-# Scans content/{category}/{module}/ structure, generates index.json,
-# copies .md files to Android assets directory
+# FANDEX Content Processor v3
+# FANDEX-App 定位：纯代码语法速查工具
+# 仅收录编程语言/查询语言/标记语言的语法格式文档
+# 扫描 content/{category}/{module}/ 结构，生成 index.json，
+# 复制 .md 文件到 Android assets 目录
 
 $ModuleCategoryMap = @{
-    "agent"              = "ai"
-    "ai-ethics"          = "ai"
-    "ai-engineering"     = "ai"
-    "llm"                = "ai"
-    "deep-learning"      = "ai"
-    "machine-learning"   = "ai"
-    "nlp"                = "ai"
-    "computer-vision"    = "ai"
-    "multimodal"         = "ai"
-    "generative-ai"      = "ai"
-    "python"             = "ai"
-    "html5"              = "frontend"
+    "c"                  = "languages"
+    "cpp"                = "languages"
+    "csharp"             = "languages"
+    "go"                 = "languages"
+    "java"               = "languages"
+    "javascript"         = "languages"
+    "kotlin"             = "languages"
+    "lua"                = "languages"
+    "python"             = "languages"
+    "typescript"         = "languages"
     "css"                = "frontend"
-    "javascript"         = "frontend"
-    "typescript"         = "frontend"
-    "react"              = "frontend"
-    "vue3"               = "frontend"
-    "java"               = "backend"
-    "go"                 = "backend"
-    "csharp"             = "backend"
-    "kotlin"             = "backend"
-    "lua"                = "backend"
     "mysql"              = "database"
     "postgresql"         = "database"
     "redis"              = "database"
     "sql"                = "database"
-    "big-data"           = "database"
-    "c"                  = "cs"
-    "cpp"                = "cs"
-    "algorithm"          = "cs"
-    "cs-fundamentals"    = "cs"
-    "discrete-math"      = "cs"
-    "networking"         = "cs"
-    "cybersecurity"      = "cs"
-    "software-architecture"  = "cs"
-    "software-engineering"   = "cs"
-    "software-testing"       = "cs"
-    "engineering-practices"  = "cs"
-    "calculus"               = "math"
-    "probability-statistics" = "math"
-    "data-analysis"          = "math"
-    "linear-algebra"         = "math"
-    "cloud-computing"    = "cloud"
-    "iot"                = "cloud"
-    "harmonyos"          = "cloud"
-    "devops"             = "tools"
     "git"                = "tools"
-    "github"             = "tools"
-    "markdown"           = "tools"
-    "getting-started"    = "tools"
-    "english"            = "tools"
+    "markdown"           = "markup"
 }
 
 $Categories = @(
-    @{ id = "tools";    label = [char]0x5DE5 + [char]0x5177 + [char]0x94FE;       color = "#4f5bd5" }
-    @{ id = "frontend"; label = [char]0x524D + [char]0x7AEF + [char]0x6280 + [char]0x672F;     color = "#d63031" }
-    @{ id = "backend";  label = [char]0x540E + [char]0x7AEF + [char]0x6280 + [char]0x672F;     color = "#e17055" }
-    @{ id = "database"; label = [char]0x6570 + [char]0x636E + [char]0x5E93;       color = "#00b894" }
-    @{ id = "cs";       label = [char]0x8BA1 + [char]0x7B97 + [char]0x673A + [char]0x79D1 + [char]0x5B66;   color = "#8854d0" }
-    @{ id = "math";     label = [char]0x6570 + [char]0x5B66;         color = "#6c5ce7" }
-    @{ id = "cloud";    label = [char]0x4E91 + [char]0x4E0E + [char]0x57FA + [char]0x7840 + [char]0x8BBE + [char]0x65BD; color = "#e05a2b" }
-    @{ id = "ai";       label = [char]0x4EBA + [char]0x5DE5 + [char]0x667A + [char]0x80FD;     color = "#f9a825" }
+    @{ id = "languages"; label = [char]0x7F16 + [char]0x7A0B + [char]0x8BED + [char]0x8A00; color = "#3b82f6" }
+    @{ id = "frontend";  label = [char]0x524D + [char]0x7AEF + [char]0x6280 + [char]0x672F; color = "#d63031" }
+    @{ id = "database";  label = [char]0x6570 + [char]0x636E + [char]0x5E93;       color = "#00b894" }
+    @{ id = "tools";     label = [char]0x5DE5 + [char]0x5177 + [char]0x94FE;       color = "#4f5bd5" }
+    @{ id = "markup";    label = [char]0x6807 + [char]0x8BB0 + [char]0x8BED + [char]0x8A00; color = "#e05a2b" }
 )
 
 $ModuleLabels = @{
-    "agent"              = "AI Agent"
-    "ai-ethics"          = "AI Ethics & Safety"
-    "ai-engineering"     = "AI Engineering"
-    "llm"                = "LLM"
-    "deep-learning"      = "Deep Learning"
-    "machine-learning"   = "Machine Learning"
-    "nlp"                = "NLP"
-    "computer-vision"    = "Computer Vision"
-    "multimodal"         = "Multimodal"
-    "generative-ai"      = "Generative AI"
-    "python"             = "Python"
-    "html5"              = "HTML5"
-    "css"                = "CSS"
-    "javascript"         = "JavaScript"
-    "typescript"         = "TypeScript"
-    "react"              = "React"
-    "vue3"               = "Vue 3"
-    "java"               = "Java"
-    "go"                 = "Go"
+    "c"                  = "C"
+    "cpp"                = "C++"
     "csharp"             = "C#"
+    "go"                 = "Go"
+    "java"               = "Java"
+    "javascript"         = "JavaScript"
     "kotlin"             = "Kotlin"
     "lua"                = "Lua"
+    "python"             = "Python"
+    "typescript"         = "TypeScript"
+    "css"                = "CSS"
     "mysql"              = "MySQL"
     "postgresql"         = "PostgreSQL"
     "redis"              = "Redis"
     "sql"                = "SQL"
-    "big-data"           = "Big Data"
-    "c"                  = "C"
-    "cpp"                = "C++"
-    "algorithm"          = "Algorithm"
-    "cs-fundamentals"    = "CS Fundamentals"
-    "discrete-math"      = "Discrete Math"
-    "networking"         = "Networking"
-    "cybersecurity"      = "Cybersecurity"
-    "software-architecture" = "Software Architecture"
-    "software-engineering"  = "Software Engineering"
-    "software-testing"      = "Software Testing"
-    "engineering-practices" = "Engineering Practices"
-    "calculus"           = "Calculus"
-    "probability-statistics" = "Probability & Statistics"
-    "data-analysis"      = "Data Analysis"
-    "linear-algebra"     = "Linear Algebra"
-    "cloud-computing"    = "Cloud Computing"
-    "iot"                = "IoT"
-    "harmonyos"          = "HarmonyOS"
     "git"                = "Git"
-    "github"             = "GitHub"
-    "devops"             = "DevOps"
     "markdown"           = "Markdown"
-    "getting-started"    = "Getting Started"
-    "english"            = "Tech English"
 }
 
 $SourceDir = "c:\Atian\Project\Trae\FANDEX-pj\FANDEX-Web\content"
 $TargetDir = "c:\Atian\Project\Trae\FANDEX-pj\FANDEX-App\android\app\src\main\assets\dist-mobile"
 
-Write-Host "=== FANDEX Content Processor v2 ==="
+Write-Host "=== FANDEX Content Processor v3 ==="
 
 # Clean target docs directory
 if (Test-Path "$TargetDir\docs") {
