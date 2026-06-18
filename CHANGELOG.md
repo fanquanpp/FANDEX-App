@@ -2,24 +2,6 @@
 
 所有版本均为测试版。
 
-## v2.1.0-beta
-
-- 新增 Kotlin 基础文档（变量与常量、函数、空安全、类与对象、集合操作）
-- 新增 Go 基础文档（变量声明、函数、控制流、结构体与方法、Goroutine 与 Channel）
-- 新增 Python 基础文档（变量与数据类型、函数、列表与字典、类与继承、异常处理）
-- 索引新增 Kotlin/Go/Python 三个模块
-
-## v2.0.0-beta
-
-- 架构重构：从 Jetpack Compose 迁移至原生 View 体系
-- 空壳体积从 7.9MB 降至 85KB（不含文档）
-- 移除 AppCompat/Material/Compose/Navigation/DataStore/commonmark 等重量级依赖
-- 手写极简 Markdown/LaTeX 渲染器（SpannableStringBuilder，零第三方依赖）
-- 手写 JSON 解析（org.json，无 Gson 依赖）
-- DrawerLayout 抽屉导航 + ListView 列表
-- ProGuard 混淆 + 资源压缩 + 语言裁剪（仅 zh-rCN）
-- 后续仅需更新 assets 文档，无需改动代码
-
 ## v1.5.1-beta
 
 - 新增文档：Python与类型系统（类型注解、泛型、Protocol、TypeGuard、TypedDict）

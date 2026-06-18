@@ -1,5 +1,3 @@
+# FANDEX ProGuard Rules
 -keepattributes *Annotation*
--keep class com.fandex.app.data.model.** { *; }
--dontwarn org.json.**
--assumenosideeffects class android.util.Log { *; }
--dontnote **
+-keep class com.fandex.app.data.** { *; }
