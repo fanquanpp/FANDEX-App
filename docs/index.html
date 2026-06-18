@@ -500,6 +500,13 @@
 
             <div class="version-grid">
 
+                <!-- v2.0.0-beta -->
+                <a class="version-card" onclick="showDetail('2.0.0')">
+                    <span class="card-icon"><span class="icon-classic">F</span></span>
+                    <h3 class="card-title">v2.0.0-beta</h3>
+                    <p class="card-desc">重新定义：纯代码语法速查工具</p>
+                </a>
+
                 <!-- v1.5.1-beta -->
                 <a class="version-card" onclick="showDetail('1.5.1')">
                     <span class="card-icon"><span class="icon-classic">F</span></span>
@@ -603,6 +610,22 @@
          * 每个版本包含：版本号、标签、下载链接、更新日志、图标颜色
          */
         var versions = {
+            '2.0.0': {
+                version: 'v2.0.0-beta',
+                badge: 'BETA',
+                apk: './FANDEX-v2.0.0-beta.apk',
+                apkName: 'FANDEX-v2.0.0-beta.apk',
+                date: '2026-06-18',
+                size: '7.9 MB',
+                require: 'Android 8.0+',
+                changes: [
+                    '重新定义：纯代码语法速查工具',
+                    '删除全部教学/概念型文档',
+                    '保留 17 个编程语言模块',
+                    '641 篇语法速查文档',
+                    '删除非编程语言模块'
+                ]
+            },
             '1.5.1': {
                 version: 'v1.5.1-beta',
                 badge: 'BETA',

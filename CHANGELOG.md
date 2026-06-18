@@ -2,6 +2,16 @@
 
 所有版本均为测试版。
 
+## v2.0.0-beta
+
+- 重新定义 App 定位：纯粹的代码语法和语法格式查看阅览工具
+- 删除全部教学/概念型文档（概述、理论、项目示例、最佳实践等）
+- 删除非编程语言模块（AI Agent、算法、微积分、软件工程等 26 个模块）
+- 删除 Vue 组件型文件（无法在 App 中渲染的语法速查.md）
+- 保留 17 个编程语言模块：C、C++、C#、CSS、Git、Go、Java、JavaScript、Kotlin、Lua、Markdown、MySQL、PostgreSQL、Python、Redis、SQL、TypeScript
+- 共 641 篇纯语法速查文档
+- 重写 index.json 注册表，分类调整为：编程语言/前端技术/数据库/工具链/标记语言
+
 ## v1.5.1-beta
 
 - 新增文档：Python与类型系统（类型注解、泛型、Protocol、TypeGuard、TypedDict）
