@@ -2,6 +2,13 @@
 
 所有版本均为测试版。
 
+## v2.1.0-beta
+
+- 新增 Kotlin 基础文档（变量与常量、函数、空安全、类与对象、集合操作）
+- 新增 Go 基础文档（变量声明、函数、控制流、结构体与方法、Goroutine 与 Channel）
+- 新增 Python 基础文档（变量与数据类型、函数、列表与字典、类与继承、异常处理）
+- 索引新增 Kotlin/Go/Python 三个模块
+
 ## v2.0.0-beta
 
 - 架构重构：从 Jetpack Compose 迁移至原生 View 体系
@@ -12,6 +19,12 @@
 - DrawerLayout 抽屉导航 + ListView 列表
 - ProGuard 混淆 + 资源压缩 + 语言裁剪（仅 zh-rCN）
 - 后续仅需更新 assets 文档，无需改动代码
+
+## v1.5.1-beta
+
+- 新增文档：Python与类型系统（类型注解、泛型、Protocol、TypeGuard、TypedDict）
+- 新增文档：Go与泛型实战（类型参数、约束、泛型切片工具、泛型栈、泛型缓存）
+- 新增文档：Java与密封类（sealed/permits、模式匹配、Record配合、AST实战）
 
 ## v1.5.0-beta
 

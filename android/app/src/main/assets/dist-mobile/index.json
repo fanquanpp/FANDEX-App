@@ -1,4 +1,4 @@
-﻿{
+{
     "categories":  [
                        {
                            "label":  "工具链",
@@ -710,6 +710,7 @@
                         "description":  "Python documents",
                         "id":  "python",
                         "documents":  [
+                                          "Python与类型系统",
                                           "Python进阶与最新特性",
                                           "Python与Celery",
                                           "Python与CI-CD",
@@ -829,6 +830,7 @@
                         "description":  "Go documents",
                         "id":  "go",
                         "documents":  [
+                                          "Go与泛型实战",
                                           "Channel原理",
                                           "Context详解",
                                           "GMP调度模型",
@@ -896,6 +898,7 @@
                         "description":  "Java documents",
                         "id":  "java",
                         "documents":  [
+                                          "Java与密封类",
                                           "CompletableFuture异步编排",
                                           "IO流与文件操作",
                                           "JavaIO与NIO",
