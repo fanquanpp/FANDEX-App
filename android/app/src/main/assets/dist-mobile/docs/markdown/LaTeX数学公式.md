@@ -1,113 +1,198 @@
-﻿
-## 1. 数学公式概述
+# LaTeX 数学公式
 
-### 1.1 Markdown 中的数学公式
+> **符号约定**：`< >` 必填参数 | `[ ]` 可选参数
 
-Markdown 通过嵌入 LaTeX 数学模式语法来渲染数学公式，主流渲染引擎为 **KaTeX**（快速）和 **MathJax**（功能全）。
+---
 
-| 引擎        | 速度 | 兼容性     | 特点                     |
-| :---------- | :--- | :--------- | :----------------------- |
-| **KaTeX**   | 极快 | 部分 LaTeX | 渲染速度快，适合大量公式 |
-| **MathJax** | 较慢 | 完整 LaTeX | 功能最全，支持所有宏     |
+## 行内公式
 
-### 1.2 行内与块级
-
+**行内公式：使用单个 $ 包裹**
+`$<公式>$`
 ```markdown
-行内公式：质能方程 $E = mc^2$ 是物理学最著名的公式之一。
+质能方程 $E = mc^2$ 是物理学最著名的公式之一。
+```
 
-块级公式：
+---
 
+## 块级公式
+
+**块级公式：使用双 $$ 包裹**
+`$$\n<公式>\n$$`
+```markdown
 $$
 E = mc^2
 $$
 ```
 
-## 2. 基础语法
+---
 
-### 2.1 上标与下标
+## 上标与下标
 
+**上标：使用 ^ 符号**
+`$<底>^<指数>$`
 ```markdown
-$x^2$ → $x^2$
-$x^{10}$ → $x^{10}$
-$a_n$ → $a_n$
-$a_{ij}$ → $a_{ij}$
-$x_1^2$ → $x_1^2$
+$x^2$
+$x^{10}$
 ```
 
-### 2.2 分数
-
+**下标：使用 _ 符号**
+`$<底>_<下标>$`
 ```markdown
-$\frac{a}{b}$ → $\frac{a}{b}$
-$\dfrac{a}{b}$ → $\dfrac{a}{b}$（大分数）
-$a/b$ → $a/b$（行内分数）
-$\cfrac{1}{1+\cfrac{1}{1+\cfrac{1}{1}}}$ → 连分数
+$a_n$
+$a_{ij}$
 ```
 
-### 2.3 根号
-
+**上下标组合**
+`$<底>_<下标>^<指数>$`
 ```markdown
-$\sqrt{2}$ → $\sqrt{2}$
-$\sqrt[3]{8}$ → $\sqrt[3]{8}$
-$\sqrt[n]{a}$ → $\sqrt[n]{a}$
+$x_1^2$
 ```
 
-### 2.4 希腊字母
+---
 
-| 小写       | 语法       | 大写      | 语法      |
-| :--------- | :--------- | :-------- | :-------- |
-| $\alpha$   | `\alpha`   | $A$       | `A`       |
-| $\beta$    | `\beta`    | $B$       | `B`       |
-| $\gamma$   | `\gamma`   | $\Gamma$  | `\Gamma`  |
-| $\delta$   | `\delta`   | $\Delta$  | `\Delta`  |
-| $\epsilon$ | `\epsilon` | $E$       | `E`       |
-| $\theta$   | `\theta`   | $\Theta$  | `\Theta`  |
-| $\lambda$  | `\lambda`  | $\Lambda$ | `\Lambda` |
-| $\mu$      | `\mu`      | $M$       | `M`       |
-| $\pi$      | `\pi`      | $\Pi$     | `\Pi`     |
-| $\sigma$   | `\sigma`   | $\Sigma$  | `\Sigma`  |
-| $\omega$   | `\omega`   | $\Omega$  | `\Omega`  |
-| $\phi$     | `\phi`     | $\Phi$    | `\Phi`    |
+## 分数
 
-## 3. 运算符与关系
-
-### 3.1 求和与积分
-
+**分数：使用 \frac**
+`$\frac{<分子>}{<分母>}$`
 ```markdown
-$\sum_{i=1}^{n} i$ → $\sum_{i=1}^{n} i$
-$\prod_{i=1}^{n} i$ → $\prod_{i=1}^{n} i$
-$\int_{0}^{\infty} f(x) dx$ → $\int_{0}^{\infty} f(x) dx$
-$\iint_{D} f(x,y) dA$ → $\iint_{D} f(x,y) dA$
-$\oint_{C} F \cdot dr$ → $\oint_{C} F \cdot dr$
+$\frac{a}{b}$
+$\dfrac{a}{b}$（大分数）
 ```
 
-### 3.2 极限与导数
-
+**连分数**
+`$\cfrac{<分子>}{<分母>}$`
 ```markdown
-$\lim_{x \to \infty} f(x)$ → $\lim_{x \to \infty} f(x)$
-$\frac{dy}{dx}$ → $\frac{dy}{dx}$
-$\frac{\partial f}{\partial x}$ → $\frac{\partial f}{\partial x}$
-$\nabla f$ → $\nabla f$
+$\cfrac{1}{1+\cfrac{1}{1+\cfrac{1}{1}}}$
 ```
 
-### 3.3 关系运算符
+---
 
-| 符号        | 语法        | 含义     |
-| :---------- | :---------- | :------- |
-| $\leq$      | `\leq`      | 小于等于 |
-| $\geq$      | `\geq`      | 大于等于 |
-| $\neq$      | `\neq`      | 不等于   |
-| $\approx$   | `\approx`   | 约等于   |
-| $\equiv$    | `\equiv`    | 恒等于   |
-| $\in$       | `\in`       | 属于     |
-| $\subset$   | `\subset`   | 真子集   |
-| $\subseteq$ | `\subseteq` | 子集     |
-| $\forall$   | `\forall`   | 任意     |
-| $\exists$   | `\exists`   | 存在     |
+## 根号
 
-## 4. 矩阵与数组
+**平方根**
+`$\sqrt{<表达式>}$`
+```markdown
+$\sqrt{2}$
+```
 
-### 4.1 矩阵
+**n 次方根**
+`$\sqrt[<n>]{<表达式>}$`
+```markdown
+$\sqrt[3]{8}$
+$\sqrt[n]{a}$
+```
 
+---
+
+## 希腊字母
+
+**小写希腊字母**
+`$\<命令>$`
+```markdown
+$\alpha$   \alpha
+$\beta$    \beta
+$\gamma$   \gamma
+$\delta$   \delta
+$\epsilon$ \epsilon
+$\theta$   \theta
+$\lambda$  \lambda
+$\mu$      \mu
+$\pi$      \pi
+$\sigma$   \sigma
+$\omega$   \omega
+$\phi$     \phi
+```
+
+**大写希腊字母**
+`$\<命令>$`
+```markdown
+$\Gamma$   \Gamma
+$\Delta$   \Delta
+$\Theta$   \Theta
+$\Lambda$  \Lambda
+$\Pi$      \Pi
+$\Sigma$   \Sigma
+$\Omega$   \Omega
+$\Phi$     \Phi
+```
+
+---
+
+## 求和与积分
+
+**求和**
+`$\sum_{<下界>}^{<上界>} <表达式>$`
+```markdown
+$\sum_{i=1}^{n} i$
+```
+
+**乘积**
+`$\prod_{<下界>}^{<上界>} <表达式>$`
+```markdown
+$\prod_{i=1}^{n} i$
+```
+
+**积分**
+`$\int_{<下界>}^{<上界>} <表达式> d<变量>$`
+```markdown
+$\int_{0}^{\infty} f(x) dx$
+$\iint_{D} f(x,y) dA$
+$\oint_{C} F \cdot dr$
+```
+
+---
+
+## 极限与导数
+
+**极限**
+`$\lim_{<变量> \to <值>} <表达式>$`
+```markdown
+$\lim_{x \to \infty} f(x)$
+```
+
+**导数**
+`$\frac{d<因变量>}{d<自变量>}$`
+```markdown
+$\frac{dy}{dx}$
+```
+
+**偏导数**
+`$\frac{\partial <函数>}{\partial <变量>}$`
+```markdown
+$\frac{\partial f}{\partial x}$
+```
+
+**梯度**
+`$\nabla <函数>$`
+```markdown
+$\nabla f$
+```
+
+---
+
+## 关系运算符
+
+**关系运算符**
+`$\<命令>$`
+```markdown
+$\leq$      小于等于
+$\geq$      大于等于
+$\neq$      不等于
+$\approx$   约等于
+$\equiv$    恒等于
+$\in$       属于
+$\subset$   真子集
+$\subseteq$ 子集
+$\forall$   任意
+$\exists$   存在
+```
+
+---
+
+## 矩阵
+
+**圆括号矩阵**
+`\begin{pmatrix} ... \end{pmatrix}`
 ```markdown
 $$
 \begin{pmatrix}
@@ -117,15 +202,8 @@ c & d
 $$
 ```
 
-$$
-\begin{pmatrix}
-a & b \\
-c & d
-\end{pmatrix}
-$$
-
-### 4.2 方括号矩阵
-
+**方括号矩阵**
+`\begin{bmatrix} ... \end{bmatrix}`
 ```markdown
 $$
 \begin{bmatrix}
@@ -136,8 +214,8 @@ $$
 $$
 ```
 
-### 4.3 行列式
-
+**行列式**
+`\begin{vmatrix} ... \end{vmatrix}`
 ```markdown
 $$
 \begin{vmatrix}
@@ -147,8 +225,8 @@ c & d
 $$
 ```
 
-### 4.4 增广矩阵
-
+**增广矩阵**
+`\left[\begin{array}{cc|c} ... \end{array}\right]`
 ```markdown
 $$
 \left[
@@ -160,10 +238,12 @@ $$
 $$
 ```
 
-## 5. 方程组与分段函数
+---
 
-### 5.1 方程组
+## 方程组与分段函数
 
+**方程组**
+`\begin{cases} ... \end{cases}`
 ```markdown
 $$
 \begin{cases}
@@ -173,8 +253,8 @@ x + y = 5 \\
 $$
 ```
 
-### 5.2 分段函数
-
+**分段函数**
+`f(x) = \begin{cases} ... \end{cases}`
 ```markdown
 $$
 f(x) = \begin{cases}
@@ -184,78 +264,71 @@ x^2 & \text{if } x \geq 0 \\
 $$
 ```
 
-## 6. 格式控制
+---
 
-### 6.1 字体
+## 字体控制
 
+**数学字体**
+`$\<命令>{<文本>}$`
 ```markdown
-$\mathbf{A}$ → $\mathbf{A}$（粗体）
-$\mathbb{R}$ → $\mathbb{R}$（黑板粗体）
-$\mathcal{L}$ → $\mathcal{L}$（花体）
-$\mathsf{A}$ → $\mathsf{A}$（无衬线）
-$\mathtt{A}$ → $\mathtt{A}$（打字机）
-$\text{文本}$ → $\text{文本}$（正体文本）
+$\mathbf{A}$    粗体
+$\mathbb{R}$    黑板粗体
+$\mathcal{L}$   花体
+$\mathsf{A}$    无衬线
+$\mathtt{A}$    打字机
+$\text{文本}$   正体文本
 ```
 
-### 6.2 空格
+---
 
+## 空格控制
+
+**空格命令**
+`$\<命令>$`
 ```markdown
-$a\!b$ → $a\!b$（负空格）
-$ab$ → $ab$（无空格）
-$a\,b$ → $a\,b$（薄空格）
-$a\;b$ → $a\;b$（中等空格）
-$a\quad b$ → $a\quad b$（1em 空格）
-$a\qquad b$→ $a\qquad b$（2em 空格）
+$a\!b$      负空格
+$ab$        无空格
+$a\,b$      薄空格
+$a\;b$      中等空格
+$a\quad b$  1em 空格
+$a\qquad b$ 2em 空格
 ```
 
-### 6.3 颜色
+---
 
+## 颜色
+
+**文字颜色**
+`$\textcolor{<颜色>}{<文本>}$`
 ```markdown
-$\textcolor{red}{红色文字}$ → $\textcolor{red}{红色文字}$
-$\textcolor{blue}{蓝色文字}$ → $\textcolor{blue}{蓝色文字}$
+$\textcolor{red}{红色文字}$
+$\textcolor{blue}{蓝色文字}$
 ```
 
-## 7. 常见公式示例
+---
 
-### 7.1 欧拉公式
+## 常见公式示例
 
+**欧拉公式**
+`$e^{i\pi} + 1 = 0$`
+```markdown
 $$
 e^{i\pi} + 1 = 0
 $$
+```
 
-### 7.2 高斯积分
-
+**高斯积分**
+`$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$`
+```markdown
 $$
 \int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
 $$
+```
 
-### 7.3 傅里叶变换
-
-$$
-\hat{f}(\xi) = \int_{-\infty}^{\infty} f(x) e^{-2\pi i x \xi} dx
-$$
-
-### 7.4 贝叶斯定理
-
+**贝叶斯定理**
+`$P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}$`
+```markdown
 $$
 P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}
 $$
-
-## 8. KaTeX 兼容性
-
-### 8.1 KaTeX 不支持的语法
-
-| 语法                | 说明       | 替代方案          |
-| :------------------ | :--------- | :---------------- |
-| `\begin{align}`     | 多行对齐   | `\begin{aligned}` |
-| `\label{}`          | 交叉引用   | 手动编号          |
-| `\ref{}`            | 引用标签   | 手动引用          |
-| `\newcommand`       | 自定义命令 | 部分支持          |
-| 某些 `\text{}` 嵌套 | 复杂文本   | 简化结构          |
-
-### 8.2 调试技巧
-
-- 公式不渲染时，检查语法是否正确
-- 使用 [KaTeX Demo](https://katex.org/) 在线测试
-- 确认 `$` 和 `$$` 前后有空行或空格
-- 特殊字符需要转义：`\{`、`\}`、`\_`
+```

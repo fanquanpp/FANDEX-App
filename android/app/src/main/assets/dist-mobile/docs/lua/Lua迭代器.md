@@ -1,310 +1,287 @@
-﻿
-## 概述
+# Lua 迭代器速查
 
-Lua 的泛型 for 循环通过迭代器函数遍历集合。理解迭代器的工作原理和自定义方式，是编写优雅 Lua 代码的关键。Lua 提供了无状态迭代器和有状态迭代器两种模式。
+> **符号约定**：`< >` 必填参数 | `[ ]` 可选参数
 
-## 基础概念
+---
 
-### 泛型 for 的工作机制
+## 泛型 for 循环
 
+**泛型 for 语法**
+`for <var1>, <var2>, ... in <exp1>, <exp2>, <exp3> do <body> end`
 ```lua
--- 泛型 for 的完整语法
-for var_1, ..., var_n in explist do block end
-
--- 等价于以下代码：
-local f, s, var = explist
-while true do
-  local var_1, ..., var_n = f(s, var)
-  if var_1 == nil then break end
-  var = var_1
-  block
-end
-
--- f: 迭代器函数
--- s: 恒定状态（不变量）
--- var: 控制变量
+-- 泛型 for 循环的工作机制
+-- 1. 调用迭代器函数（exp1）产生第一个值
+-- 2. 将不可变状态（exp2）和控制变量（exp3）传入迭代器
+-- 3. 将返回值赋给变量列表
+-- 4. 如果第一个返回值为 nil，循环结束
+-- 5. 否则执行循环体，回到步骤 2
+-- 等价于
+do
+    local iter, state, control = exp1, exp2, exp3;
+    while true do
+        local var1, var2 = iter(state, control);
+        if var1 == nil then break end;
+        control = var1;
+        -- 循环体
+    end;
+end;
 ```
 
-### 内置迭代器
+---
 
-| 迭代器 | 用途                 |
-| ------ | -------------------- |
-| pairs  | 遍历表的所有键值对   |
-| ipairs | 遍历数组的连续整数键 |
-| next   | 返回下一个键值对     |
+## 无状态迭代器
 
-## 快速上手
-
-### 简单迭代器
-
+**无状态迭代器**
+`function <iter>(<state>, <control>) <body> return <next> end`
 ```lua
--- 最简单的迭代器：闭包实现
-function range(n)
-  local i = 0
-  return function()
-    i = i + 1
-    if i <= n then return i end
-  end
-end
-
-for i in range(5) do
-  print(i) -- 输出 1, 2, 3, 4, 5
-end
-
--- 带步长的迭代器
-function range(start, stop, step)
-  step = step or 1
-  local current = start - step
-  return function()
-    current = current + step
-    if current <= stop then return current end
-  end
-end
-
-for i in range(1, 10, 2) do
-  print(i) -- 输出 1, 3, 5, 7, 9
-end
-```
-
-### pairs 和 ipairs 的区别
-
-```lua
-local t = {10, 20, 30, key = "value"}
-
--- ipairs：只遍历连续整数键（1, 2, 3...）
-for i, v in ipairs(t) do
-  print(i, v) -- 1 10, 2 20, 3 30
-end
-
--- pairs：遍历所有键值对
-for k, v in pairs(t) do
-  print(k, v) -- 包括 key = "value"
-end
-
--- 注意：pairs 的遍历顺序不确定
--- 如果需要有序遍历，需要先排序键
-local keys = {}
-for k in pairs(t) do table.insert(keys, k) end
-table.sort(keys, function(a, b) return tostring(a) < tostring(b) end)
-for _, k in ipairs(keys) do
-  print(k, t[k])
-end
-```
-
-## 详细用法
-
-### 无状态迭代器
-
-```lua
--- 无状态迭代器：不依赖闭包，所有状态通过参数传递
--- 更高效，因为不需要创建闭包
-
--- 实现自定义的 ipairs
-local function iter(t, i)
-  i = i + 1
-  local v = t[i]
-  if v ~= nil then return i, v end
-end
-
-function myIpairs(t)
-  return iter, t, 0
-end
-
+-- 无状态迭代器：不保存任何状态
+local function iter(state, i)
+    i = i + 1;
+    if i > #state then return nil end;
+    return i, state[i];
+end;
+function ipairs(t)
+    return iter, t, 0;
+end;
 -- 使用
-for i, v in myIpairs({"a", "b", "c"}) do
-  print(i, v)
-end
-
--- 反向遍历迭代器
-local function revIter(t, i)
-  i = i - 1
-  if i > 0 then return i, t[i] end
-end
-
-function revIpairs(t)
-  return revIter, t, #t + 1
-end
-
-for i, v in revIpairs({"a", "b", "c"}) do
-  print(i, v) -- 3 c, 2 b, 1 a
-end
+local arr = {10, 20, 30};
+for i, v in ipairs(arr) do
+    print(i, v);  -- 1 10, 2 20, 3 30
+end;
 ```
 
-### 有状态迭代器
+**数字迭代器**
+`function <range>(<from>, <to>, <step>) <body> end`
+```lua
+-- 数字迭代器
+local function rangeIter(state, current)
+    current = current + state.step;
+    if current > state.to then return nil end;
+    return current;
+end;
+function range(from, to, step)
+    step = step or 1;
+    return rangeIter, {from = from, to = to, step = step}, from - step;
+end;
+-- 使用
+for i in range(1, 10, 2) do
+    print(i);  -- 1, 3, 5, 7, 9
+end;
+```
 
+---
+
+## 多值迭代器
+
+**返回键值对的迭代器**
+`function <pairsIter>(<state>, <control>) <body> return <key>, <value> end`
+```lua
+-- 返回键值对的迭代器
+local function pairsIter(t, k)
+    local v;
+    k, v = next(t, k);
+    if k == nil then return nil end;
+    return k, v;
+end;
+function pairs(t)
+    return pairsIter, t, nil;
+end;
+-- 使用
+local dict = {name = "Alice", age = 30, city = "Beijing"};
+for k, v in pairs(dict) do
+    print(k, v);
+end;
+```
+
+---
+
+## 有状态迭代器
+
+**闭包迭代器**
+`function <iter>(<collection>) local <state> return function() <body> end end`
 ```lua
 -- 有状态迭代器：使用闭包保存状态
--- 适合复杂遍历逻辑
-
--- 遍历树形结构
-function treeIter(root)
-  local stack = {root}
-  return function()
-    if #stack == 0 then return nil end
-    local node = table.remove(stack)
-    -- 子节点入栈（右子树先入栈，左子树后入栈）
-    if node.right then table.insert(stack, node.right) end
-    if node.left then table.insert(stack, node.left) end
-    return node
-  end
-end
-
--- 过滤迭代器
-function filterIter(iterFn, predicate)
-  return function()
-    for value in iterFn do
-      if predicate(value) then return value end
-    end
-  end
-end
-
+function reversedIterator(arr)
+    local i = #arr + 1;
+    return function()
+        i = i - 1;
+        if i >= 1 then
+            return i, arr[i];
+        end;
+        return nil;
+    end;
+end;
 -- 使用
-local items = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-local evens = filterIter(range(10), function(x) return x % 2 == 0 end)
-for v in evens do print(v) end -- 2, 4, 6, 8, 10
+local arr = {"a", "b", "c", "d"};
+for i, v in reversedIterator(arr) do
+    print(i, v);  -- 4 d, 3 c, 2 b, 1 a
+end;
 ```
 
-### 文件行迭代器
+---
 
+## 复杂迭代器
+
+**文件行迭代器**
+`function <lines>(<file>) <body> return function() <body> end end`
 ```lua
--- io.lines 返回文件行迭代器
-for line in io.lines("data.txt") do
-  process(line)
-end
-
--- 自定义 CSV 行迭代器
-function csvLines(filename)
-  local file = io.open(filename, "r")
-  if not file then return nil end
-  return function()
-    local line = file:read()
-    if not line then
-      file:close()
-      return nil
-    end
-    -- 解析 CSV 行
-    local fields = {}
-    for field in line:gmatch("([^,]*)") do
-      table.insert(fields, field)
-    end
-    return unpack(fields)
-  end
-end
-
+-- 文件行迭代器
+function lines(filename)
+    local file = io.open(filename, "r");
+    if not file then return function() return nil end end;
+    return function()
+        local line = file:read("*l");
+        if line == nil then file:close() end;
+        return line;
+    end;
+end;
 -- 使用
-for name, age, city in csvLines("users.csv") do
-  print(name, age, city)
-end
+for line in lines("test.txt") do
+    print(line);
+end;
 ```
 
-## 常见场景
-
-### 字符串迭代器
-
+**斐波那契数列迭代器**
+`function <fibonacci>(<limit>) <body> return function() <body> end end`
 ```lua
--- 逐字符迭代
-function chars(s)
-  local i = 0
-  return function()
-    i = i + 1
-    if i <= #s then return s:sub(i, i) end
-  end
-end
-
-for c in chars("Hello") do
-  print(c) -- H, e, l, l, o
-end
-
--- 单词迭代器
-function words(s)
-  return s:gmatch("%S+")
-end
-
-for w in words("hello world from lua") do
-  print(w)
-end
-```
-
-### 组合迭代器
-
-```lua
--- map 迭代器：对每个元素应用函数
-function mapIter(iterFn, transform)
-  return function()
-    local value = iterFn()
-    if value ~= nil then return transform(value) end
-  end
-end
-
+-- 斐波那契数列迭代器
+function fibonacci(limit)
+    local a, b = 0, 1;
+    local count = 0;
+    return function()
+        if count >= limit then return nil end;
+        local result = a;
+        a, b = b, a + b;
+        count = count + 1;
+        return count, result;
+    end;
+end;
 -- 使用
-local doubled = mapIter(range(5), function(x) return x * 2 end)
-for v in doubled do print(v) end -- 2, 4, 6, 8, 10
-
--- take 迭代器：只取前 n 个
-function takeIter(iterFn, n)
-  local count = 0
-  return function()
-    if count >= n then return nil end
-    count = count + 1
-    return iterFn()
-  end
-end
-
-for v in takeIter(range(100), 5) do
-  print(v) -- 1, 2, 3, 4, 5
-end
+for i, fib in fibonacci(10) do
+    print(i, fib);  -- 1 0, 2 1, 3 1, 4 2, 5 3, 6 5, 7 8, 8 13, 9 21, 10 34
+end;
 ```
 
-## 注意事项
-
-- 无状态迭代器比有状态迭代器更高效，优先使用
-- ipairs 遇到 nil 值会停止遍历，即使后面还有元素
-- pairs 的遍历顺序不确定，不要依赖遍历顺序
-- 闭包迭代器会捕获变量，注意循环中的变量引用
-- 迭代器函数返回 nil 时 for 循环结束
-- 自定义迭代器应保持语义清晰，避免副作用
-
-## 进阶用法
-
-### 协程迭代器
-
+**树遍历迭代器**
+`function <traverse>(<tree>) <body> return function() <body> end end`
 ```lua
--- 使用协程实现复杂迭代器
-function traverseTree(root)
-  return coroutine.wrap(function()
-    if root then
-      for v in traverseTree(root.left) do coroutine.yield(v) end
-      coroutine.yield(root.value)
-      for v in traverseTree(root.right) do coroutine.yield(v) end
-    end
-  end)
-end
+-- 树遍历迭代器（深度优先）
+function traverseTree(node)
+    local stack = {node};
+    return function()
+        while #stack > 0 do
+            local current = table.remove(stack);
+            if current then
+                if current.right then table.insert(stack, current.right) end;
+                if current.left then table.insert(stack, current.left) end;
+                return current.value;
+            end;
+        end;
+        return nil;
+    end;
+end;
+-- 使用
+local tree = {
+    value = 1,
+    left = {
+        value = 2,
+        left = {value = 4},
+        right = {value = 5}
+    },
+    right = {
+        value = 3,
+        left = {value = 6},
+        right = {value = 7}
+    }
+};
+for v in traverseTree(tree) do
+    print(v);  -- 1, 2, 4, 5, 3, 6, 7
+end;
+```
 
--- 中序遍历二叉树
-for value in traverseTree(root) do
-  print(value)
-end
+---
 
--- 生成排列
-function permutations(arr)
-  return coroutine.wrap(function()
-    local n = #arr
-    local function generate(k)
-      if k == 1 then
-        coroutine.yield(table.concat(arr, ","))
-      else
-        for i = 1, k do
-          arr[i], arr[k] = arr[k], arr[i]
-          generate(k - 1)
-          arr[i], arr[k] = arr[k], arr[i]
-        end
-      end
-    end
-    generate(n)
-  end)
-end
+## 协程迭代器
 
-for p in permutations({1, 2, 3}) do
-  print(p)
-end
+**协程生成迭代器**
+`function <gen>(<args>) return coroutine.wrap(function() <body> end) end`
+```lua
+-- 使用协程生成迭代器
+function filter(arr, predicate)
+    return coroutine.wrap(function()
+        for i, v in ipairs(arr) do
+            if predicate(v) then
+                coroutine.yield(i, v);
+            end;
+        end;
+    end);
+end;
+-- 使用
+local arr = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+for i, v in filter(arr, function(x) return x % 2 == 0 end) do
+    print(i, v);  -- 2 2, 4 4, 6 6, 8 8, 10 10
+end;
+```
+
+**生成器**
+`function <generator>(<args>) return coroutine.wrap(function() <body> end) end`
+```lua
+-- 无限序列生成器
+function naturalNumbers()
+    return coroutine.wrap(function()
+        local i = 1;
+        while true do
+            coroutine.yield(i);
+            i = i + 1;
+        end;
+    end);
+end;
+-- 使用（需要手动停止）
+local gen = naturalNumbers();
+for i = 1, 5 do
+    print(gen());  -- 1, 2, 3, 4, 5
+end;
+```
+
+---
+
+## 迭代器组合
+
+**map 迭代器**
+`function <map>(<iter>, <transform>) return coroutine.wrap(function() <body> end) end`
+```lua
+-- map 迭代器
+function map(iter, transform)
+    return coroutine.wrap(function()
+        for k, v in iter do
+            coroutine.yield(k, transform(v));
+        end;
+    end);
+end;
+-- 使用
+local arr = {1, 2, 3, 4, 5};
+for i, v in map(ipairs(arr), function(x) return x * 2 end) do
+    print(i, v);  -- 1 2, 2 4, 3 6, 4 8, 5 10
+end;
+```
+
+**链式组合**
+`for <k>, <v> in <iter1> |> <iter2> do <body> end`
+```lua
+-- 链式组合多个迭代器
+function take(iter, n)
+    return coroutine.wrap(function()
+        local count = 0;
+        for k, v in iter do
+            if count >= n then break end;
+            coroutine.yield(k, v);
+            count = count + 1;
+        end;
+    end);
+end;
+-- 使用
+local arr = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+for i, v in take(map(ipairs(arr), function(x) return x * 2 end), 3) do
+    print(i, v);  -- 1 2, 2 4, 3 6
+end;
 ```

@@ -9,7 +9,8 @@
 - 删除非编程语言模块（AI Agent、算法、微积分、软件工程等 26 个模块）
 - 删除 Vue 组件型文件（无法在 App 中渲染的语法速查.md）
 - 保留 17 个编程语言模块：C、C++、C#、CSS、Git、Go、Java、JavaScript、Kotlin、Lua、Markdown、MySQL、PostgreSQL、Python、Redis、SQL、TypeScript
-- 共 641 篇纯语法速查文档
+- 共 207 篇纯语法速查文档（严格按模板格式重写）
+- 全部 207 篇文档按模板格式重写：语法签名 + 代码示例，删除所有概念讲解、理论说明
 - 重写 index.json 注册表，分类调整为：编程语言/前端技术/数据库/工具链/标记语言
 - 更新 README.md：标语改为"代码语法，离线速查"，新增定位章节
 - 更新项目说明文件：新增第四节"FANDEX-App 内容规则"

@@ -4,12 +4,12 @@
 
 **代码语法，离线速查** · Android 原生语法查阅工具
 
-纯粹的代码语法和语法格式查看阅览应用。无需网络依赖，内置 17 个编程语言模块、641 篇语法速查文档，覆盖 C/C++/Java/Go/Python/JavaScript/TypeScript/Kotlin/C#/CSS/SQL/MySQL/PostgreSQL/Redis/Git/Markdown/Lua，基于 Kotlin + Jetpack Compose 原生渲染，为开发者提供即查即用的语法参考。
+纯粹的代码语法和语法格式查看阅览应用。无需网络依赖，内置 17 个编程语言模块、207 篇语法速查文档，覆盖 C/C++/Java/Go/Python/JavaScript/TypeScript/Kotlin/C#/CSS/SQL/MySQL/PostgreSQL/Redis/Git/Markdown/Lua，基于 Kotlin + Jetpack Compose 原生渲染，为开发者提供即查即用的语法参考。
 
 [![下载 APK](https://img.shields.io/badge/下载_APK-fanquanpp.github.io%2FFANDEX--App-2563eb?style=for-the-badge&logo=android&logoColor=white)](https://fanquanpp.github.io/FANDEX-App/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?style=flat-square&logo=kotlin&logoColor=white)](https://kotlinlang.org)
 [![Jetpack Compose](https://img.shields.io/badge/Jetpack_Compose-Material_3-4285F4?style=flat-square&logo=jetpackcompose&logoColor=white)](https://developer.android.com/compose)
-[![文档数](https://img.shields.io/badge/文档-641-0ea5e9?style=flat-square)](https://fanquanpp.github.io/FANDEX-App/)
+[![文档数](https://img.shields.io/badge/文档-207-0ea5e9?style=flat-square)](https://fanquanpp.github.io/FANDEX-App/)
 [![模块数](https://img.shields.io/badge/模块-17-8b5cf6?style=flat-square)](https://fanquanpp.github.io/FANDEX-App/)
 
 </div>
@@ -24,7 +24,7 @@ FANDEX-App 是一款纯粹的代码语法速查工具，专注于编程语言的
 
 | 特性 | 说明 |
 | :--- | :--- |
-| 离线速查 | 内置 17 个模块、641 篇语法文档，无需网络即可查阅 |
+| 离线速查 | 内置 17 个模块、207 篇语法文档，无需网络即可查阅 |
 | 编程语言 | C、C++、C#、Go、Java、JavaScript、Kotlin、Lua、Python、TypeScript |
 | 前端技术 | CSS |
 | 数据库 | MySQL、PostgreSQL、Redis、SQL |
@@ -50,7 +50,7 @@ FANDEX-App 是一款纯粹的代码语法速查工具，专注于编程语言的
 | tools | 工具链 | Git |
 | markup | 标记语言 | Markdown |
 
-> 17 个模块 · 641 篇语法文档 · 5 大分类 · 完全离线
+> 17 个模块 · 207 篇语法文档 · 5 大分类 · 完全离线
 
 ## 技术栈
 

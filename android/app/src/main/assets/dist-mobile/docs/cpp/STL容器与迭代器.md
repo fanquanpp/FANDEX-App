@@ -1,448 +1,406 @@
-﻿
-## 1. 序列容器
+# STL容器与迭代器
 
-序列容器按顺序存储元素，支持随机访问或顺序访问。
-| 容器 | 描述 | 特点 | 示例 |
-| :--- | :--- | :--- | :--- |
-| `std::vector` | 动态数组 | 随机访问快，尾部插入/删除快 | `std::vector<int> v = {1, 2, 3};` |
-| `std::list` | 双向链表 | 任意位置插入/删除快，不支持随机访问 | `std::list<int> l = {1, 2, 3};` |
-| `std::deque` | 双端队列 | 两端插入/删除快，随机访问快 | `std::deque<int> d = {1, 2, 3};` |
-| `std::array` | 固定大小数组 (C++11) | 栈上分配，随机访问快 | `std::array<int, 3> a = {1, 2, 3};` |
-| `std::forward_list` | 单向链表 (C++11) | 空间开销小，仅支持前向遍历 | `std::forward_list<int> fl = {1, 2, 3};` |
+> **符号约定**：`< >` 必填参数 | `[ ]` 可选参数
 
-### 1.1 std::vector
+---
 
+## 顺序容器
+
+**vector：动态数组**
+`std::vector<<Type>> <vec>;`
 ```cpp
- #include <vector>
- #include <iostream>
- int main() {
-  // 创建向量
-  std::vector<int> v;
-  // 预分配空间
-  v.reserve(10);
-  // 添加元素
-  v.push_back(1);
-  v.push_back(2);
-  v.push_back(3);
-  // 访问元素
-  std::cout << v[0] << std::endl; // 1 (无边界检查)
-  std::cout << v.at(1) << std::endl; // 2 (有边界检查)
-  // 遍历元素
-  for (size_t i = 0; i < v.size(); i++) {
-  std::cout << v[i] << " ";
-  }
-  std::cout << std::endl;
-  // 范围 for 循环
-  for (int num : v) {
-  std::cout << num << " ";
-  }
-  std::cout << std::endl;
-  // 迭代器遍历
-  for (auto it = v.begin(); it != v.end(); ++it) {
-  std::cout << *it << " ";
-  }
-  std::cout << std::endl;
-  // 插入元素
-  v.insert(v.begin() + 1, 4); // 在索引 1 处插入 4
-  // 删除元素
-  v.erase(v.begin() + 2); // 删除索引 2 处的元素
-  // 清空容器
-  v.clear();
-  std::cout << "Size after clear: " << v.size() << std::endl;
-  return 0;
- }
-```
-
-### 1.2 std::list
-
-```cpp
- #include <list>
- #include <iostream>
- int main() {
-  // 创建链表
-  std::list<int> l = {1, 2, 3};
-  // 添加元素
-  l.push_front(0); // 头部添加
-  l.push_back(4); // 尾部添加
-  // 遍历元素
-  for (int num : l) {
-  std::cout << num << " ";
-  }
-  std::cout << std::endl; // 0 1 2 3 4
-  // 插入元素
-  auto it = l.begin();
-  ++it; // 移动到第二个元素
-  l.insert(it, 5); // 在 0 和 1 之间插入 5
-  // 删除元素
-  it = l.begin();
-  ++it; // 指向 5
-  l.erase(it); // 删除 5
-  // 排序
-  l.sort();
-  // 合并
-  std::list<int> l2 = {6, 7, 8};
-  l.merge(l2);
-  // 移除元素
-  l.remove(3); // 移除所有值为 3 的元素
-  // 移除满足条件的元素
-  l.remove_if([](int n) { return n % 2 == 0; }); // 移除所有偶数
-  // 遍历结果
-  for (int num : l) {
-  std::cout << num << " ";
-  }
-  std::cout << std::endl;
-  return 0;
- }
-```
-
-### 1.3 std::array
-
-```cpp
- #include <array>
- #include <iostream>
- int main() {
-  // 创建数组
-  std::array<int, 5> arr = {1, 2, 3, 4, 5};
-  // 访问元素
-  std::cout << "First element: " << arr[0] << std::endl;
-  std::cout << "Last element: " << arr.back() << std::endl;
-  // 遍历元素
-  for (size_t i = 0; i < arr.size(); i++) {
-  std::cout << arr[i] << " ";
-  }
-  std::cout << std::endl;
-  // 范围 for 循环
-  for (int num : arr) {
-  std::cout << num << " ";
-  }
-  std::cout << std::endl;
-  // 检查是否为空
-  std::cout << "Is empty: " << (arr.empty() ? "yes" : "no") << std::endl;
-  // 填充元素
-  arr.fill(10);
-  for (int num : arr) {
-  std::cout << num << " ";
-  }
-  std::cout << std::endl;
-  return 0;
- }
-```
-
-## 2. 关联容器
-
-关联容器按键值对存储元素，自动排序。
-| 容器 | 描述 | 特点 | 示例 |
-| :--- | :--- | :--- | :--- |
-| `std::set` | 有序集合 | 自动排序，无重复元素 | `std::set<int> s = {3, 1, 2};` |
-| `std::map` | 有序键值对 | 自动按键排序 | `std::map<std::string, int> m = {{"a", 1}, {"b", 2}};` |
-| `std::multiset` | 有序多重集合 | 自动排序，允许重复元素 | `std::multiset<int> ms = {1, 2, 1, 3};` |
-| `std::multimap` | 有序多重映射 | 自动按键排序，允许重复键 | `std::multimap<std::string, int> mm = {{"a", 1}, {"a", 2}};` |
-
-### 2.1 std::map
-
-```cpp
- #include <map>
- #include <iostream>
- int main() {
-  // 创建映射
-  std::map<std::string, int> m;
-  // 添加元素
-  m["Alice"] = 25;
-  m["Bob"] = 30;
-  m["Charlie"] = 35;
-  // 插入元素的另一种方式
-  m.insert(std::make_pair("David", 40));
-  m.insert({"Eve", 45});
-  // 访问元素
-  std::cout << m["Alice"] << std::endl; // 25
-  // 检查键是否存在
-  if (m.find("David") != m.end()) {
-  std::cout << "David found: " << m["David"] << std::endl;
-  } else {
-  std::cout << "David not found" << std::endl;
-  }
-  // 使用 at() 访问（有边界检查）
-  try {
-  std::cout << m.at("Bob") << std::endl;
-  // std::cout << m.at("Frank") << std::endl; // 会抛出异常
-  } catch (const std::out_of_range& e) {
-  std::cout << "Exception: " << e.what() << std::endl;
-  }
-  // 遍历元素
-  for (const auto& pair : m) {
-  std::cout << pair.first << ": " << pair.second << std::endl;
-  }
-  // 删除元素
-  m.erase("Bob");
-  // 清空容器
-  // m.clear();
-  return 0;
- }
-```
-
-### 2.2 std::multimap
-
-```cpp
- #include <map>
- #include <iostream>
- int main() {
-  // 创建多重映射
-  std::multimap<std::string, int> mm;
-  // 添加元素
-  mm.insert({"Alice", 25});
-  mm.insert({"Alice", 30});
-  mm.insert({"Bob", 35});
-  mm.insert({"Bob", 40});
-  mm.insert({"Charlie", 45});
-  // 遍历所有元素
-  std::cout << "All elements: " << std::endl;
-  for (const auto& pair : mm) {
-  std::cout << pair.first << ": " << pair.second << std::endl;
-  }
-  // 查找特定键的范围
-  std::cout << "\nAlice's entries: " << std::endl;
-  auto range = mm.equal_range("Alice");
-  for (auto it = range.first; it != range.second; ++it) {
-  std::cout << it->first << ": " << it->second << std::endl;
-  }
-  // 计算特定键的元素个数
-  std::cout << "\nNumber of Bob's entries: " << mm.count("Bob") << std::endl;
-  return 0;
- }
-```
-
-## 3. 无序容器 (C++11)
-
-无序容器使用哈希表实现，提供平均常数时间的查找、插入和删除操作。
-| 容器 | 描述 | 特点 | 示例 |
-| :--- | :--- | :--- | :--- |
-| `std::unordered_set` | 无序集合 | 哈希表实现，无序 | `std::unordered_set<int> us = {3, 1, 2};` |
-| `std::unordered_map` | 无序键值对 | 哈希表实现，无序 | `std::unordered_map<std::string, int> um = {{"a", 1}, {"b", 2}};` |
-| `std::unordered_multiset` | 无序多重集合 | 哈希表实现，允许重复元素 | `std::unordered_multiset<int> ums = {1, 2, 1, 3};` |
-| `std::unordered_multimap` | 无序多重映射 | 哈希表实现，允许重复键 | `std::unordered_multimap<std::string, int> umm = {{"a", 1}, {"a", 2}};` |
-
-### 3.1 std::unordered_map
-
-```cpp
- #include <unordered_map>
- #include <iostream>
- int main() {
-  // 创建无序映射
-  std::unordered_map<std::string, int> um;
-  // 添加元素
-  um["Alice"] = 25;
-  um["Bob"] = 30;
-  um["Charlie"] = 35;
-  // 访问元素
-  std::cout << um["Alice"] << std::endl; // 25
-  // 遍历元素（顺序不确定）
-  std::cout << "Elements: " << std::endl;
-  for (const auto& pair : um) {
-  std::cout << pair.first << ": " << pair.second << std::endl;
-  }
-  // 桶相关操作
-  std::cout << "Bucket count: " << um.bucket_count() << std::endl;
-  std::cout << "Load factor: " << um.load_factor() << std::endl;
-  std::cout << "Max load factor: " << um.max_load_factor() << std::endl;
-  // 查找元素
-  auto it = um.find("Bob");
-  if (it != um.end()) {
-  std::cout << "Found Bob: " << it->second << std::endl;
-  }
-  // 删除元素
-  um.erase("Charlie");
-  return 0;
- }
-```
-
-## 4. 容器适配器
-
-容器适配器是对现有容器的封装，提供特定的接口。
-| 容器 | 描述 | 底层容器 | 示例 |
-| :--- | :--- | :--- | :--- |
-| `std::stack` | 栈（后进先出） | `deque` (默认) | `std::stack<int> st; st.push(1);` |
-| `std::queue` | 队列（先进先出） | `deque` (默认) | `std::queue<int> q; q.push(1);` |
-| `std::priority_queue` | 优先队列（最大堆） | `vector` (默认) | `std::priority_queue<int> pq; pq.push(1);` |
-
-### 4.1 std::stack
-
-```cpp
- #include <stack>
- #include <iostream>
- int main() {
-  // 创建栈
-  std::stack<int> st;
-  // 压入元素
-  st.push(1);
-  st.push(2);
-  st.push(3);
-  // 查看栈顶元素
-  std::cout << "Top: " << st.top() << std::endl; // 3
-  // 弹出元素
-  st.pop();
-  std::cout << "Top after pop: " << st.top() << std::endl; // 2
-  // 检查大小
-  std::cout << "Size: " << st.size() << std::endl; // 2
-  // 检查是否为空
-  std::cout << "Empty: " << (st.empty() ? "yes" : "no") << std::endl; // no
-  // 清空栈
-  while (!st.empty()) {
-  st.pop();
-  }
-  std::cout << "Size after clear: " << st.size() << std::endl; // 0
-  return 0;
- }
-```
-
-### 4.2 std::queue
-
-```cpp
- #include <queue>
- #include <iostream>
- int main() {
-  // 创建队列
-  std::queue<int> q;
-  // 入队
-  q.push(1);
-  q.push(2);
-  q.push(3);
-  // 查看队首元素
-  std::cout << "Front: " << q.front() << std::endl; // 1
-  // 查看队尾元素
-  std::cout << "Back: " << q.back() << std::endl; // 3
-  // 出队
-  q.pop();
-  std::cout << "Front after pop: " << q.front() << std::endl; // 2
-  // 检查大小
-  std::cout << "Size: " << q.size() << std::endl; // 2
-  // 检查是否为空
-  std::cout << "Empty: " << (q.empty() ? "yes" : "no") << std::endl; // no
-  return 0;
- }
-```
-
-### 4.3 std::priority_queue
-
-```cpp
- #include <queue>
- #include <vector>
- #include <iostream>
- // 自定义类型
- struct Person {
-  std::string name;
-  int age;
-  Person(const std::string& n, int a) : name(n), age(a) {}
-  // 重载 < 运算符（用于最大堆）
-  bool operator<(const Person& other) const {
-  return age < other.age; // 年龄大的优先级高
-  }
- }
- int main() {
-  // 创建优先队列（默认最大堆）
-  std::priority_queue<int> pq;
-  // 压入元素
-  pq.push(3);
-  pq.push(1);
-  pq.push(4);
-  pq.push(1);
-  pq.push(5);
-  // 查看队首元素（最大值）
-  std::cout << "Top: " << pq.top() << std::endl; // 5
-  // 弹出元素
-  pq.pop();
-  std::cout << "Top after pop: " << pq.top() << std::endl; // 4
-  // 创建最小堆
-  std::priority_queue<int, std::vector<int>, std::greater<int>> min_pq;
-  min_pq.push(3);
-  min_pq.push(1);
-  min_pq.push(4);
-  std::cout << "Min top: " << min_pq.top() << std::endl; // 1
-  // 使用自定义类型
-  std::priority_queue<Person> person_pq;
-  person_pq.emplace("Alice", 25);
-  person_pq.emplace("Bob", 30);
-  person_pq.emplace("Charlie", 20);
-  while (!person_pq.empty()) {
-  const Person& p = person_pq.top();
-  std::cout << p.name << " (" << p.age << ")" << std::endl;
-  person_pq.pop();
-  }
-  // 输出：Bob (30), Alice (25), Charlie (20)
-  return 0;
- }
-```
-
-## 5. 迭代器 (Iterators)
-
-迭代器是连接容器与算法的桥梁，提供了访问容器元素的统一接口。
-
-### 5.1 迭代器类型
-
-| 迭代器类型         | 描述               | 支持的操作                                                   |
-| :----------------- | :----------------- | :----------------------------------------------------------- |
-| **输入迭代器**     | 只读，单向移动     | `++`, `*`, `==`, `!=`                                        |
-| **输出迭代器**     | 只写，单向移动     | `++`, `*`                                                    |
-| **前向迭代器**     | 可读可写，单向移动 | `++`, `*`, `==`, `!=`                                        |
-| **双向迭代器**     | 可读可写，双向移动 | `++`, `--`, `*`, `==`, `!=`                                  |
-| **随机访问迭代器** | 可读可写，随机访问 | `++`, `--`, `+`, `-`, `[]`, `==`, `!=`, `<`, `>`, `<=`, `>=` |
-
-### 5.2 迭代器使用示例
-
-```cpp
- #include <vector>
- #include <list>
- #include <iostream>
- int main() {
-  // 向量迭代器（随机访问）
-  std::vector<int> vec = {1, 2, 3, 4, 5};
-  std::cout << "Vector elements: ";
-  for (std::vector<int>::iterator it = vec.begin(); it != vec.end(); ++it) {
-  std::cout << *it << " ";
-  }
-  std::cout << std::endl;
-  // 常量迭代器
-  std::cout << "Vector elements (const): ";
-  for (std::vector<int>::const_iterator it = vec.cbegin(); it != vec.cend(); ++it) {
-  std::cout << *it << " ";
-  }
-  std::cout << std::endl;
-  // 列表迭代器（双向）
-  std::list<int> lst = {1, 2, 3, 4, 5};
-  std::cout << "List elements: ";
-  for (std::list<int>::const_iterator it = lst.cbegin(); it != lst.cend(); ++it) {
-  std::cout << *it << " ";
-  }
-  std::cout << std::endl;
-  // 反向迭代器
-  std::cout << "Vector reversed: ";
-  for (std::vector<int>::reverse_iterator it = vec.rbegin(); it != vec.rend(); ++it) {
-  std::cout << *it << " ";
-  }
-  std::cout << std::endl;
-  // 常量反向迭代器
-  std::cout << "Vector reversed (const): ";
-  for (std::vector<int>::const_reverse_iterator it = vec.crbegin(); it != vec.crend(); ++it) {
-  std::cout << *it << " ";
-  }
-  std::cout << std::endl;
-  // 范围 for 循环 (C++11)
-  std::cout << "Range for: ";
-  for (int num : vec) {
-  std::cout << num << " ";
-  }
-  std::cout << std::endl;
-  // 使用 auto 简化迭代器声明
-  std::cout << "Using auto: ";
-  for (auto it = vec.begin(); it != vec.end(); ++it) {
-  std::cout << *it << " ";
-  }
-  std::cout << std::endl;
-  return 0;
- }
+#include <vector>
+std::vector<int> v1;                    // 空 vector
+std::vector<int> v2(10);                // 10 个元素，默认值 0
+std::vector<int> v3(10, 5);             // 10 个元素，值为 5
+std::vector<int> v4 = {1, 2, 3, 4, 5};  // 列表初始化
+// 添加元素
+v1.push_back(10);
+v1.emplace_back(20);
+// 访问元素
+std::cout << v4[0] << std::endl;        // 1
+std::cout << v4.at(1) << std::endl;     // 2（带边界检查）
+std::cout << v4.front() << std::endl;   // 1
+std::cout << v4.back() << std::endl;    // 5
+// 大小
+std::cout << v4.size() << std::endl;    // 5
 ```
 
 ---
 
-### 更新日志 (Changelog)
+**list：双向链表**
+`std::list<<Type>> <lst>;`
+```cpp
+#include <list>
+std::list<int> lst = {1, 2, 3};
+// 头尾操作
+lst.push_front(0);
+lst.push_back(4);
+// 插入与删除
+auto it = lst.begin();
+std::advance(it, 2);
+lst.insert(it, 10);
+lst.remove(10);    // 删除所有值为 10 的元素
+// 大小
+std::cout << lst.size() << std::endl;
+```
 
-- 2026-05-27: 从 C13_105 拆分，专注于 STL 容器与迭代器。
+---
+
+**deque：双端队列**
+`std::deque<<Type>> <dq>;`
+```cpp
+#include <deque>
+std::deque<int> dq = {1, 2, 3};
+dq.push_front(0);
+dq.push_back(4);
+// dq: {0, 1, 2, 3, 4}
+dq.pop_front();
+dq.pop_back();
+// dq: {1, 2, 3}
+```
+
+---
+
+**array：固定大小数组（C++11）**
+`std::array<<Type>, <Size>> <arr>;`
+```cpp
+#include <array>
+std::array<int, 5> arr = {1, 2, 3, 4, 5};
+// 访问
+std::cout << arr[0] << std::endl;       // 1
+std::cout << arr.at(1) << std::endl;    // 2
+std::cout << arr.size() << std::endl;   // 5
+// 遍历
+for (const auto& elem : arr) {
+    std::cout << elem << " ";
+}
+```
+
+---
+
+**forward_list：单向链表（C++11）**
+`std::forward_list<<Type>> <flst>;`
+```cpp
+#include <forward_list>
+std::forward_list<int> flst = {1, 2, 3};
+flst.push_front(0);
+flst.push_front(-1);
+// flst: {-1, 0, 1, 2, 3}
+flst.pop_front();
+// flst: {0, 1, 2, 3}
+```
+
+---
+
+## 关联容器
+
+**map：有序键值对**
+`std::map<<KeyType>, <ValueType>> <m>;`
+```cpp
+#include <map>
+std::map<std::string, int> ages;
+// 插入
+ages["Alice"] = 25;
+ages["Bob"] = 30;
+ages.insert({"Charlie", 35});
+// 访问
+std::cout << ages["Alice"] << std::endl;    // 25
+// 查找
+if (ages.find("Bob") != ages.end()) {
+    std::cout << "Found Bob" << std::endl;
+}
+// 遍历
+for (const auto& [name, age] : ages) {
+    std::cout << name << ": " << age << std::endl;
+}
+```
+
+---
+
+**set：有序集合**
+`std::set<<Type>> <s>;`
+```cpp
+#include <set>
+std::set<int> s = {3, 1, 4, 1, 5, 9, 2, 6};
+// 自动排序去重
+// s: {1, 2, 3, 4, 5, 6, 9}
+s.insert(7);
+s.erase(4);
+// 查找
+if (s.count(5)) {
+    std::cout << "5 exists" << std::endl;
+}
+// 遍历
+for (int n : s) {
+    std::cout << n << " ";
+}
+```
+
+---
+
+**unordered_map：哈希表（C++11）**
+`std::unordered_map<<KeyType>, <ValueType>> <m>;`
+```cpp
+#include <unordered_map>
+std::unordered_map<std::string, int> hash_map;
+hash_map["one"] = 1;
+hash_map["two"] = 2;
+hash_map["three"] = 3;
+// 查找
+auto it = hash_map.find("two");
+if (it != hash_map.end()) {
+    std::cout << it->first << ": " << it->second << std::endl;
+}
+```
+
+---
+
+**unordered_set：哈希集合（C++11）**
+`std::unordered_set<<Type>> <s>;`
+```cpp
+#include <unordered_set>
+std::unordered_set<int> uset = {3, 1, 4, 1, 5, 9};
+// 自动去重
+// uset: {1, 3, 4, 5, 9}（无序）
+uset.insert(7);
+if (uset.count(4)) {
+    std::cout << "4 exists" << std::endl;
+}
+```
+
+---
+
+**multimap 与 multiset：允许重复键**
+`std::multimap<<KeyType>, <ValueType>> <mm>;`
+```cpp
+#include <map>
+#include <set>
+std::multimap<std::string, int> mm;
+mm.insert({"Alice", 90});
+mm.insert({"Alice", 85});
+mm.insert({"Bob", 95});
+// 查找所有 Alice 的记录
+auto range = mm.equal_range("Alice");
+for (auto it = range.first; it != range.second; ++it) {
+    std::cout << it->first << ": " << it->second << std::endl;
+}
+```
+
+---
+
+## 容器适配器
+
+**stack：栈**
+`std::stack<<Type>> <stk>;`
+```cpp
+#include <stack>
+std::stack<int> stk;
+stk.push(1);
+stk.push(2);
+stk.push(3);
+std::cout << stk.top() << std::endl;    // 3
+stk.pop();
+std::cout << stk.top() << std::endl;    // 2
+std::cout << stk.size() << std::endl;   // 2
+```
+
+---
+
+**queue：队列**
+`std::queue<<Type>> <q>;`
+```cpp
+#include <queue>
+std::queue<int> q;
+q.push(1);
+q.push(2);
+q.push(3);
+std::cout << q.front() << std::endl;    // 1
+std::cout << q.back() << std::endl;     // 3
+q.pop();
+std::cout << q.front() << std::endl;    // 2
+```
+
+---
+
+**priority_queue：优先队列**
+`std::priority_queue<<Type>> <pq>;`
+```cpp
+#include <queue>
+// 默认最大堆
+std::priority_queue<int> pq;
+pq.push(3);
+pq.push(1);
+pq.push(4);
+pq.push(1);
+pq.push(5);
+std::cout << pq.top() << std::endl;    // 5（最大值）
+pq.pop();
+std::cout << pq.top() << std::endl;    // 4
+// 最小堆
+std::priority_queue<int, std::vector<int>, std::greater<int>> min_pq;
+min_pq.push(3);
+min_pq.push(1);
+min_pq.push(4);
+std::cout << min_pq.top() << std::endl;    // 1（最小值）
+```
+
+---
+
+## 迭代器
+
+**迭代器类型**
+`<container>::iterator | <container>::const_iterator | <container>::reverse_iterator`
+```cpp
+std::vector<int> v = {1, 2, 3, 4, 5};
+// 正向迭代器
+for (std::vector<int>::iterator it = v.begin(); it != v.end(); ++it) {
+    std::cout << *it << " ";
+}
+// const 迭代器
+for (std::vector<int>::const_iterator it = v.cbegin(); it != v.cend(); ++it) {
+    std::cout << *it << " ";
+}
+// 反向迭代器
+for (std::vector<int>::reverse_iterator it = v.rbegin(); it != v.rend(); ++it) {
+    std::cout << *it << " ";    // 5 4 3 2 1
+}
+```
+
+---
+
+**迭代器辅助函数**
+`std::advance(<it>, <n>) | std::distance(<first>, <last>) | std::next(<it>[, <n>]) | std::prev(<it>[, <n>])`
+```cpp
+#include <iterator>
+std::vector<int> v = {1, 2, 3, 4, 5};
+auto it = v.begin();
+// 前进
+std::advance(it, 2);
+std::cout << *it << std::endl;    // 3
+// 距离
+auto it2 = v.begin();
+std::cout << std::distance(it2, it) << std::endl;    // 2
+// next/prev
+auto next_it = std::next(it);    // 指向 4
+auto prev_it = std::prev(it);   // 指向 2
+```
+
+---
+
+**插入迭代器**
+`std::back_inserter(<container>) | std::front_inserter(<container>) | std::inserter(<container>, <it>)`
+```cpp
+#include <iterator>
+std::vector<int> src = {1, 2, 3};
+std::vector<int> dest;
+// back_inserter：在末尾插入
+std::copy(src.begin(), src.end(), std::back_inserter(dest));
+// dest: {1, 2, 3}
+std::list<int> lst;
+// front_inserter：在开头插入
+std::copy(src.begin(), src.end(), std::front_inserter(lst));
+// lst: {3, 2, 1}
+```
+
+---
+
+## 容器通用操作
+
+**大小与容量**
+`<c>.size() | <c>.empty() | <c>.clear()`
+```cpp
+std::vector<int> v = {1, 2, 3};
+std::cout << v.size() << std::endl;    // 3
+std::cout << v.empty() << std::endl;   // false
+v.clear();
+std::cout << v.empty() << std::endl;   // true
+```
+
+---
+
+**交换**
+`<c1>.swap(<c2>)`
+```cpp
+std::vector<int> v1 = {1, 2, 3};
+std::vector<int> v2 = {4, 5, 6};
+v1.swap(v2);
+// v1: {4, 5, 6}, v2: {1, 2, 3}
+```
+
+---
+
+## 算法
+
+**排序算法**
+`std::sort(<begin>, <end>[, <comp>])`
+```cpp
+#include <algorithm>
+std::vector<int> v = {5, 2, 8, 1, 9, 3};
+// 升序
+std::sort(v.begin(), v.end());
+// 降序
+std::sort(v.begin(), v.end(), std::greater<int>());
+// 自定义比较
+std::sort(v.begin(), v.end(), [](int a, int b) {
+    return a % 10 < b % 10;    // 按个位数排序
+});
+```
+
+---
+
+**查找算法**
+`std::find(<begin>, <end>, <value>) | std::find_if(<begin>, <end>, <pred>)`
+```cpp
+std::vector<int> v = {1, 2, 3, 4, 5};
+// 查找值
+auto it = std::find(v.begin(), v.end(), 3);
+if (it != v.end()) {
+    std::cout << "Found at: " << std::distance(v.begin(), it) << std::endl;
+}
+// 条件查找
+auto it2 = std::find_if(v.begin(), v.end(), [](int n) { return n > 3; });
+```
+
+---
+
+**计数与累加**
+`std::count(<begin>, <end>, <value>) | std::accumulate(<begin>, <end>, <init>)`
+```cpp
+#include <numeric>
+std::vector<int> v = {1, 2, 3, 4, 5};
+// 计数
+int count = std::count(v.begin(), v.end(), 3);    // 1
+// 累加
+int sum = std::accumulate(v.begin(), v.end(), 0);    // 15
+```
+
+---
+
+**复制与转换**
+`std::copy(<begin>, <end>, <out>) | std::transform(<begin>, <end>, <out>, <func>)`
+```cpp
+std::vector<int> src = {1, 2, 3, 4, 5};
+std::vector<int> dest(src.size());
+// 复制
+std::copy(src.begin(), src.end(), dest.begin());
+// 转换
+std::transform(src.begin(), src.end(), dest.begin(), [](int n) {
+    return n * n;    // 平方
+});
+// dest: {1, 4, 9, 16, 25}
+```
+
+---
+
+**删除元素**
+`std::remove(<begin>, <end>, <value>) | std::remove_if(<begin>, <end>, <pred>)`
+```cpp
+std::vector<int> v = {1, 2, 3, 4, 5, 3};
+// 删除所有值为 3 的元素
+auto new_end = std::remove(v.begin(), v.end(), 3);
+v.erase(new_end, v.end());
+// v: {1, 2, 4, 5}
+// 条件删除
+v.erase(std::remove_if(v.begin(), v.end(), [](int n) { return n % 2 == 0; }), v.end());
+```

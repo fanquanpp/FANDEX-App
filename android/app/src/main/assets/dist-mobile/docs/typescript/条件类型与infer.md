@@ -1,165 +1,274 @@
-﻿
-## 1. 条件类型基础
+# 条件类型与infer
 
-### 1.1 基本语法
+> **符号约定**：`< >` 必填参数 | `[ ]` 可选参数
 
-条件类型根据类型关系选择不同的类型结果：
+---
+
+## 条件类型基础
+
+**条件类型：根据类型关系选择不同类型**
+`type <类型><T> = T extends U ? X : Y`
 
 ```typescript
+// 基本条件类型
 type IsString<T> = T extends string ? true : false;
-
-type A = IsString<'hello'>; // true
-type B = IsString<42>; // false
+type IsNumber<T> = T extends number ? true : false;
+// 使用条件类型
+type A = IsString<string>; // true
+type B = IsString<number>; // false
+type C = IsNumber<number>; // true
+type D = IsNumber<string>; // false
 ```
 
-语法结构：`T extends U ? X : Y`
+---
 
-### 1.2 extends 的含义
+## 分布式条件类型
 
-`extends` 在条件类型中表示"是否可赋值给"：
-
-```typescript
-type IsAssignable<T, U> = T extends U ? true : false;
-
-type A = IsAssignable<string, any>; // true
-type B = IsAssignable<never, string>; // never — 特殊行为
-type C = IsAssignable<string, number>; // false
-```
-
-## 2. 分布式条件类型
-
-### 2.1 自动分发
-
-当条件类型的检查参数是裸类型参数（naked type parameter）时，会自动对联合类型分发：
+**分布式条件类型：对联合类型自动分发**
+`type <类型><T> = T extends U ? X : Y`
 
 ```typescript
+// 分布式条件类型
 type ToArray<T> = T extends any ? T[] : never;
-
-type Result = ToArray<string | number>;
-// 等价于：ToArray<string> | ToArray<number>
-// 结果：string[] | number[]
+// 使用联合类型
+type A = ToArray<string | number>; // string[] | number[]
+// 非分布式条件类型（使用方括号阻止分发）
+type ToArrayNonDist<T> = [T] extends [any] ? T[] : never;
+type B = ToArrayNonDist<string | number>; // (string | number)[]
 ```
 
-### 2.2 阻止分发
+---
 
-用 `[T]` 包裹阻止分发：
+## infer 关键字
+
+**infer：在条件类型中推断类型**
+`type <类型><T> = T extends Array<infer U> ? U : T`
 
 ```typescript
-type ToArrayNoDistribute<T> = [T] extends [any] ? T[] : never;
-
-type Result = ToArrayNoDistribute<string | number>;
-// 结果：(string | number)[] — 不分发
+// 提取数组元素类型
+type UnpackArray<T> = T extends Array<infer U> ? U : T;
+type A = UnpackArray<string[]>; // string
+type B = UnpackArray<number[]>; // number
+type C = UnpackArray<string>; // string
 ```
 
-### 2.3 实用分发模式
+---
+
+**提取函数返回类型**
+`type <类型><T> = T extends (...args: any[]) => infer R ? R : any`
 
 ```typescript
-// 过滤联合类型中的 null/undefined
-type NonNullable<T> = T extends null | undefined ? never : T;
-
-type A = NonNullable<string | null | number | undefined>;
-// string | number
-
-// 提取函数类型
-type ExtractFunction<T> = T extends (...args: any[]) => any ? T : never;
-
-type B = ExtractFunction<string | (() => void) | number>;
-// () => void
+// 提取函数返回类型
+type ReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
+type R1 = ReturnType<() => string>; // string
+type R2 = ReturnType<() => number>; // number
+type R3 = ReturnType<(x: number) => boolean>; // boolean
 ```
 
-## 3. infer 关键字
+---
 
-### 3.1 基本用法
-
-`infer` 在 extends 子句中声明类型变量，由 TypeScript 推断：
-
-```typescript
-type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
-
-type A = ReturnType<() => string>; // string
-type B = ReturnType<(x: number) => boolean>; // boolean
-```
-
-### 3.2 提取函数参数
+**提取函数参数类型**
+`type <类型><T> = T extends (...args: infer P) => any ? P : never`
 
 ```typescript
+// 提取函数参数类型
 type Parameters<T> = T extends (...args: infer P) => any ? P : never;
-
-type A = Parameters<(x: string, y: number) => void>;
-// [string, number]
+type P1 = Parameters<(a: string) => void>; // [string]
+type P2 = Parameters<(a: string, b: number) => void>; // [string, number]
+// 提取第一个参数类型
+type FirstParameter<T> = T extends (first: infer F, ...rest: any[]) => any ? F : never;
+type F = FirstParameter<(name: string, age: number) => void>; // string
 ```
 
-### 3.3 提取 Promise 值
+---
+
+**提取 Promise 值类型**
+`type <类型><T> = T extends Promise<infer U> ? U : T`
 
 ```typescript
-type Awaited<T> = T extends Promise<infer U> ? Awaited<U> : T;
-
+// 提取 Promise 值类型
+type Awaited<T> = T extends Promise<infer U> ? U : T;
 type A = Awaited<Promise<string>>; // string
-type B = Awaited<Promise<Promise<number>>>; // number（递归解包）
+type B = Awaited<Promise<number>>; // number
 ```
 
-### 3.4 提取数组元素
+---
+
+**提取构造函数实例类型**
+`type <类型><T> = T extends new (...args: any[]) => infer R ? R : any`
 
 ```typescript
-type First<T extends any[]> = T extends [infer F, ...any[]] ? F : never;
-type Last<T extends any[]> = T extends [...any[], infer L] ? L : never;
-
-type A = First<[1, 2, 3]>; // 1
-type B = Last<[1, 2, 3]>; // 3
-```
-
-### 3.5 提取字符串部分
-
-```typescript
-type GetPrefix<S extends string> = S extends `${infer P}_${string}` ? P : S;
-
-type A = GetPrefix<'user_name'>; // 'user'
-type B = GetPrefix<'hello'>; // 'hello'
-```
-
-## 4. 多 infer 位置
-
-```typescript
-// 同时提取函数参数和返回值
-type FunctionInfo<T> = T extends (...args: infer Args) => infer Return
-  ? { args: Args; return: Return }
-  : never;
-
-type Info = FunctionInfo<(x: string, y: number) => boolean>;
-// { args: [string, number]; return: boolean }
-```
-
-## 5. 条件类型实战
-
-### 5.1 深层只读
-
-```typescript
-type DeepReadonly<T> = T extends Function
-  ? T
-  : T extends object
-    ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
-    : T;
-```
-
-### 5.2 类型过滤
-
-```typescript
-type PickByValue<T, V> = {
-  [K in keyof T as T[K] extends V ? K : never]: T[K];
-};
-
-type User = { name: string; age: number; active: boolean };
-type StringFields = PickByValue<User, string>; // { name: string }
-```
-
-### 5.3 函数重载推断
-
-```typescript
-// 获取最后一个重载签名（最具体的）
-type LastOverload<T> = T extends {
-  (...args: infer A): infer R;
-  (...args: any[]): any;
+// 提取构造函数实例类型
+type InstanceType<T> = T extends new (...args: any[]) => infer R ? R : any;
+class MyClass {
+  name: string = 'MyClass';
 }
-  ? (...args: A) => R
-  : never;
+type I = InstanceType<typeof MyClass>; // MyClass
+const instance: I = new MyClass();
+console.log(instance.name); // MyClass
+```
+
+---
+
+## 内置条件类型
+
+**Exclude：从联合类型中排除**
+`type <类型> = Exclude<T, U>`
+
+```typescript
+// Exclude：从联合类型中排除
+type T1 = Exclude<'a' | 'b' | 'c', 'a'>; // 'b' | 'c'
+type T2 = Exclude<string | number | boolean, string>; // number | boolean
+type T3 = Exclude<number | string | (() => void), Function>; // number | string
+```
+
+---
+
+**Extract：从联合类型中提取**
+`type <类型> = Extract<T, U>`
+
+```typescript
+// Extract：从联合类型中提取
+type T1 = Extract<'a' | 'b' | 'c', 'a' | 'b'>; // 'a' | 'b'
+type T2 = Extract<string | number | boolean, string | number>; // string | number
+```
+
+---
+
+**NonNullable：排除 null 和 undefined**
+`type <类型> = NonNullable<T>`
+
+```typescript
+// NonNullable：排除 null 和 undefined
+type T1 = NonNullable<string | null>; // string
+type T2 = NonNullable<number | null | undefined>; // number
+type T3 = NonNullable<string | null | undefined | number>; // string | number
+```
+
+---
+
+**ReturnType：获取函数返回类型**
+`type <类型> = ReturnType<T>`
+
+```typescript
+// ReturnType：获取函数返回类型
+type T1 = ReturnType<() => string>; // string
+type T2 = ReturnType<() => number>; // number
+type T3 = ReturnType<typeof JSON.parse>; // any
+```
+
+---
+
+**Parameters：获取函数参数类型**
+`type <类型> = Parameters<T>`
+
+```typescript
+// Parameters：获取函数参数类型
+type T1 = Parameters<(a: string) => void>; // [string]
+type T2 = Parameters<(a: string, b: number) => void>; // [string, number]
+type T3 = Parameters<typeof Math.max>; // number[]
+```
+
+---
+
+**InstanceType：获取构造函数实例类型**
+`type <类型> = InstanceType<T>`
+
+```typescript
+// InstanceType：获取构造函数实例类型
+class Person {
+  name: string;
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+type T1 = InstanceType<typeof Person>; // Person
+const person: T1 = new Person('Alice');
+```
+
+---
+
+## 递归条件类型
+
+**递归条件类型：处理嵌套结构**
+`type <类型><T> = T extends Array<infer U> ? <递归调用> : T`
+
+```typescript
+// 递归展平数组类型
+type DeepFlatten<T> = T extends Array<infer U> ? DeepFlatten<U> : T;
+type A = DeepFlatten<number[][][]>; // number
+// 递归提取 Promise 类型
+type DeepAwaited<T> = T extends Promise<infer U> ? DeepAwaited<U> : T;
+type B = DeepAwaited<Promise<Promise<string>>>; // string
+```
+
+---
+
+## 条件类型与映射类型
+
+**条件类型与映射类型组合**
+`type <类型><T> = { [K in keyof T]: T[K] extends <约束> ? <类型1> : <类型2> }`
+
+```typescript
+// 条件类型与映射类型组合
+type FunctionProperties<T> = {
+  [K in keyof T]: T[K] extends Function ? K : never;
+};
+type NonFunctionProperties<T> = {
+  [K in keyof T]: T[K] extends Function ? never : K;
+};
+// 使用
+interface Example {
+  name: string;
+  age: number;
+  greet: () => void;
+  farewell: () => string;
+}
+type Functions = FunctionProperties<Example>[keyof Example]; // 'greet' | 'farewell'
+type NonFunctions = NonFunctionProperties<Example>[keyof Example]; // 'name' | 'age'
+```
+
+---
+
+## 条件类型的应用
+
+**根据条件选择不同类型**
+`type <类型><T> = T extends <约束> ? <类型1> : <类型2>`
+
+```typescript
+// 根据条件选择不同类型
+type ResultType<T> = T extends string
+  ? { type: 'string'; value: T }
+  : T extends number
+  ? { type: 'number'; value: T }
+  : T extends boolean
+  ? { type: 'boolean'; value: T }
+  : { type: 'unknown'; value: T };
+// 使用
+type R1 = ResultType<string>; // { type: 'string'; value: string }
+type R2 = ResultType<number>; // { type: 'number'; value: number }
+type R3 = ResultType<boolean>; // { type: 'boolean'; value: boolean }
+```
+
+---
+
+## 自定义条件类型工具
+
+**自定义条件类型工具**
+`type <类型><T> = ...`
+
+```typescript
+// 自定义条件类型工具
+// 检查类型是否为 never
+type IsNever<T> = [T] extends [never] ? true : false;
+type A = IsNever<never>; // true
+type B = IsNever<string>; // false
+// 检查类型是否为 any
+type IsAny<T> = 0 extends 1 & T ? true : false;
+type C = IsAny<any>; // true
+type D = IsAny<string>; // false
+// 检查类型是否为 unknown
+type IsUnknown<T> = unknown extends T ? (T extends object ? false : true) : false;
+type E = IsUnknown<unknown>; // true
+type F = IsUnknown<string>; // false
 ```

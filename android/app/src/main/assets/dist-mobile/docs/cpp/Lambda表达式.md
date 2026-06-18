@@ -1,348 +1,298 @@
-﻿
-## 概述
+# Lambda表达式
 
-Lambda 表达式是 C++11 引入的匿名函数机制，允许在代码中就地定义函数对象。Lambda 使得算法的回调、容器的遍历和异步操作等场景的代码更加简洁直观。从 C++11 到 C++23，Lambda 的能力持续增强：泛型参数、初始化捕获、模板 Lambda、递归 Lambda 等，使其成为现代 C++ 最重要的特性之一。
+> **符号约定**：`< >` 必填参数 | `[ ]` 可选参数
 
-Lambda 的本质是编译器自动生成的函数对象类，捕获的变量成为该类的成员，函数体成为 operator() 的实现。理解这一点有助于理解 Lambda 的各种行为和限制。
+---
 
-## 基础概念
+## Lambda 基础
 
-### Lambda 的组成部分
-
+**基本 Lambda 语法**
+`[<capture>](<params>) -> <return_type> { <body> }`
 ```cpp
-[捕获列表](参数列表) mutable noexcept -> 返回类型 { 函数体 }
-```
-
-- **捕获列表**：指定如何访问外部变量
-- **参数列表**：与普通函数相同（C++14 起可使用 auto）
-- **mutable**：允许修改值捕获的变量
-- **noexcept**：声明不抛出异常
-- **返回类型**：通常可自动推导，复杂情况需显式指定
-- **函数体**：Lambda 的执行逻辑
-
-### Lambda 的类型
-
-每个 Lambda 表达式都有唯一的匿名类型，只能用 auto 或模板参数接收。如果需要存储 Lambda，可使用 `std::function`（有开销）或模板（零开销）。
-
-## 快速上手
-
-### 基本语法
-
-```cpp
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
-int main() {
-    // 最简单的 Lambda
-    auto add = [](int a, int b) { return a + b; };
-    std::cout << add(1, 2) << std::endl;  // 3
-
-    // 在算法中使用 Lambda
-    std::vector<int> nums = {5, 2, 8, 1, 9, 3};
-    std::sort(nums.begin(), nums.end(), [](int a, int b) {
-        return a > b;  // 降序排序
-    });
-
-    for (int n : nums) {
-        std::cout << n << " ";  // 9 8 5 3 2 1
-    }
-    return 0;
-}
-```
-
-### 捕获外部变量
-
-```cpp
-int x = 10, y = 20;
-
-auto f1 = [x, y]() { return x + y; };    // 值捕获
-auto f2 = [&x, &y]() { x++; y++; };      // 引用捕获
-auto f3 = [=]() { return x + y; };       // 全部值捕获
-auto f4 = [&]() { x++; y++; };           // 全部引用捕获
-auto f5 = [=, &x]() { x++; return y; };  // 混合捕获
-auto f6 = [this]() { return member; };    // 捕获 this 指针
-auto f7 = [*this]() { return member; };   // C++17，拷贝当前对象
-```
-
-## 详细用法
-
-### 泛型 Lambda（C++14）
-
-```cpp
-#include <iostream>
-#include <string>
-
-// 使用 auto 参数，Lambda 自动成为模板
-auto greater = [](auto a, auto b) { return a > b; };
-
-greater(3, 2);       // true，int 比较
-greater(3.0, 2.5);   // true，double 比较
-greater("b", "a");   // true，字符串比较
-
-// 泛型 Lambda 与容器配合
-auto printContainer = [](const auto& container) {
-    for (const auto& item : container) {
-        std::cout << item << " ";
-    }
-    std::cout << std::endl;
+// 无捕获、无参数的 Lambda
+auto hello = []() { std::cout << "Hello, Lambda!" << std::endl; };
+hello();
+// 带参数的 Lambda
+auto add = [](int a, int b) { return a + b; };
+std::cout << add(3, 4) << std::endl;    // 7
+// 显式指定返回类型
+auto divide = [](double a, double b) -> double {
+    if (b == 0) return 0;
+    return a / b;
 };
 ```
 
-### 模板 Lambda（C++20）
+---
 
+**Lambda 立即调用**
+`[<capture>](<params>) { ... }();`
 ```cpp
-#include <concepts>
-
-// C++20: 显式模板参数，可以约束类型
-auto process = []<typename T>(T value) {
-    return value * 2;
-};
-
-// 带概念约束的模板 Lambda
-auto processIntegral = []<std::integral T>(T value) {
-    return value * 2;  // 仅接受整数类型
-};
-
-// 模板 Lambda 可以使用更复杂的类型操作
-auto transformPair = []<typename A, typename B>(std::pair<A, B> p) {
-    return std::make_pair(p.second, p.first);  // 交换 pair 的两个元素
-};
+// 立即调用的 Lambda
+[]() {
+    std::cout << "Executed immediately" << std::endl;
+}();
+// 带参数
+[](int x) {
+    std::cout << "x = " << x << std::endl;
+}(42);
 ```
 
-### 初始化捕获与移动捕获（C++14）
+---
 
+## 捕获方式
+
+**值捕获**
+`[<var>]`
 ```cpp
-#include <memory>
-#include <string>
-
-// 移动捕获：将 unique_ptr 移入 Lambda
-auto ptr = std::make_unique<int>(42);
-auto f = [p = std::move(ptr)]() { return *p; };
-
-// 计算捕获：在捕获时计算表达式
-int threshold = 100;
-auto checker = [max = threshold * 2](int value) {
-    return value > max;
+int x = 10;
+int y = 20;
+// 值捕获：捕获 x 的副本
+auto lambda = [x]() {
+    std::cout << "x = " << x << std::endl;    // 10
 };
-
-// 捕获字符串副本
-std::string name = "张三";
-auto greeter = [n = std::move(name)]() {
-    return "你好, " + n;
-};
+x = 100;
+lambda();    // 仍输出 10（捕获的是副本）
 ```
 
-### C++23 递归 Lambda
+---
 
+**引用捕获**
+`[&<var>]`
 ```cpp
-// C++23: 使用显式对象参数实现递归 Lambda
-auto fibonacci = [](this auto self, int n) -> int {
-    return n <= 1 ? n : self(n - 1) + self(n - 2);
+int x = 10;
+// 引用捕获：捕获 x 的引用
+auto lambda = [&x]() {
+    x = 100;    // 修改外部变量
 };
-
-std::cout << fibonacci(10) << std::endl;  // 55
-
-// 也可以实现更复杂的递归逻辑
-auto treeTraversal = [](this auto self, const Node* node) -> void {
-    if (!node) return;
-    self(node->left);   // 递归遍历左子树
-    std::cout << node->value << " ";
-    self(node->right);  // 递归遍历右子树
-};
+lambda();
+std::cout << x << std::endl;    // 100
 ```
 
-## 常见场景
+---
 
-### 自定义排序
-
+**混合捕获**
+`[<var1>, &<var2>]`
 ```cpp
-#include <vector>
-#include <algorithm>
-#include <string>
-
-struct Student {
-    std::string name;
-    int score;
+int x = 10;
+int y = 20;
+int z = 30;
+// x 值捕获，y 引用捕获，z 值捕获
+auto lambda = [x, &y, z]() {
+    y = x + y + z;    // 10 + 20 + 30 = 60
 };
-
-int main() {
-    std::vector<Student> students = {
-        {"张三", 85}, {"李四", 92}, {"王五", 78}
-    };
-
-    // 按成绩降序排序
-    std::sort(students.begin(), students.end(),
-        [](const Student& a, const Student& b) {
-            return a.score > b.score;
-        });
-
-    // 按姓名排序
-    std::sort(students.begin(), students.end(),
-        [](const Student& a, const Student& b) {
-            return a.name < b.name;
-        });
-    return 0;
-}
+lambda();
+std::cout << y << std::endl;    // 60
 ```
 
-### 事件回调
+---
 
+**全部捕获**
+`[=]` 或 `[&]`
 ```cpp
-#include <functional>
-#include <vector>
-#include <iostream>
+int x = 10, y = 20, z = 30;
+// 全部值捕获
+auto val_lambda = [=]() {
+    std::cout << x << " " << y << " " << z << std::endl;
+};
+// 全部引用捕获
+auto ref_lambda = [&]() {
+    x = 1; y = 2; z = 3;
+};
+ref_lambda();
+std::cout << x << " " << y << " " << z << std::endl;    // 1 2 3
+```
 
-class Button {
-    std::vector<std::function<void()>> clickHandlers_;
+---
+
+**this 捕获**
+`[this]` 或 `[*this]`
+```cpp
+class Counter {
+    int count_ = 0;
 public:
-    void onClick(std::function<void()> handler) {
-        clickHandlers_.push_back(std::move(handler));
+    auto getIncrementor() {
+        // 捕获 this
+        return [this]() { return ++count_; };
     }
-
-    void click() {
-        for (auto& h : clickHandlers_) h();
-    }
-};
-
-int main() {
-    Button btn;
-    int clickCount = 0;
-
-    // 使用 Lambda 注册回调
-    btn.onClick([&clickCount]() {
-        ++clickCount;
-        std::cout << "按钮被点击了 " << clickCount << " 次" << std::endl;
-    });
-
-    btn.click();  // 按钮被点击了 1 次
-    btn.click();  // 按钮被点击了 2 次
-    return 0;
-}
-```
-
-### 延迟计算
-
-```cpp
-#include <functional>
-#include <iostream>
-
-// 延迟求值：只在需要时计算
-template<typename F>
-class LazyValue {
-    F func_;
-    mutable bool computed_ = false;
-    mutable decltype(func_()) value_;
-public:
-    explicit LazyValue(F func) : func_(std::move(func)) {}
-
-    const auto& get() const {
-        if (!computed_) {
-            value_ = func_();
-            computed_ = true;
-        }
-        return value_;
+    auto getIncrementorCopy() {
+        // C++17：拷贝 *this
+        return [*this]() mutable { return ++count_; };
     }
 };
-
-// 使用 Lambda 创建延迟值
-auto lazyData = LazyValue([]() {
-    std::cout << "计算中..." << std::endl;
-    return 42;
-});
-
-// 此时不会计算
-std::cout << "延迟值已创建" << std::endl;
-
-// 首次访问时才计算
-std::cout << lazyData.get() << std::endl;  // 输出: 计算中... 42
 ```
 
-## 注意事项
+---
 
-- 引用捕获可能导致悬空引用，Lambda 的生命周期超过被引用变量时尤其危险
-- 值捕获的是创建 Lambda 时的快照，后续修改原变量不影响 Lambda 内的值
-- 避免使用默认捕获 `[=]` 和 `[&]`，显式列出每个捕获变量更安全
-- `[=]` 会隐式捕获 this 指针（C++20 已弃用此行为），应显式写 `[=, this]` 或 `[=, *this]`
-- Lambda 默认是 const 的，需要 `mutable` 关键字才能修改值捕获的变量
-- 无捕获的 Lambda 可以转换为函数指针，有捕获的不能
+## mutable Lambda
 
-## 进阶用法
-
-### Lambda 与 STL 算法组合
-
+**mutable 关键字**
+`[<capture>](<params>) mutable { <body> }`
 ```cpp
-#include <algorithm>
-#include <vector>
-#include <numeric>
-
-int main() {
-    std::vector<int> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-
-    // 使用 Lambda 进行条件计数
-    auto evenCount = std::count_if(data.begin(), data.end(),
-        [](int n) { return n % 2 == 0; });
-
-    // 使用 Lambda 进行条件移除
-    auto newEnd = std::remove_if(data.begin(), data.end(),
-        [](int n) { return n < 5; });
-    data.erase(newEnd, data.end());
-
-    // 使用 Lambda 进行自定义累加
-    auto sumOfSquares = std::accumulate(data.begin(), data.end(), 0,
-        [](int sum, int n) { return sum + n * n; });
-    return 0;
-}
-```
-
-### Lambda 与 std::function
-
-```cpp
-#include <functional>
-#include <map>
-#include <string>
-
-// 使用 std::map 存储不同签名的 Lambda
-class CommandDispatcher {
-    std::map<std::string, std::function<void(const std::string&)>> commands_;
-public:
-    void registerCommand(const std::string& name,
-                         std::function<void(const std::string&)> handler) {
-        commands_[name] = std::move(handler);
-    }
-
-    void execute(const std::string& name, const std::string& arg) {
-        auto it = commands_.find(name);
-        if (it != commands_.end()) {
-            it->second(arg);
-        }
-    }
+int x = 10;
+// mutable 允许修改值捕获的变量
+auto counter = [x]() mutable {
+    return ++x;    // 修改的是副本
 };
+std::cout << counter() << std::endl;    // 11
+std::cout << counter() << std::endl;    // 12
+std::cout << x << std::endl;           // 10（原变量未变）
+```
 
-// 注册不同行为的命令
-dispatcher.registerCommand("greet", [](const std::string& name) {
-    std::cout << "你好, " << name << "!" << std::endl;
-});
-dispatcher.registerCommand("echo", [](const std::string& msg) {
-    std::cout << msg << std::endl;
+---
+
+## Lambda 与 STL
+
+**for_each**
+`std::for_each(<begin>, <end>, <lambda>)`
+```cpp
+std::vector<int> nums = {1, 2, 3, 4, 5};
+std::for_each(nums.begin(), nums.end(), [](int n) {
+    std::cout << n << " ";
 });
 ```
 
-### C++20 捕获包展开
+---
 
+**transform**
+`std::transform(<begin>, <end>, <out>, <lambda>)`
 ```cpp
-#include <tuple>
-#include <iostream>
+std::vector<int> nums = {1, 2, 3, 4, 5};
+std::vector<int> squared(nums.size());
+std::transform(nums.begin(), nums.end(), squared.begin(), [](int n) {
+    return n * n;
+});
+// squared: {1, 4, 9, 16, 25}
+```
 
-// 在 Lambda 中展开参数包
-template<typename... Args>
-void forEach(Args... args) {
-    // C++20: 使用初始化捕获展开参数包
-    [... captures = std::move(args)]() {
-        ((std::cout << captures << " "), ...);
-    }();
+---
+
+**sort 自定义比较**
+`std::sort(<begin>, <end>, <lambda>)`
+```cpp
+std::vector<int> nums = {5, 2, 8, 1, 9, 3};
+// 升序排序
+std::sort(nums.begin(), nums.end(), [](int a, int b) {
+    return a < b;
+});
+// 降序排序
+std::sort(nums.begin(), nums.end(), [](int a, int b) {
+    return a > b;
+});
+```
+
+---
+
+**find_if**
+`std::find_if(<begin>, <end>, <lambda>)`
+```cpp
+std::vector<int> nums = {1, 2, 3, 4, 5};
+// 查找第一个大于 3 的元素
+auto it = std::find_if(nums.begin(), nums.end(), [](int n) {
+    return n > 3;
+});
+if (it != nums.end()) {
+    std::cout << "Found: " << *it << std::endl;    // 4
 }
+```
 
+---
+
+**remove_if**
+`std::remove_if(<begin>, <end>, <lambda>)`
+```cpp
+std::vector<int> nums = {1, 2, 3, 4, 5};
+// 移除所有偶数
+auto new_end = std::remove_if(nums.begin(), nums.end(), [](int n) {
+    return n % 2 == 0;
+});
+nums.erase(new_end, nums.end());
+// nums: {1, 3, 5}
+```
+
+---
+
+## Lambda 存储与传递
+
+**存储 Lambda**
+`auto <var> = <lambda>;` 或 `std::function<<signature>> <var> = <lambda>;`
+```cpp
+#include <functional>
+// 使用 auto
+auto add = [](int a, int b) { return a + b; };
+// 使用 std::function
+std::function<int(int, int)> subtract = [](int a, int b) { return a - b; };
+// 调用
+std::cout << add(5, 3) << std::endl;       // 8
+std::cout << subtract(5, 3) << std::endl;  // 2
+```
+
+---
+
+**Lambda 作为函数参数**
+`void <func>(std::function<<signature>> <callback>) { ... }`
+```cpp
+#include <functional>
+void process(int value, std::function<void(int)> callback) {
+    callback(value);
+}
 // 使用
-forEach(1, "hello", 3.14);  // 输出: 1 hello 3.14
+int multiplier = 10;
+process(5, [multiplier](int x) {
+    std::cout << x * multiplier << std::endl;    // 50
+});
+```
+
+---
+
+**模板参数传递 Lambda**
+`template <typename Func> void <func>(Func <callback>) { ... }`
+```cpp
+template <typename Func>
+void process(int value, Func callback) {
+    callback(value);
+}
+// 使用
+process(5, [](int x) { std::cout << x << std::endl; });
+```
+
+---
+
+## 泛型 Lambda（C++14）
+
+**auto 参数**
+`[<capture>](auto <param>) { <body> }`
+```cpp
+// C++14：泛型 Lambda
+auto print = [](auto value) {
+    std::cout << value << std::endl;
+};
+print(42);
+print(3.14);
+print("Hello");
+// 多参数泛型
+auto max = [](auto a, auto b) {
+    return a > b ? a : b;
+};
+std::cout << max(10, 20) << std::endl;        // 20
+std::cout << max(3.14, 2.71) << std::endl;    // 3.14
+```
+
+---
+
+## Lambda 捕获初始化（C++14）
+
+**捕获初始化**
+`[<var> = <expr>]`
+```cpp
+// C++14：捕获初始化
+auto lambda = [x = 10, y = 20]() {
+    std::cout << x << " " << y << std::endl;
+};
+lambda();    // 10 20
+// 移动捕获
+auto ptr = std::make_unique<int>(42);
+auto move_lambda = [p = std::move(ptr)]() {
+    std::cout << *p << std::endl;
+};
+move_lambda();    // 42
 ```
