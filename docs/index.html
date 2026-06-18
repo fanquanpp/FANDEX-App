@@ -270,6 +270,77 @@
             -webkit-box-orient: vertical;
         }
 
+        /* ========== 版本分组折叠 ========== */
+        .version-groups {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .version-group {
+            border: 1px solid var(--color-border-light);
+        }
+
+        .group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--color-bg-card);
+            cursor: pointer;
+            transition: background var(--transition-fast);
+            user-select: none;
+        }
+
+        .group-header:hover {
+            background: var(--color-bg-hover);
+        }
+
+        .group-header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .group-version-range {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--color-text);
+        }
+
+        .group-count {
+            font-family: var(--font-display);
+            font-size: 0.72rem;
+            color: var(--color-text-tertiary);
+            padding: 1px 6px;
+            border: 1px solid var(--color-border-light);
+        }
+
+        .group-toggle {
+            font-size: 0.7rem;
+            color: var(--color-text-tertiary);
+            transition: transform var(--transition-fast);
+            display: inline-block;
+        }
+
+        .version-group.expanded .group-toggle {
+            transform: rotate(90deg);
+        }
+
+        .group-content {
+            display: none;
+        }
+
+        .version-group.expanded .group-content {
+            display: block;
+        }
+
+        .group-content .version-grid {
+            border: none;
+            border-top: 1px solid var(--color-border-light);
+        }
+
         /* ========== 版本详情页 ========== */
         .detail-page { display: none; }
         .detail-page.active { display: block; }
@@ -498,78 +569,8 @@
                 <p class="page-desc">Android 纯代码语法速查工具 · 17 个模块 · 641 篇语法文档 · 完全离线 · 中英日三语界面 · 深浅色双模式</p>
             </div>
 
-            <div class="version-grid">
-
-                <!-- v2.0.0-beta -->
-                <a class="version-card" onclick="showDetail('2.0.0')">
-                    <span class="card-icon"><span class="icon-classic">F</span></span>
-                    <h3 class="card-title">v2.0.0-beta</h3>
-                    <p class="card-desc">重新定义：纯代码语法速查工具</p>
-                </a>
-
-                <!-- v1.5.1-beta -->
-                <a class="version-card" onclick="showDetail('1.5.1')">
-                    <span class="card-icon"><span class="icon-classic">F</span></span>
-                    <h3 class="card-title">v1.5.1-beta</h3>
-                    <p class="card-desc">新增 Python/Go/Java 编程语言文档</p>
-                </a>
-
-                <!-- v1.5.0-beta -->
-                <a class="version-card" onclick="showDetail('1.5.0')">
-                    <span class="card-icon"><span class="icon-classic">F</span></span>
-                    <h3 class="card-title">v1.5.0-beta</h3>
-                    <p class="card-desc">表格渲染修复 / 增量日志 / 中文化</p>
-                </a>
-
-                <!-- v1.4.1-beta -->
-                <a class="version-card" onclick="showDetail('1.4.1')">
-                    <span class="card-icon"><span class="icon-classic">F</span></span>
-                    <h3 class="card-title">v1.4.1-beta</h3>
-                    <p class="card-desc">LaTeX 公式修复 / TOC 标记修复 / 分类筛选保持</p>
-                </a>
-
-                <!-- v1.4.0-beta -->
-                <a class="version-card" onclick="showDetail('1.4.0')">
-                    <span class="card-icon"><span class="icon-classic">F</span></span>
-                    <h3 class="card-title">v1.4.0-beta</h3>
-                    <p class="card-desc">启动页 / 分类筛选保持 / 经典图标</p>
-                </a>
-
-                <!-- v1.3.1-beta -->
-                <a class="version-card" onclick="showDetail('1.3.1')">
-                    <span class="card-icon"><span class="icon-classic">F</span></span>
-                    <h3 class="card-title">v1.3.1-beta</h3>
-                    <p class="card-desc">顶部栏整合 / 侧边栏分级 / 表格修复 / 全屏阅读</p>
-                </a>
-
-                <!-- v1.3.0-beta -->
-                <a class="version-card" onclick="showDetail('1.3.0')">
-                    <span class="card-icon"><span class="icon-classic">F</span></span>
-                    <h3 class="card-title">v1.3.0-beta</h3>
-                    <p class="card-desc">原生 Compose 渲染 / DataStore 持久化 / 侧边栏导航 / 三语界面</p>
-                </a>
-
-                <!-- v1.2.0-beta -->
-                <a class="version-card" onclick="showDetail('1.2.0')">
-                    <span class="card-icon"><span class="icon-classic">F</span></span>
-                    <h3 class="card-title">v1.2.0-beta</h3>
-                    <p class="card-desc">三语界面 / 文档编号 / 分类分界线 / 翻页与返回顶部</p>
-                </a>
-
-                <!-- v1.1.1-beta -->
-                <a class="version-card" onclick="showDetail('1.1.1')">
-                    <span class="card-icon"><span class="icon-classic">F</span></span>
-                    <h3 class="card-title">v1.1.1-beta</h3>
-                    <p class="card-desc">中英双版本 / 模块分界线 / 分类色标识</p>
-                </a>
-
-                <!-- v1.0.0-beta1 -->
-                <a class="version-card" onclick="showDetail('1.0.0')">
-                    <span class="card-icon"><span class="icon-classic">F</span></span>
-                    <h3 class="card-title">v1.0.0-beta1</h3>
-                    <p class="card-desc">首个测试版本 / 基础查阅功能 / WebView 渲染</p>
-                </a>
-
+            <div class="version-groups" id="versionGroups">
+                <!-- 由 JavaScript 动态渲染版本分组 -->
             </div>
 
             <!-- 推荐区域 -->
@@ -778,6 +779,81 @@
         };
 
         /**
+         * 版本分组数据
+         * 按主版本号.次版本号 分组，如 v1.0.x、v1.1.x、v2.0.x
+         * 每个分组包含该大版本下的所有补丁版本
+         */
+        var versionGroups = [
+            { range: 'v2.0.x', versions: ['2.0.0'] },
+            { range: 'v1.5.x', versions: ['1.5.1', '1.5.0'] },
+            { range: 'v1.4.x', versions: ['1.4.1', '1.4.0'] },
+            { range: 'v1.3.x', versions: ['1.3.1', '1.3.0'] },
+            { range: 'v1.2.x', versions: ['1.2.0'] },
+            { range: 'v1.1.x', versions: ['1.1.1'] },
+            { range: 'v1.0.x', versions: ['1.0.0'] }
+        ];
+
+        /**
+         * 版本卡片简短描述
+         * 用于列表页卡片展示，与详情页完整更新日志区分
+         */
+        var cardDescriptions = {
+            '2.0.0': '重新定义：纯代码语法速查工具',
+            '1.5.1': '新增 Python/Go/Java 编程语言文档',
+            '1.5.0': '表格渲染修复 / 增量日志 / 中文化',
+            '1.4.1': 'LaTeX 公式修复 / TOC 标记修复 / 分类筛选保持',
+            '1.4.0': '启动页 / 分类筛选保持 / 经典图标',
+            '1.3.1': '顶部栏整合 / 侧边栏分级 / 表格修复 / 全屏阅读',
+            '1.3.0': '原生 Compose 渲染 / DataStore 持久化 / 侧边栏导航 / 三语界面',
+            '1.2.0': '三语界面 / 文档编号 / 分类分界线 / 翻页与返回顶部',
+            '1.1.1': '中英双版本 / 模块分界线 / 分类色标识',
+            '1.0.0': '首个测试版本 / 基础查阅功能 / WebView 渲染'
+        };
+
+        /**
+         * 渲染版本分组列表
+         * 默认展开最新分组（第一个），其余折叠
+         */
+        function renderGroups() {
+            var container = document.getElementById('versionGroups');
+            var html = '';
+            for (var i = 0; i < versionGroups.length; i++) {
+                var g = versionGroups[i];
+                var expanded = i === 0 ? ' expanded' : '';
+                html += '<div class="version-group' + expanded + '" id="group-' + i + '">';
+                html += '<div class="group-header" onclick="toggleGroup(' + i + ')">';
+                html += '<div class="group-header-left">';
+                html += '<span class="group-version-range">' + g.range + '</span>';
+                html += '<span class="group-count">' + g.versions.length + '</span>';
+                html += '</div>';
+                html += '<span class="group-toggle">&#9654;</span>';
+                html += '</div>';
+                html += '<div class="group-content"><div class="version-grid">';
+                for (var j = 0; j < g.versions.length; j++) {
+                    var v = versions[g.versions[j]];
+                    if (!v) continue;
+                    html += '<a class="version-card" onclick="showDetail(\'' + g.versions[j] + '\')">';
+                    html += '<span class="card-icon"><span class="icon-classic">F</span></span>';
+                    html += '<h3 class="card-title">' + v.version + '</h3>';
+                    html += '<p class="card-desc">' + (cardDescriptions[g.versions[j]] || '') + '</p>';
+                    html += '</a>';
+                }
+                html += '</div></div>';
+                html += '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        /**
+         * 切换分组折叠状态
+         * 输入：分组索引
+         */
+        function toggleGroup(index) {
+            var group = document.getElementById('group-' + index);
+            group.classList.toggle('expanded');
+        }
+
+        /**
          * 显示版本详情页
          * 输入：版本标识字符串（如 "1.3.1"）
          */
@@ -844,6 +920,9 @@
             var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             document.querySelector('.theme-toggle').innerHTML = isDark ? '&#9788;' : '&#9790;';
         })();
+
+        /* 页面加载时渲染版本分组列表 */
+        renderGroups();
     </script>
 
 </body>
