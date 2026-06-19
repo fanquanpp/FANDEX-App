@@ -142,8 +142,8 @@ FANDEX-App 是 FANDEX 知识体系的一部分，以下为关联仓库：
 
 | 仓库 | 说明 |
 | :--- | :--- |
-| [FANDEX](https://github.com/fanquanpp/FANDEX) | 基于 GitHub Pages 构建的云端在线查阅平台，为最早建立的内容仓库，文档体系最为完善 |
-| [FANDEX-Web](https://github.com/fanquanpp/FANDEX-Web) | Astro 5 SSG 知识学习平台，四层分离架构，具备 AI 能力、三种阅读模式、知识图谱、复习卡片系统 |
+| [FANDEX](https://github.com/fanquanpp/FANDEX) | 原始 Astro 版本，FANDEX-Web 的前身，基于 GitHub Pages 构建的云端在线查阅平台，文档体系最为完善 |
+| [FANDEX-Web](https://github.com/fanquanpp/FANDEX-Web) | Astro 5 SSG 知识学习平台，monorepo 四层分离架构（内容层/知识工程层/能力层/应用层），具备 AI 能力（语义搜索/Quiz/Tutor/Roadmap/GraphRAG）、知识图谱、复习卡片系统、Electron 桌面应用 |
 
 ## 免责声明
 
