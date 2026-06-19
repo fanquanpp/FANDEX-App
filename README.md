@@ -2,7 +2,7 @@
 
 # FANDEX-App
 
-**零基础到本科毕业的离线速查伴侣** · Android 原生应用
+**零基础学习者的离线语法速查伴侣** · Android 原生应用
 
 一款纯粹的代码语法速查工具，为移动场景而生的离线学习伴侣。无需网络依赖，内置 17 个编程语言模块、207 篇语法速查文档，覆盖 C/C++/Java/Go/Python/JavaScript/TypeScript/Kotlin/C#/CSS/SQL/MySQL/PostgreSQL/Redis/Git/Markdown/Lua，基于 Kotlin + Jetpack Compose 原生渲染，为自学者提供即查即用的语法参考，随时随地巩固所学。
 
@@ -21,7 +21,7 @@
 
 FANDEX-App 是 FANDEX 知识体系的**离线移动速查应用**。它聚焦于编程语言的语法格式、函数签名、控制结构、类型定义等即时查阅场景，不包含教学讲解、概念阐述、项目实战等内容，仅提供即查即用的语法参考。
 
-作为自学者在移动场景下的离线伴侣，FANDEX-App 将 FANDEX-Web 平台中最核心的语法速查文档抽取为移动端产物，通过 Kotlin + Jetpack Compose 原生渲染，实现完全离线、即开即查的体验。无论是在通勤途中、午休间隙，还是在没有网络的环境中，都能随时巩固所学语法。
+作为零基础学习者在移动场景下的离线伴侣，FANDEX-App 将 FANDEX-Web 平台中最核心的语法速查文档抽取为移动端产物，通过 Kotlin + Jetpack Compose 原生渲染，实现完全离线、即开即查的体验。当学习者在 FANDEX-Web 上完成概念学习后，可随时在 App 中查阅对应语言的语法格式，巩固所学。无论是在通勤途中、午休间隙，还是在没有网络的环境中，都能随时复习语法。
 
 ## 仓库特色
 
@@ -139,8 +139,8 @@ FANDEX-App 是 FANDEX 知识体系的一部分，以下为关联仓库：
 
 | 仓库 | 定位 | 特色 |
 | :--- | :--- | :--- |
-| [FANDEX](https://github.com/fanquanpp/FANDEX) | 内容基准仓库 | 原始 Astro 版本，FANDEX-Web 的前身，51 模块 6 分类，基于 GitHub Pages 构建的云端在线查阅平台，文档体系最为完善 |
-| [FANDEX-Web](https://github.com/fanquanpp/FANDEX-Web) | AI 增强学习平台 | Astro 5 SSG 知识学习平台，monorepo 四层分离架构，具备 AI 能力（语义搜索/Quiz/Tutor/Roadmap/GraphRAG）、知识图谱、复习卡片系统、Electron 桌面应用 |
+| [FANDEX](https://github.com/fanquanpp/FANDEX) | 内容基准仓库 | 原始 Astro 版本，FANDEX-Web 的前身，面向零基础学习者的完整自学教程，51 模块 6 分类，从环境搭建到 AI 前沿，文档体系最为完善 |
+| [FANDEX-Web](https://github.com/fanquanpp/FANDEX-Web) | AI 增强学习平台 | Astro 5 SSG 知识学习平台，面向零基础自学者，monorepo 四层分离架构，具备 AI 能力（语义搜索/Quiz/Tutor/Roadmap/GraphRAG）、知识图谱、复习卡片系统、Electron 桌面应用 |
 
 ## 更新日志规则
 
