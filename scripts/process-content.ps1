@@ -52,7 +52,7 @@ $ModuleLabels = @{
     "markdown"           = "Markdown"
 }
 
-$SourceDir = "c:\Atian\Project\Trae\FANDEX-pj\FANDEX-Web\content"
+$SourceDir = "c:\Atian\Project\Trae\FANDEX-pj\FANDEX-exe\content"
 $TargetDir = "c:\Atian\Project\Trae\FANDEX-pj\FANDEX-App\android\app\src\main\assets\dist-mobile"
 
 Write-Host "=== FANDEX Content Processor v3 ==="

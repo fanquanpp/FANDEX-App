@@ -116,7 +116,7 @@
 - 代码块复制按钮
 - 深色/亮色模式切换
 - 文档编号显示
-- CSS 移植自 FANDEX-Original-HTML
+- CSS 移植自 FANDEX-web
 
 ## v1.0.0-beta1
 
