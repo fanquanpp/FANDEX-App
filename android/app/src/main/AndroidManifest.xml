@@ -20,10 +20,10 @@
             </intent-filter>
         </activity>
 
-        <!-- 主页 Activity（非 LAUNCHER，由 SplashActivity 跳转） -->
+        <!-- 主页 Activity（非 LAUNCHER，由 SplashActivity 跳转，不应导出） -->
         <activity
             android:name=".home.HomeActivity"
-            android:exported="true"
+            android:exported="false"
             android:theme="@style/Theme.FANDEX" />
 
     </application>
