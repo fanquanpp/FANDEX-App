@@ -159,14 +159,14 @@ FANDEX-App 是 FANDEX 知识体系的一部分，以下为关联仓库：
 
 | 仓库                                                  | 定位         | 特色                                                                                          |
 | :---------------------------------------------------- | :----------- | :-------------------------------------------------------------------------------------------- |
-| [FANDEX-web](https://github.com/fanquanpp/FANDEX-web) | 线上学习平台 | 内容基准仓库，面向零基础学习者的完整自学教程，51 模块 1993 篇文档，浏览器直接访问            |
+| [FANDEX-web](https://github.com/fanquanpp/FANDEX-web) | 线上学习平台 | 内容基准仓库，零基础到本科毕业的完整自学路径，51 模块 1993 篇文档，浏览器直接访问            |
 | [FANDEX-exe](https://github.com/fanquanpp/FANDEX-exe) | Windows 桌面端 | Electron 桌面应用，完全离线访问，适配网页端不具备的特殊功能                                  |
 
 ## 下载
 
 | 平台 | 地址 | 说明 |
 | :--- | :--- | :--- |
-| 移动端 | [fanquanpp.github.io/FANDEX-App](https://fanquanpp.github.io/FANDEX-App/) | 直接下载 APK |
+| 移动端 | [fanquanpp.github.io/FANDEX-App](https://fanquanpp.github.io/FANDEX-App/) | 下载页直接下载 APK |
 | 桌面端 | [GitHub Releases](https://github.com/fanquanpp/FANDEX-App/releases) | 历史版本归档 |
 
 > 安装前请在系统设置中允许"安装未知来源应用"权限。
@@ -200,6 +200,12 @@ APK 输出路径：
 
 - 仅留存每个大版本的最终安装包
 - 大版本初始安装包须单独留存
+
+## 内容说明
+
+本仓库为 FANDEX 知识体系的离线移动速查应用，内容来源于 FANDEX-web 仓库，通过构建脚本生成移动端 JSON 索引。FANDEX-web 仓库为全部项目的根本内容源，本仓库仅允许只读引用，如需变更内容须从 FANDEX-web 仓库复制后在本仓库内进行适配与优化。
+
+本仓库所有内容均由人工与人工智能（AI）共同编写、搜集、整理与编排。受限于编撰方式与知识更新速度，内容可能存在遗漏、过时或错误之处，使用者应结合官方文档与权威资料进行独立验证。
 
 ## 开源共享声明
 

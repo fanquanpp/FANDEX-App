@@ -1,3 +1,4 @@
+# Android / Gradle
 *.iml
 .gradle
 /local.properties
@@ -8,36 +9,48 @@
 .externalNativeBuild
 .cxx
 local.properties
-node_modules/
-dist/
-.astro/
-.trae/
-.cache/
-generated/
-
-# Android build outputs
 android/app/build/
 android/build/
 android/.kotlin/
 
-# Signing keys
+# Node / 前端工具链
+node_modules/
+dist/
+.astro/
+
+# 环境变量（禁止提交密钥）
+.env
+.env.*
+!.env.example
+
+# 日志文件
+*.log
+npm-debug.log*
+
+# 签名密钥（禁止提交）
 *.jks
 *.keystore
 
-# Temporary files
+# 临时文件
 build-log*.txt
 sdk-tmp/
+.trae/
+.cache/
+generated/
+.uploads/
 
-# 二进制产物 / 安装包
+# 二进制产物
 *.aab
 
 # IDE / 编辑器
 .vscode/
+.idea/
 *.swp
 *.swo
 *~
 
 # OS 生成文件
+.DS_Store
 Thumbs.db
 Desktop.ini
 ehthumbs.db
@@ -48,6 +61,9 @@ ehthumbs.db
 *.tar.gz
 *.rar
 *.7z
+
+# Obsidian
+.obsidian/
 
 # Code Wiki (generated)
 Code-Wiki.md

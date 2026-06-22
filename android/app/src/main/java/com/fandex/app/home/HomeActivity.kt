@@ -70,6 +70,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -786,6 +787,32 @@ fun SidebarHomeContent(
                 checked = isSplashEnabled,
                 onCheckedChange = onSplashToggle,
                 modifier = Modifier.height(24.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+
+        /* 免责声明 */
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    RoundedCornerShape(8.dp)
+                )
+                .padding(12.dp)
+        ) {
+            Text(
+                text = "免责声明",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "内容由人工与 AI 共同编写，可能存在遗漏或错误，请结合官方文档独立验证。因使用本应用内容所产生的一切后果，由使用者自行承担。",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 16.sp
             )
         }
         Spacer(modifier = Modifier.height(12.dp))

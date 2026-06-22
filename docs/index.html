@@ -577,10 +577,10 @@
             <div class="recommend-section">
                 <h2 class="recommend-title">更多平台</h2>
                 <div class="recommend-grid">
-                    <a href="https://fanquanpp.github.io/FANDEX/" class="recommend-card" target="_blank" rel="noopener">
+                    <a href="https://fanquanpp.github.io/FANDEX-web/" class="recommend-card" target="_blank" rel="noopener">
                         <span class="card-platform">GITHUB PAGES</span>
-                        <span class="card-name">FANDEX</span>
-                        <p class="card-desc">云端在线查阅平台，综合知识体系，双端适配，自动构建部署</p>
+                        <span class="card-name">FANDEX-web</span>
+                        <p class="card-desc">零基础到本科毕业的完整自学路径，51 模块 1993 篇文档，浏览器直接访问</p>
                     </a>
                     <a href="https://github.com/fanquanpp/FANDEX-App" class="recommend-card" target="_blank" rel="noopener">
                         <span class="card-platform">ANDROID</span>
@@ -602,6 +602,12 @@
             FANDEX-App · 代码语法，离线速查<br>
             安装前请在系统设置中允许"安装未知来源应用"权限<br>
             <a href="https://github.com/fanquanpp/FANDEX-App" target="_blank" rel="noopener">GitHub 仓库</a>
+            <br><br>
+            <span style="font-size:0.72rem;color:var(--color-text-tertiary);line-height:1.5;">
+                本应用所有内容以开放共享为目的，不主张知识产权保护。任何个人或机构均可自由获取、使用、修改和分发。<br>
+                所有内容均由人工与 AI 共同编写、搜集、整理与编排，可能存在遗漏、过时或错误之处，使用者应结合官方文档与权威资料进行独立验证。<br>
+                因使用本应用内容所产生的一切后果，由使用者自行承担，与本应用及其作者、维护者无关。
+            </span>
         </footer>
 
     </main>
@@ -612,6 +618,24 @@
          * 每个版本包含：版本号、标签、下载链接、更新日志、图标颜色
          */
         var versions = {
+            '2.0.2': {
+                version: 'v2.0.2-beta',
+                badge: 'BETA',
+                apk: null,
+                apkName: 'FANDEX-v2.0.2-beta.apk',
+                date: '2026-06-23',
+                size: '2.0 MB',
+                require: 'Android 8.0+',
+                changes: [
+                    '修正下载页 FANDEX-web 链接，更新在线阅读描述',
+                    '下载页页脚添加免责声明',
+                    'App 侧边栏添加免责声明区块',
+                    'README 新增内容说明章节，更新关联项目描述',
+                    '新增 CodeQL 安全扫描工作流',
+                    '新增 PR 模板',
+                    '完善 .gitignore 忽略规则'
+                ]
+            },
             '2.0.1': {
                 version: 'v2.0.1-beta',
                 badge: 'BETA',
@@ -824,7 +848,7 @@
          * 每个分组包含该大版本下的所有补丁版本
          */
         var versionGroups = [
-            { range: 'v2.0.x', versions: ['2.0.1', '2.0.0'] },
+            { range: 'v2.0.x', versions: ['2.0.2', '2.0.1', '2.0.0'] },
             { range: 'v1.5.x', versions: ['1.5.1', '1.5.0'] },
             { range: 'v1.4.x', versions: ['1.4.1', '1.4.0'] },
             { range: 'v1.3.x', versions: ['1.3.1', '1.3.0'] },
@@ -838,6 +862,7 @@
          * 用于列表页卡片展示，与详情页完整更新日志区分
          */
         var cardDescriptions = {
+            '2.0.2': '免责声明、CodeQL 安全扫描、PR 模板',
             '2.0.1': '修复版本号硬编码，完善 CI/CD 与下载页',
             '2.0.0': '重新定义：纯代码语法速查工具',
             '1.5.1': '新增 Python/Go/Java 三篇类型系统文档',
