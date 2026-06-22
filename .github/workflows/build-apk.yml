@@ -120,4 +120,4 @@ jobs:
             下载最新 APK 覆盖安装即可。
           files: FANDEX-v*.apk
           draft: false
-          prerelease: true
+          prerelease: false

@@ -618,33 +618,33 @@
          * 每个版本包含：版本号、标签、下载链接、更新日志、图标颜色
          */
         var versions = {
-            '2.0.2': {
-                version: 'v2.0.2',
-                badge: '稳定版',
-                apk: 'https://github.com/fanquanpp/FANDEX-App/releases/download/v2.0.2/FANDEX-v2.0.2.apk',
-                apkName: 'FANDEX-v2.0.2.apk',
+            '1.0.0': {
+                version: 'v1.0.0',
+                badge: '正式版',
+                apk: 'https://github.com/fanquanpp/FANDEX-App/releases/download/v1.0.0/FANDEX-v1.0.0.apk',
+                apkName: 'FANDEX-v1.0.0.apk',
                 date: '2026-06-23',
                 size: '2.0 MB',
                 require: 'Android 8.0+',
                 changes: [
-                    '修正下载页 FANDEX-web 链接，更新在线阅读描述',
-                    '下载页页脚添加免责声明',
-                    'App 侧边栏添加免责声明区块',
-                    'README 新增内容说明章节，更新关联项目描述',
-                    '新增 CodeQL 安全扫描工作流',
-                    '新增 PR 模板',
-                    '完善 .gitignore 忽略规则'
+                    '首个正式发行版',
+                    '17 模块 207 篇文档，离线速查',
+                    'Kotlin + Jetpack Compose + Material 3',
+                    '深色/浅色双模式',
+                    '三语界面（中文/英文/日文）',
+                    'Markdown 渲染与代码高亮',
+                    '完全离线运行，无网络权限'
                 ]
             }
         };
 
         /**
          * 版本分组数据
-         * 按主版本号.次版本号 分组，如 v2.0.x
+         * 按主版本号.次版本号 分组，如 v1.0.x
          * 每个分组包含该大版本下的所有补丁版本
          */
         var versionGroups = [
-            { range: 'v2.0.x', versions: ['2.0.2'] }
+            { range: 'v1.0.x', versions: ['1.0.0'] }
         ];
 
         /**
@@ -652,7 +652,7 @@
          * 用于列表页卡片展示，与详情页完整更新日志区分
          */
         var cardDescriptions = {
-            '2.0.2': '首个正式发行版'
+            '1.0.0': '首个正式发行版'
         };
 
         /**

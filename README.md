@@ -167,7 +167,7 @@ FANDEX-App 是 FANDEX 知识体系的一部分，以下为关联仓库：
 | 平台 | 地址 | 说明 |
 | :--- | :--- | :--- |
 | 移动端 | [fanquanpp.github.io/FANDEX-App](https://fanquanpp.github.io/FANDEX-App/) | 下载页直接下载 APK |
-| 桌面端 | [GitHub Releases](https://github.com/fanquanpp/FANDEX-App/releases) | 历史版本归档 |
+| 桌面端 | [GitHub Releases](https://github.com/fanquanpp/FANDEX-App/releases) | 版本归档 |
 
 > 安装前请在系统设置中允许"安装未知来源应用"权限。
 

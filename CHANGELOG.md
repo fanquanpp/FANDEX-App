@@ -1,11 +1,20 @@
 # 更新日志
 
-## v2.0.2
+## v1.0.0（2026-06-23）
 
-- 修正下载页 FANDEX-web 链接（FANDEX -> FANDEX-web），更新在线阅读描述
-- 下载页页脚添加免责声明（开放共享 + AI 共同编撰 + 独立验证）
-- App 侧边栏添加免责声明区块
-- README 新增"内容说明"章节，更新关联项目描述与开源共享声明
-- 新增 CodeQL 安全扫描工作流（每周一自动扫描 + push/PR 触发）
-- 新增 PR 模板（变更检查清单 + 变更说明）
-- 完善 .gitignore：新增 .env、日志、.idea/、.obsidian/ 等忽略规则
+### 首个正式发行版
+
+Android 平台离线速查应用，采用 Kotlin + Jetpack Compose + Material 3 构建。
+
+#### 新增
+
+- 17 模块 207 篇文档，完全离线访问
+- Kotlin + Jetpack Compose + Material 3 技术栈
+- 深色/浅色双模式主题切换
+- 三语界面（中文/英文/日文）
+- Markdown 渲染与代码高亮
+- DataStore 持久化用户偏好
+- 完全离线运行，无 INTERNET 权限
+- 侧边栏免责声明区块
+- CodeQL 安全扫描工作流
+- PR 模板与贡献规范
