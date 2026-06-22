@@ -382,8 +382,8 @@
             font-size: 0.7rem;
             font-weight: 500;
             padding: 2px 8px;
-            border: 1px solid var(--color-tertiary);
-            color: var(--color-tertiary);
+            border: 1px solid var(--color-secondary);
+            color: var(--color-secondary);
             letter-spacing: 0.05em;
             margin-left: var(--spacing-sm);
         }
@@ -604,9 +604,9 @@
             <a href="https://github.com/fanquanpp/FANDEX-App" target="_blank" rel="noopener">GitHub 仓库</a>
             <br><br>
             <span style="font-size:0.72rem;color:var(--color-text-tertiary);line-height:1.5;">
-                本应用所有内容以开放共享为目的，不主张知识产权保护。任何个人或机构均可自由获取、使用、修改和分发。<br>
+                本应用所有内容完全开源，容许任何用途（含商业用途），无需获得授权。<br>
                 所有内容均由人工与 AI 共同编写、搜集、整理与编排，可能存在遗漏、过时或错误之处，使用者应结合官方文档与权威资料进行独立验证。<br>
-                因使用本应用内容所产生的一切后果，由使用者自行承担，与本应用及其作者、维护者无关。
+                因使用本应用内容所产生的一切后果，由使用者自行承担，本应用作者及维护者不承担任何责任。
             </span>
         </footer>
 
@@ -619,10 +619,10 @@
          */
         var versions = {
             '2.0.2': {
-                version: 'v2.0.2-beta',
-                badge: 'BETA',
-                apk: 'https://github.com/fanquanpp/FANDEX-App/releases/download/v2.0.2-beta/FANDEX-v2.0.2-beta.apk',
-                apkName: 'FANDEX-v2.0.2-beta.apk',
+                version: 'v2.0.2',
+                badge: 'STABLE',
+                apk: 'https://github.com/fanquanpp/FANDEX-App/releases/download/v2.0.2/FANDEX-v2.0.2.apk',
+                apkName: 'FANDEX-v2.0.2.apk',
                 date: '2026-06-23',
                 size: '2.0 MB',
                 require: 'Android 8.0+',
@@ -637,26 +637,26 @@
                 ]
             },
             '2.0.1': {
-                version: 'v2.0.1-beta',
-                badge: 'BETA',
-                apk: 'https://github.com/fanquanpp/FANDEX-App/releases/download/v2.0.1-beta/FANDEX-v2.0.1-beta.apk',
-                apkName: 'FANDEX-v2.0.1-beta.apk',
+                version: 'v2.0.1',
+                badge: 'STABLE',
+                apk: 'https://github.com/fanquanpp/FANDEX-App/releases/download/v2.0.1/FANDEX-v2.0.1.apk',
+                apkName: 'FANDEX-v2.0.1.apk',
                 date: '2026-06-23',
                 size: '2.0 MB',
                 require: 'Android 8.0+',
                 changes: [
                     '修复侧边栏版本号硬编码，改为 BuildConfig 动态读取',
                     '更新三语界面标语：对齐"代码语法，离线速查"定位',
-                    '补全下载页全部历史版本（v1.0.0-beta1 至 v2.0.0-beta 共 11 个版本）',
+                    '补全下载页全部历史版本（v1.0.0 至 v2.0.0 共 11 个版本）',
                     '修正下载页文档数量（641 -> 207）',
                     '完善 GitHub Actions CI/CD：分支修正为 master、签名密钥库解码、Tag 推送自动发布'
                 ]
             },
             '2.0.0': {
-                version: 'v2.0.0-beta',
-                badge: 'BETA',
-                apk: 'https://github.com/fanquanpp/FANDEX-App/releases/download/v2.0.0-beta/FANDEX-v2.0.0-beta.apk',
-                apkName: 'FANDEX-v2.0.0-beta.apk',
+                version: 'v2.0.0',
+                badge: 'STABLE',
+                apk: 'https://github.com/fanquanpp/FANDEX-App/releases/download/v2.0.0/FANDEX-v2.0.0.apk',
+                apkName: 'FANDEX-v2.0.0.apk',
                 date: '2026-06-18',
                 size: '7.9 MB',
                 require: 'Android 8.0+',
@@ -673,10 +673,10 @@
                 ]
             },
             '1.5.1': {
-                version: 'v1.5.1-beta',
-                badge: 'BETA',
+                version: 'v1.5.1',
+                badge: 'STABLE',
                 apk: null,
-                apkName: 'FANDEX-v1.5.1-beta.apk',
+                apkName: 'FANDEX-v1.5.1.apk',
                 date: '2026-06-18',
                 size: '7.8 MB',
                 require: 'Android 8.0+',
@@ -687,10 +687,10 @@
                 ]
             },
             '1.5.0': {
-                version: 'v1.5.0-beta',
-                badge: 'BETA',
+                version: 'v1.5.0',
+                badge: 'STABLE',
                 apk: null,
-                apkName: 'FANDEX-v1.5.0-beta.apk',
+                apkName: 'FANDEX-v1.5.0.apk',
                 date: '2026-06-17',
                 size: '7.8 MB',
                 require: 'Android 8.0+',
@@ -701,10 +701,10 @@
                 ]
             },
             '1.4.1': {
-                version: 'v1.4.1-beta',
-                badge: 'BETA',
+                version: 'v1.4.1',
+                badge: 'STABLE',
                 apk: null,
-                apkName: 'FANDEX-v1.4.1-beta.apk',
+                apkName: 'FANDEX-v1.4.1.apk',
                 date: '2026-06-16',
                 size: '7.7 MB',
                 require: 'Android 8.0+',
@@ -715,10 +715,10 @@
                 ]
             },
             '1.4.0': {
-                version: 'v1.4.0-beta',
-                badge: 'BETA',
+                version: 'v1.4.0',
+                badge: 'STABLE',
                 apk: null,
-                apkName: 'FANDEX-v1.4.0-beta.apk',
+                apkName: 'FANDEX-v1.4.0.apk',
                 date: '2026-06-15',
                 size: '7.7 MB',
                 require: 'Android 8.0+',
@@ -730,10 +730,10 @@
                 ]
             },
             '1.3.1': {
-                version: 'v1.3.1-beta',
-                badge: 'BETA',
+                version: 'v1.3.1',
+                badge: 'STABLE',
                 apk: null,
-                apkName: 'FANDEX-v1.3.1-beta.apk',
+                apkName: 'FANDEX-v1.3.1.apk',
                 date: '2026-06-14',
                 size: '7.5 MB',
                 require: 'Android 8.0+',
@@ -751,10 +751,10 @@
                 ]
             },
             '1.3.0': {
-                version: 'v1.3.0-beta',
-                badge: 'BETA',
+                version: 'v1.3.0',
+                badge: 'STABLE',
                 apk: null,
-                apkName: 'FANDEX-v1.3.0-beta.apk',
+                apkName: 'FANDEX-v1.3.0.apk',
                 date: '2026-06-13',
                 size: '7.4 MB',
                 require: 'Android 8.0+',
@@ -774,10 +774,10 @@
                 ]
             },
             '1.2.0': {
-                version: 'v1.2.0-beta',
-                badge: 'BETA',
+                version: 'v1.2.0',
+                badge: 'STABLE',
                 apk: null,
-                apkName: 'FANDEX-v1.2.0-beta.apk',
+                apkName: 'FANDEX-v1.2.0.apk',
                 date: '2026-06-12',
                 size: '7.2 MB',
                 require: 'Android 8.0+',
@@ -792,10 +792,10 @@
                 ]
             },
             '1.1.1': {
-                version: 'v1.1.1-beta',
-                badge: 'BETA',
+                version: 'v1.1.1',
+                badge: 'STABLE',
                 apk: null,
-                apkName: 'FANDEX-v1.1.1-beta.apk',
+                apkName: 'FANDEX-v1.1.1.apk',
                 date: '2026-06-11',
                 size: '7.0 MB',
                 require: 'Android 8.0+',
@@ -803,14 +803,14 @@
                     '中英文双语界面支持',
                     '模块和文档间添加分类色短分界线',
                     '所有 UI 字符串国际化',
-                    '版本号标记为 beta'
+                    '版本号标记为正式版'
                 ]
             },
             '1.1.0': {
-                version: 'v1.1.0-beta',
-                badge: 'BETA',
+                version: 'v1.1.0',
+                badge: 'STABLE',
                 apk: null,
-                apkName: 'FANDEX-v1.1.0-beta.apk',
+                apkName: 'FANDEX-v1.1.0.apk',
                 date: '2026-06-10',
                 size: '6.9 MB',
                 require: 'Android 8.0+',
@@ -824,10 +824,10 @@
                 ]
             },
             '1.0.0': {
-                version: 'v1.0.0-beta1',
-                badge: 'BETA',
+                version: 'v1.0.0',
+                badge: 'STABLE',
                 apk: null,
-                apkName: 'FANDEX-v1.0.0-beta1.apk',
+                apkName: 'FANDEX-v1.0.0.apk',
                 date: '2026-06-09',
                 size: '6.5 MB',
                 require: 'Android 8.0+',
