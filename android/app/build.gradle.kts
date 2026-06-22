@@ -12,8 +12,8 @@ android {
         applicationId = "com.fandex.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 14
-        versionName = "2.0.0-beta"
+        versionCode = 15
+        versionName = "2.0.1-beta"
     }
 
     signingConfigs {
@@ -57,6 +57,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

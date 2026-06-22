@@ -1,5 +1,6 @@
 package com.fandex.app.home
 
+import com.fandex.app.BuildConfig
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -740,8 +741,8 @@ fun SidebarHomeContent(
                 )
                 .padding(12.dp)
         ) {
-            /* 版本信息 */
-            InfoRow(label = "v1.4.0-beta", value = "")
+            /* 版本信息 - 从 BuildConfig 动态读取 */
+            InfoRow(label = "v${BuildConfig.VERSION_NAME}", value = "")
             /* 作者信息 */
             InfoRow(label = "fanquanpp", value = "")
             /* 更新时间 */

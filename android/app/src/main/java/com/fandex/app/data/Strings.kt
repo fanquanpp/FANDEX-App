@@ -47,7 +47,7 @@ object Strings {
     fun get(lang: Language): LangStrings = when (lang) {
         Language.ZH -> LangStrings(
             appName = "FANDEX",
-            homeSubtitle = "\u5FAA\u5E8F\u6E10\u8FDB\uFF0C\u4ECE\u7B2C\u4E00\u884C\u4EE3\u7801\u5230\u7406\u89E3\u6574\u4E2A\u4E16\u754C",
+            homeSubtitle = "\u4EE3\u7801\u8BED\u6CD5\uFF0C\u79BB\u7EBF\u901F\u67E5",
             loading = "\u52A0\u8F7D\u4E2D...",
             all = "\u5168\u90E8",
             docs = "\u7BC7",
@@ -73,7 +73,7 @@ object Strings {
         )
         Language.EN -> LangStrings(
             appName = "FANDEX",
-            homeSubtitle = "Step by step, from the first line of code to understanding the world",
+            homeSubtitle = "Code Syntax, Offline Reference",
             loading = "Loading...",
             all = "All",
             docs = "docs",
@@ -99,7 +99,7 @@ object Strings {
         )
         Language.JA -> LangStrings(
             appName = "FANDEX",
-            homeSubtitle = "\u9806\u6B21\u9032\u3081\u3001\u6700\u521D\u306E\u884C\u304B\u3089\u4E16\u754C\u3092\u7406\u89E3\u3059\u308B",
+            homeSubtitle = "\u30B3\u30FC\u30C9\u69CB\u6587\u3001\u30AA\u30D5\u30E9\u30A4\u30F3\u53C2\u7167",
             loading = "\u8AAD\u307F\u8FBC\u307F\u4E2D...",
             all = "\u3059\u3079\u3066",
             docs = "\u4EF6",

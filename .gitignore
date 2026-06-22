@@ -30,7 +30,6 @@ sdk-tmp/
 
 # 二进制产物 / 安装包
 *.aab
-*.apk
 
 # IDE / 编辑器
 .vscode/
