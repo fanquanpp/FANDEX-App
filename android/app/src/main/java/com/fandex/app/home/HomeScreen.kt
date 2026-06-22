@@ -32,11 +32,10 @@ import com.fandex.app.data.Strings
  * 输出：可滚动的分类-模块列表
  * 流程：加载索引 -> 渲染分类筛选 -> 渲染增强模块卡片
  *
- * 设计变更（v1.3.1）：
+ * 设计变更：
  * - 移除内部 TopAppBar，由 HomeActivity 统一管理
  * - 移除 onOpenDrawer 回调，侧边栏由 HomeActivity 管理
  *
- * 设计变更（v1.4.1）：
  * - selectedCategory 状态提升至 FANDEXApp，避免导航返回时筛选状态丢失
  */
 @Composable

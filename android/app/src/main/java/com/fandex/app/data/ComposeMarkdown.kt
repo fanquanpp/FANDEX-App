@@ -769,7 +769,7 @@ private fun RenderTableBody(
  *
  * 流程：遍历 TableCell -> 渲染每个单元格（使用 weight(1f) 均分宽度）
  *
- * 修复（v1.3.1）：
+ * 修复：
  * - 移除 width(IntrinsicSize.Min)，改用 weight(1f) 均分列宽
  * - 整个表格使用 horizontalScroll 支持横向滚动
  * - 表格外层包装确保列对齐

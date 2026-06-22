@@ -578,12 +578,12 @@
                 <h2 class="recommend-title">更多平台</h2>
                 <div class="recommend-grid">
                     <a href="https://fanquanpp.github.io/FANDEX-web/" class="recommend-card" target="_blank" rel="noopener">
-                        <span class="card-platform">GITHUB PAGES</span>
+                        <span class="card-platform">在线平台</span>
                         <span class="card-name">FANDEX-web</span>
                         <p class="card-desc">零基础到本科毕业的完整自学路径，51 模块 1993 篇文档，浏览器直接访问</p>
                     </a>
                     <a href="https://github.com/fanquanpp/FANDEX-App" class="recommend-card" target="_blank" rel="noopener">
-                        <span class="card-platform">ANDROID</span>
+                        <span class="card-platform">安卓应用</span>
                         <span class="card-name">FANDEX-App</span>
                         <p class="card-desc">纯代码语法速查工具，17 模块 207 篇文档，完全离线，原生渲染，三语界面</p>
                     </a>
@@ -620,7 +620,7 @@
         var versions = {
             '2.0.2': {
                 version: 'v2.0.2',
-                badge: 'STABLE',
+                badge: '稳定版',
                 apk: 'https://github.com/fanquanpp/FANDEX-App/releases/download/v2.0.2/FANDEX-v2.0.2.apk',
                 apkName: 'FANDEX-v2.0.2.apk',
                 date: '2026-06-23',
@@ -635,226 +635,16 @@
                     '新增 PR 模板',
                     '完善 .gitignore 忽略规则'
                 ]
-            },
-            '2.0.1': {
-                version: 'v2.0.1',
-                badge: 'STABLE',
-                apk: 'https://github.com/fanquanpp/FANDEX-App/releases/download/v2.0.1/FANDEX-v2.0.1.apk',
-                apkName: 'FANDEX-v2.0.1.apk',
-                date: '2026-06-23',
-                size: '2.0 MB',
-                require: 'Android 8.0+',
-                changes: [
-                    '修复侧边栏版本号硬编码，改为 BuildConfig 动态读取',
-                    '更新三语界面标语：对齐"代码语法，离线速查"定位',
-                    '补全下载页全部历史版本（v1.0.0 至 v2.0.0 共 11 个版本）',
-                    '修正下载页文档数量（641 -> 207）',
-                    '完善 GitHub Actions CI/CD：分支修正为 master、签名密钥库解码、Tag 推送自动发布'
-                ]
-            },
-            '2.0.0': {
-                version: 'v2.0.0',
-                badge: 'STABLE',
-                apk: 'https://github.com/fanquanpp/FANDEX-App/releases/download/v2.0.0/FANDEX-v2.0.0.apk',
-                apkName: 'FANDEX-v2.0.0.apk',
-                date: '2026-06-18',
-                size: '7.9 MB',
-                require: 'Android 8.0+',
-                changes: [
-                    '重新定义 App 定位：纯粹的代码语法和语法格式查看阅览工具',
-                    '删除全部教学/概念型文档（概述、理论、项目示例、最佳实践等）',
-                    '删除非编程语言模块（AI Agent、算法、微积分、软件工程等 26 个模块）',
-                    '删除 Vue 组件型文件（无法在 App 原生渲染器中显示）',
-                    '保留 17 个编程语言模块：C、C++、C#、CSS、Git、Go、Java、JavaScript、Kotlin、Lua、Markdown、MySQL、PostgreSQL、Python、Redis、SQL、TypeScript',
-                    '共 207 篇纯语法速查文档',
-                    '重写 index.json 注册表，分类调整为：编程语言/前端技术/数据库/工具链/标记语言',
-                    '更新 README、项目说明文件、文档格式模板，对齐纯语法速查定位',
-                    '更新内容处理脚本，模块映射从 49 个精简为 17 个'
-                ]
-            },
-            '1.5.1': {
-                version: 'v1.5.1',
-                badge: 'STABLE',
-                apk: null,
-                apkName: 'FANDEX-v1.5.1.apk',
-                date: '2026-06-18',
-                size: '7.8 MB',
-                require: 'Android 8.0+',
-                changes: [
-                    '新增文档：Python与类型系统（类型注解、泛型、Protocol、TypeGuard、TypedDict）',
-                    '新增文档：Go与泛型实战（类型参数、约束、泛型切片工具、泛型栈、泛型缓存）',
-                    '新增文档：Java与密封类（sealed/permits、模式匹配、Record配合、AST实战）'
-                ]
-            },
-            '1.5.0': {
-                version: 'v1.5.0',
-                badge: 'STABLE',
-                apk: null,
-                apkName: 'FANDEX-v1.5.0.apk',
-                date: '2026-06-17',
-                size: '7.8 MB',
-                require: 'Android 8.0+',
-                changes: [
-                    '修复 Markdown 表格渲染失败：表格行内 LaTeX 公式不再被替换为行内代码',
-                    '修复更新日志为增量记录，补全所有历史版本',
-                    'App 内复制按钮文本中文化（Copied -> 已复制，Copy -> 复制）'
-                ]
-            },
-            '1.4.1': {
-                version: 'v1.4.1',
-                badge: 'STABLE',
-                apk: null,
-                apkName: 'FANDEX-v1.4.1.apk',
-                date: '2026-06-16',
-                size: '7.7 MB',
-                require: 'Android 8.0+',
-                changes: [
-                    '修复 LaTeX 数学公式渲染失效：块级公式以代码块样式显示，行内公式以行内代码样式显示',
-                    '移除 [TOC]/[[toc]]/{:toc} 目录标记，避免渲染异常',
-                    '分类筛选状态保持：模块返回后保持之前的分类筛选'
-                ]
-            },
-            '1.4.0': {
-                version: 'v1.4.0',
-                badge: 'STABLE',
-                apk: null,
-                apkName: 'FANDEX-v1.4.0.apk',
-                date: '2026-06-15',
-                size: '7.7 MB',
-                require: 'Android 8.0+',
-                changes: [
-                    '启动页：1.8 秒品牌展示 + 欢迎语，侧边栏可关闭',
-                    '分类筛选状态保持：模块返回后保持之前的分类筛选',
-                    '统一经典图标（蓝色 + F）',
-                    'APK 文件不再被 .gitignore 忽略'
-                ]
-            },
-            '1.3.1': {
-                version: 'v1.3.1',
-                badge: 'STABLE',
-                apk: null,
-                apkName: 'FANDEX-v1.3.1.apk',
-                date: '2026-06-14',
-                size: '7.5 MB',
-                require: 'Android 8.0+',
-                changes: [
-                    '修复顶部导航栏重复显示问题',
-                    '移除底部导航栏，所有功能按钮整合到顶部导航栏',
-                    '侧边栏根据当前页面显示不同内容',
-                    '主页侧边栏显示应用信息、作者、更新时间、数量统计',
-                    '模块页和文档页侧边栏显示文档列表',
-                    '文章阅读页全屏显示，最大化内容区域',
-                    '修复 Markdown 表格渲染崩坏问题',
-                    '清理冗余代码（Room/复习功能/WebView 渲染器）',
-                    'App 图标重新设计，与 FANDEX 主站 Logo 统一',
-                    'GitHub Pages 下载页部署，解决移动端 APK 下载问题'
-                ]
-            },
-            '1.3.0': {
-                version: 'v1.3.0',
-                badge: 'STABLE',
-                apk: null,
-                apkName: 'FANDEX-v1.3.0.apk',
-                date: '2026-06-13',
-                size: '7.4 MB',
-                require: 'Android 8.0+',
-                changes: [
-                    '架构重构：移除 WebView，使用原生 Compose Markdown 渲染器',
-                    '新增 DataStore Preferences 持久化存储（主题、语言、字体大小）',
-                    '新增 ModalNavigationDrawer 侧边栏导航',
-                    '默认深色主题',
-                    '主题/语言/字体大小设置持久化，重启后保留',
-                    '侧边栏：分类与模块快速跳转',
-                    '字体缩放：0.8x - 1.4x',
-                    '翻页：文档内上一篇/下一篇 + 页码显示',
-                    '返回顶部：悬浮按钮',
-                    '三语界面：中文/英文/日语循环切换',
-                    '代码块语法高亮：16 种语言',
-                    '代码块复制：ClipboardManager 一键复制'
-                ]
-            },
-            '1.2.0': {
-                version: 'v1.2.0',
-                badge: 'STABLE',
-                apk: null,
-                apkName: 'FANDEX-v1.2.0.apk',
-                date: '2026-06-12',
-                size: '7.2 MB',
-                require: 'Android 8.0+',
-                changes: [
-                    '移除搜索和复习功能，简化应用',
-                    '新增日语界面语言（中文/英文/日语循环切换）',
-                    '修复文章阅读页：复制按钮重叠、代码块溢出、内容溢出',
-                    '新增翻页按钮（上一篇/下一篇）',
-                    '新增返回顶部悬浮按钮',
-                    '修复切换文档时深色模式闪屏',
-                    '复制按钮默认隐藏，悬停时显示'
-                ]
-            },
-            '1.1.1': {
-                version: 'v1.1.1',
-                badge: 'STABLE',
-                apk: null,
-                apkName: 'FANDEX-v1.1.1.apk',
-                date: '2026-06-11',
-                size: '7.0 MB',
-                require: 'Android 8.0+',
-                changes: [
-                    '中英文双语界面支持',
-                    '模块和文档间添加分类色短分界线',
-                    '所有 UI 字符串国际化',
-                    '版本号标记为正式版'
-                ]
-            },
-            '1.1.0': {
-                version: 'v1.1.0',
-                badge: 'STABLE',
-                apk: null,
-                apkName: 'FANDEX-v1.1.0.apk',
-                date: '2026-06-10',
-                size: '6.9 MB',
-                require: 'Android 8.0+',
-                changes: [
-                    '使用 commonmark-java 重写 Markdown 渲染器，支持完整语法',
-                    '代码语法高亮：轻量级 JS 高亮器，支持 20+ 语言',
-                    '代码块复制按钮',
-                    '深色/亮色模式切换',
-                    '文档编号显示',
-                    'CSS 移植自 FANDEX-web'
-                ]
-            },
-            '1.0.0': {
-                version: 'v1.0.0',
-                badge: 'STABLE',
-                apk: null,
-                apkName: 'FANDEX-v1.0.0.apk',
-                date: '2026-06-09',
-                size: '6.5 MB',
-                require: 'Android 8.0+',
-                changes: [
-                    '首个测试版本',
-                    'Navigation Compose 单 Activity 架构',
-                    'Room 数据库 + SM-2 间隔重复算法',
-                    'MarkdownRenderer 渲染器',
-                    '搜索和分类筛选',
-                    '49 个模块、1933 篇文档'
-                ]
             }
         };
 
         /**
          * 版本分组数据
-         * 按主版本号.次版本号 分组，如 v1.0.x、v1.1.x、v2.0.x
+         * 按主版本号.次版本号 分组，如 v2.0.x
          * 每个分组包含该大版本下的所有补丁版本
          */
         var versionGroups = [
-            { range: 'v2.0.x', versions: ['2.0.2', '2.0.1', '2.0.0'] },
-            { range: 'v1.5.x', versions: ['1.5.1', '1.5.0'] },
-            { range: 'v1.4.x', versions: ['1.4.1', '1.4.0'] },
-            { range: 'v1.3.x', versions: ['1.3.1', '1.3.0'] },
-            { range: 'v1.2.x', versions: ['1.2.0'] },
-            { range: 'v1.1.x', versions: ['1.1.1', '1.1.0'] },
-            { range: 'v1.0.x', versions: ['1.0.0'] }
+            { range: 'v2.0.x', versions: ['2.0.2'] }
         ];
 
         /**
@@ -862,19 +652,7 @@
          * 用于列表页卡片展示，与详情页完整更新日志区分
          */
         var cardDescriptions = {
-            '2.0.2': '免责声明、CodeQL 安全扫描、PR 模板',
-            '2.0.1': '修复版本号硬编码，完善 CI/CD 与下载页',
-            '2.0.0': '重新定义：纯代码语法速查工具',
-            '1.5.1': '新增 Python/Go/Java 三篇类型系统文档',
-            '1.5.0': '修复表格渲染与复制按钮中文化',
-            '1.4.1': '修复 LaTeX 公式渲染与 TOC 标记',
-            '1.4.0': '启动页品牌展示与分类筛选保持',
-            '1.3.1': '修复导航栏重复，统一侧边栏',
-            '1.3.0': '架构重构：原生 Compose Markdown 渲染',
-            '1.2.0': '移除搜索复习，新增日语界面',
-            '1.1.1': '中英文双语界面与国际化',
-            '1.1.0': 'commonmark-java 渲染器重写',
-            '1.0.0': '首个测试版本'
+            '2.0.2': '首个正式发行版'
         };
 
         /**
@@ -922,7 +700,7 @@
 
         /**
          * 显示版本详情页
-         * 输入：版本标识字符串（如 "1.3.1"）
+         * 输入：版本标识字符串（如 "2.0.2"）
          */
         function showDetail(id) {
             var v = versions[id];

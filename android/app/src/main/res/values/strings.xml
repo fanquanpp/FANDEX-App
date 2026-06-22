@@ -2,7 +2,5 @@
 <resources>
     <string name="app_name">FANDEX</string>
     <string name="home_title">FANDEX</string>
-    <string name="home_subtitle">循序渐进，从第一行代码到理解整个世界</string>
-    <string name="review_title">复习</string>
-    <string name="search_hint">搜索模块或文档</string>
+    <string name="home_subtitle">代码语法，离线速查</string>
 </resources>

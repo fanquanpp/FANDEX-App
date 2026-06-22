@@ -30,7 +30,7 @@ import com.fandex.app.data.Strings
  * 输出：带编号圆圈和分界线的文档卡片列表
  * 流程：加载索引 -> 查找模块与分类 -> 渲染模块信息区 -> 渲染带编号的文档列表
  *
- * 设计变更（v1.3.1）：
+ * 设计变更：
  * - 移除内部 TopAppBar，由 HomeActivity 统一管理
  * - 移除 onNavigateBack 和 onOpenDrawer 回调
  */
