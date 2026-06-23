@@ -103,10 +103,20 @@
         }
 
         .logo-mark {
-            display: inline-block;
-            width: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
             height: 28px;
             background: var(--color-primary);
+            border-radius: 4px;
+            color: var(--color-bg);
+            font-weight: 800;
+            font-size: 0.9em;
+            font-family: var(--font-display);
+        }
+        .logo-mark::before {
+            content: 'F';
         }
 
         .logo-text {
@@ -618,21 +628,22 @@
          * 每个版本包含：版本号、标签、下载链接、更新日志、图标颜色
          */
         var versions = {
-            '1.0.0': {
-                version: 'v1.0.0',
+            '1.1.0': {
+                version: 'v1.1.0',
                 badge: '正式版',
-                apk: 'https://github.com/fanquanpp/FANDEX-App/releases/download/v1.0.0/FANDEX-v1.0.0.apk',
-                apkName: 'FANDEX-v1.0.0.apk',
-                date: '2026-06-23',
+                apk: 'https://github.com/fanquanpp/FANDEX-App/releases/download/v1.1.0/FANDEX-v1.1.0.apk',
+                apkName: 'FANDEX-v1.1.0.apk',
+                date: '2026-06-24',
                 size: '2.0 MB',
                 require: 'Android 8.0+',
                 changes: [
-                    '首个正式发行版',
+                    '统一程序图标为字母 F',
+                    '规范 README 文本描述与免责声明',
+                    '修复 gradlew 缺少可执行权限导致 CI 构建失败',
                     '17 模块 207 篇文档，离线速查',
                     'Kotlin + Jetpack Compose + Material 3',
                     '深色/浅色双模式',
                     '三语界面（中文/英文/日文）',
-                    'Markdown 渲染与代码高亮',
                     '完全离线运行，无网络权限'
                 ]
             }
@@ -644,7 +655,7 @@
          * 每个分组包含该大版本下的所有补丁版本
          */
         var versionGroups = [
-            { range: 'v1.0.x', versions: ['1.0.0'] }
+            { range: 'v1.1.x', versions: ['1.1.0'] }
         ];
 
         /**
@@ -652,7 +663,7 @@
          * 用于列表页卡片展示，与详情页完整更新日志区分
          */
         var cardDescriptions = {
-            '1.0.0': '首个正式发行版'
+            '1.1.0': '统一图标与文本规范，修复 CI 构建权限'
         };
 
         /**
