@@ -17,6 +17,10 @@ node_modules/
 dist/
 .astro/
 
+# 构建产物（由 process-content.ps1 从 FANDEX-exe 的 dist-mobile.zip 生成）
+android/app/src/main/assets/dist-mobile/
+android/app/src/main/assets/index.json
+
 # 环境变量（禁止提交密钥）
 .env
 .env.*
