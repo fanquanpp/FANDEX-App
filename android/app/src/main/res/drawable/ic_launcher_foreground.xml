@@ -2,9 +2,9 @@
 <!--
     FANDEX-App 启动图标 - 前景层
 
-    设计语言：经典蓝色背景 + 白色 F 字母
-    - 蓝色背景 #4F5BD5 填满 108x108
-    - 白色竖线 + 白色横线构成 F 字母
+    设计语言：白色 F 字母
+    - F 字母由左侧竖线 + 顶部横线 + 中间横线构成
+    - 背景由 ic_launcher_background 颜色提供（#4F5BD5）
 
     自适应图标安全区域：中心 72x72dp（108dp 画布）
 -->
@@ -14,24 +14,19 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- 蓝色背景填满画布 -->
-    <path
-        android:fillColor="#4F5BD5"
-        android:pathData="M0,0h108v108h-108z"/>
-
     <!-- F 字母：左侧竖线 -->
     <path
         android:fillColor="#FFFFFF"
         android:pathData="M38,32h8v44h-8z"/>
 
-    <!-- F 字母：右侧竖线 -->
+    <!-- F 字母：顶部横线 -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M62,32h8v44h-8z"/>
+        android:pathData="M38,32h32v8h-32z"/>
 
     <!-- F 字母：中间横线 -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M38,52h32v8h-32z"/>
+        android:pathData="M38,52h28v8h-28z"/>
 
 </vector>
